@@ -24,6 +24,15 @@
     <url-pattern>/sottotestogwt/tagme</url-pattern>
   </servlet-mapping>
   
+    <servlet>
+    <servlet-name>dbpediaServlet</servlet-name>
+    <servlet-class>com.sottotesto.server.DBPediaServiceImpl</servlet-class>
+  </servlet>  
+  <servlet-mapping>
+    <servlet-name>dbpediaServlet</servlet-name>
+    <url-pattern>/sottotestogwt/dbpedia</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Sottotestogwt.html</welcome-file>

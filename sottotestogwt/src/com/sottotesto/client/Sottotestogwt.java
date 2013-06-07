@@ -1,5 +1,6 @@
 package com.sottotesto.client;
 
+import com.sottotesto.server.DBPediaServiceImpl;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
@@ -38,6 +39,8 @@ public class Sottotestogwt implements EntryPoint {
 			.create(GreetingService.class);
 	
 	private final GeneralServiceAsync tagmeService = GWT.create(GeneralService.class);
+	
+	private final GeneralServiceAsync dbpediaService = GWT.create(GeneralService.class);
 
 	/**
 	 * This is the entry point method.
@@ -55,6 +58,8 @@ public class Sottotestogwt implements EntryPoint {
 		final TextArea textarea = new TextArea();
 		textarea.setText(textAreaDefText);		
 		final Label errorLabel = new Label();
+		final Label serverResponseLabel = new Label();
+		
 
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
@@ -65,6 +70,7 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("textAreaContainer").add(textarea);
 		RootPanel.get("sendButtonContainer").add(sendButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
+		RootPanel.get("tagmetext").add(serverResponseLabel);
 
 		// Focus the cursor on the name field when the app loads
 		textarea.setFocus(true);
@@ -78,16 +84,18 @@ public class Sottotestogwt implements EntryPoint {
 		// We can set the id of a widget by accessing its Element
 		closeButton.getElement().setId("closeButton");
 		final Label textToServerLabel = new Label();
-		final HTML serverResponseLabel = new HTML();
+		
 		VerticalPanel dialogVPanel = new VerticalPanel();
 		dialogVPanel.addStyleName("dialogVPanel");
 		dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
 		//dialogVPanel.add(textToServerLabel);
 		dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-		dialogVPanel.add(serverResponseLabel);
+		//dialogVPanel.add(serverResponseLabel);
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
 		dialogVPanel.add(closeButton);
 		dialogBox.setWidget(dialogVPanel);
+		
+		
 
 		// Add a handler to close the DialogBox
 		closeButton.addClickHandler(new ClickHandler() {
@@ -135,6 +143,7 @@ public class Sottotestogwt implements EntryPoint {
 				sendButton.setEnabled(false);
 				textToServerLabel.setText(textToServer);
 				serverResponseLabel.setText("");
+				
 				tagmeService.sendToServer(textToServer, new AsyncCallback<String>() {
 							public void onFailure(Throwable caught) {
 								// Show the RPC error message to the user
@@ -142,18 +151,32 @@ public class Sottotestogwt implements EntryPoint {
 										.setText("Remote Procedure Call - Failure");
 								serverResponseLabel
 										.addStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(SERVER_ERROR);
+								//serverResponseLabel.setHTML(SERVER_ERROR);
 								dialogBox.center();
 								closeButton.setFocus(true);
 							}
 
 							public void onSuccess(String result) {
-								dialogBox.setText("Remote Procedure Call");
-								serverResponseLabel
-										.removeStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(result);
-								dialogBox.center();
-								closeButton.setFocus(true);
+								//dialogBox.setText("Remote Procedure Call");
+								//serverResponseLabel
+								//		.removeStyleName("serverResponseLabelError");
+								serverResponseLabel.setText(result);
+								sendButton.setEnabled(true);
+			/*					dbpediaService.sendToServer(result,  new AsyncCallback<String>() {
+									public void onFailure(Throwable caught) {
+										// Show the RPC error message to the user
+										serverResponseLabel.setText("errore");
+										
+									}
+
+									public void onSuccess(String result2) {
+											
+										
+									}}); */
+									
+								
+								//dialogBox.center();
+								//closeButton.setFocus(true);
 							}
 						});
 				/*
