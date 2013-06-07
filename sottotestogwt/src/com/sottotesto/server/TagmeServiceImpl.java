@@ -11,17 +11,17 @@ import java.net.URLEncoder;
 import java.util.Scanner;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.sottotesto.client.GeneralService;
+import com.sottotesto.client.TagmeService;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.TagmeResponse;
 
-public class TagmeServiceImpl extends RemoteServiceServlet implements GeneralService {
+public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeService {
 	
-	public String sendToServer(String input) throws IllegalArgumentException {
+	public TagmeResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
 		
-		
-		//config & view JSP
-		String tagmeResp = "";
+
+		TagmeResponse tagmeResp = new TagmeResponse();
 		try {
 			//config TAGME request parameters
 			URL url = new URL ("http://tagme.di.unipi.it/tag");
@@ -46,48 +46,55 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements GeneralSer
 				output.write(query.getBytes(charset));
 				} 
 			finally {
-				if (output != null) try { output.close(); } catch (IOException err){}			
+				if (output != null) try { output.close(); } 
+				catch (IOException err){ tagmeResp.setCode(-1);
+										 tagmeResp.setError("Error closing OutputStream");
+										 return tagmeResp;}			
 				}
 			
 			//read TAGME response
-			int rspCode = connessione.getResponseCode();
-			String messaggio = connessione.getResponseMessage(); 
-			String contenttype = connessione.getContentType();	
-			String responsetag = "";
-			if (contenttype.contains("application/json")){		
+			tagmeResp.setCode(connessione.getResponseCode());
+			tagmeResp.setMessage(connessione.getResponseMessage());
+			tagmeResp.setContentType(connessione.getContentType());			
+			String responseTagTmp = "";
+			if (tagmeResp.getContentType().contains("application/json")){		
 				Scanner inputs = new Scanner(connessione.getInputStream());		
 				while (inputs.hasNextLine())
-					responsetag += (inputs.nextLine());
+					responseTagTmp += (inputs.nextLine());
 				inputs.close();		
 			}else{
-				responsetag = "nessuna stringa";
+				responseTagTmp = "empty";
 			}
 
-			tagmeResp = "";
-			String json = responsetag.replaceAll(",", ",<br>");
-			tagmeResp = "Code: "+String.valueOf(rspCode)+"\n";
-			tagmeResp += "messaggio: "+messaggio+"\n";
-			tagmeResp += "contenttype: "+contenttype+"\n";
-					tagmeResp += "json: "+json+"\n";
+			tagmeResp.setJson(responseTagTmp);
+			
+			//aggiungi la risposta formattata html
+			responseTagTmp = "";
+			tagmeResp.setJsonNL(tagmeResp.getJson().replaceAll(",", ",\n"));
+			
 				
 			//andava a dbpedia		
 			//request.setAttribute("responsetag", responsetag);	
 			//request.getRequestDispatcher("/tagme.jsp").forward(request, response);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
+			tagmeResp.setCode(-1);
+			 tagmeResp.setError("Error MalformedURLException");
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+			tagmeResp.setCode(-1);
+			 tagmeResp.setError("Error UnsupportedEncodingException");
 			e.printStackTrace();
 		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
+			tagmeResp.setCode(-1);
+			 tagmeResp.setError("Error ProtocolException");
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			tagmeResp.setCode(-1);
+			 tagmeResp.setError("Error IOException");
 			e.printStackTrace();
 		}
 		
-		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer(): "+tagmeResp);
+		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer(): "+String.valueOf(tagmeResp.getCode()));
 		
 		return tagmeResp;
 	}

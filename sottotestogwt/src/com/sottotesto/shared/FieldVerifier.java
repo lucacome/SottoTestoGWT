@@ -35,7 +35,7 @@ public class FieldVerifier {
 	 */
 	public static boolean isValidTagRequest(String name) {		
 		boolean retvalue = true;
-		if (name.isEmpty()) {
+		if (name.isEmpty() || name == "\n" || name.length()<3) {
 			retvalue = false;
 		}
 		Debug.printDbgLine("FieldVerifier.java: isValidTagRequest():"+String.valueOf(retvalue)+", (text=\""+name+"\")");

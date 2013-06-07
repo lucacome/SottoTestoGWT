@@ -6,15 +6,7 @@
          xmlns="http://java.sun.com/xml/ns/javaee">
 
   <!-- Servlets -->
-  <servlet>
-    <servlet-name>greetServlet</servlet-name>
-    <servlet-class>com.sottotesto.server.GreetingServiceImpl</servlet-class>
-  </servlet>  
-  <servlet-mapping>
-    <servlet-name>greetServlet</servlet-name>
-    <url-pattern>/sottotestogwt/greet</url-pattern>
-  </servlet-mapping>
-  
+   
   <servlet>
     <servlet-name>tagmeServlet</servlet-name>
     <servlet-class>com.sottotesto.server.TagmeServiceImpl</servlet-class>

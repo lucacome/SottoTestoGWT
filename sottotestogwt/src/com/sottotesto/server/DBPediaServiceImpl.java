@@ -8,13 +8,15 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.sottotesto.client.GeneralService;
-import com.sottotesto.server.TagmeDataWrapper.TagmeData;
+import com.sottotesto.client.DBPediaService;
+import com.sottotesto.shared.DataWrapper.TagmeData;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.DBPediaResponse;
+import com.sottotesto.shared.TagmeResponse;
 
-public class DBPediaServiceImpl extends RemoteServiceServlet implements GeneralService {
+public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaService {
 	
-	public String sendToServer(String input) throws IllegalArgumentException {
+	public DBPediaResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
 		//Debug.writeDbgLine(request.getAttribute("responsetag").toString());
 
@@ -22,6 +24,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements GeneralS
 		TagmeData data = null;
 		Gson gson = new Gson();
 		String responsetag = input;
+		DBPediaResponse resultquery2 = null;
 				//request.getAttribute("responsetag").toString();
 		data = gson.fromJson(responsetag, TagmeData.class);
 		
@@ -56,7 +59,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements GeneralS
 
 		//request.getRequestDispatcher("/dbpedia.jsp").forward(request, response);
 		
-		return resultquery;
+		return resultquery2;
 		
 	}
 }
