@@ -1,9 +1,5 @@
 package com.sottotesto.client;
 
-import com.sottotesto.server.DBPediaServiceImpl;
-import com.sottotesto.shared.TagmeResponse;
-import com.sottotesto.shared.Debug;
-import com.sottotesto.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -13,13 +9,14 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.sottotesto.shared.DBPediaResponse;
+import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.FieldVerifier;
+import com.sottotesto.shared.TagmeResponse;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -31,7 +28,7 @@ public class Sottotestogwt implements EntryPoint {
 	
 	// Create a remote service proxy to talk to the server-side Greeting service
 	private final TagmeServiceAsync tagmeService = GWT.create(TagmeService.class);	
-	private final TagmeServiceAsync dbpediaService = GWT.create(TagmeService.class);
+	private final DBPediaServiceAsync dbpediaService = GWT.create(DBPediaService.class);
 	
 	
 	private String textAreaDefText; //default text written on textarea
@@ -146,17 +143,24 @@ public class Sottotestogwt implements EntryPoint {
 	}
 	private void callDBPedia(){
 		Debug.printDbgLine("Sottotestogwt.java: callDBPedia()");
-		/*					dbpediaService.sendToServer(result,  new AsyncCallback<String>() {
+		
+		
+		dbpediaService.sendToServer(tagmeResp.getJson(), new AsyncCallback<DBPediaResponse>() {
 		public void onFailure(Throwable caught) {
 			// Show the RPC error message to the user
 			serverResponseLabel.setText("errore");
 			
 		}
 
-		public void onSuccess(String result2) {
-				
+		public void onSuccess(DBPediaResponse result) {
 			
-		}}); */
+			String temp = serverResponseLabel.getText();
+			
+			//serverResponseLabel.setText(temp + result.getQueryResult());
+			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );
+			
+			
+		}}); 
 		
 	}
 }

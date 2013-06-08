@@ -1,6 +1,10 @@
 package com.sottotesto.shared;
 
 public class TagmeResponse implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int code;
 	private String message;
 	private String contentType;

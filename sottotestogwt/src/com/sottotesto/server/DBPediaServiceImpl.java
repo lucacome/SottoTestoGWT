@@ -9,25 +9,33 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.sottotesto.client.DBPediaService;
-import com.sottotesto.shared.DataWrapper.TagmeData;
-import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.DBPediaResponse;
-import com.sottotesto.shared.TagmeResponse;
+import com.sottotesto.shared.TagmeData;
+import com.sottotesto.shared.Debug;
 
 public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaService {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public DBPediaResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
 		//Debug.writeDbgLine(request.getAttribute("responsetag").toString());
 
 	
-		TagmeData data = null;
+		TagmeData data = new TagmeData();
+		Debug.printDbgLine("DBPediServiceImpl.java: 1");
 		Gson gson = new Gson();
+		Debug.printDbgLine("DBPediServiceImpl.java: 2");
 		String responsetag = input;
-		DBPediaResponse resultquery2 = null;
+		Debug.printDbgLine("DBPediServiceImpl.java: 3");
+		DBPediaResponse resultquery2 = new DBPediaResponse();
+		Debug.printDbgLine("DBPediServiceImpl.java: 4");
 				//request.getAttribute("responsetag").toString();
 		data = gson.fromJson(responsetag, TagmeData.class);
-		
+		Debug.printDbgLine("DBPediServiceImpl.java: dopo gson");
 		ResultSet results = null;
 		String resultquery = "";
 		for (int i=0; i<=data.annotations.size()-1; i++){
@@ -58,7 +66,8 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 //		request.setAttribute("hello_string", titletag);  
 
 		//request.getRequestDispatcher("/dbpedia.jsp").forward(request, response);
-		
+		resultquery2.setQueryResult(resultquery);
+				
 		return resultquery2;
 		
 	}

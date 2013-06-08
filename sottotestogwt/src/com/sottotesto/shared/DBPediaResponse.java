@@ -1,11 +1,16 @@
 package com.sottotesto.shared;
 
 public class DBPediaResponse implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int code;
 	private String message;
 	private String contentType;
 	private String json;
 	private String jsonHTML;
+	private String queryResult;
 	
 	public DBPediaResponse() {
 		code = 0;
@@ -13,6 +18,7 @@ public class DBPediaResponse implements java.io.Serializable{
 		contentType = "";
 		json = "";
 		jsonHTML = "";
+		queryResult = "";
 	}
 	
 	
@@ -27,4 +33,6 @@ public class DBPediaResponse implements java.io.Serializable{
 	public String getJson(){return json;}
 	public void setJsonHTML(String x) {jsonHTML = x;}
 	public String getJsonHTML(){return jsonHTML;}
+	public void setQueryResult(String x) {queryResult = x;}
+	public String getQueryResult(){return queryResult;}
 }
