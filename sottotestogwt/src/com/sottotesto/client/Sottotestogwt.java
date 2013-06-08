@@ -7,17 +7,27 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.i18n.server.testing.Parent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.sencha.gxt.core.client.resources.ThemeStyles;
+import com.sencha.gxt.core.client.util.Margins;
+import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
+import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
+import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.FieldVerifier;
 import com.sottotesto.shared.TagmeResponse;
-
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -37,8 +47,20 @@ public class Sottotestogwt implements EntryPoint {
 	private TextArea textArea;     //textarea for user input
 	private Label errorLabel;      //errorlabel for textarea misuse
 	private Label serverResponseLabel;
+	private Label textAreaLabel;
+	
+	//Service status panel items
+	ContentPanel serviceStatusPanel = null;
+	HorizontalLayoutContainer serviceStatusPanelHC;
+	VerticalLayoutContainer tagmeStatusVLC;
+	VerticalLayoutContainer dbpediaStatusVLC;
+	HTML HtmlTagmeService;
+	HTML HtmlDBPediaService;
+	Button tagmeShowDataBTN;
 	
 	private TagmeResponse tagmeResp; //response of TAGME service
+	
+	
 	
 	//This is the entry point method.
 	public void onModuleLoad() {
@@ -46,6 +68,11 @@ public class Sottotestogwt implements EntryPoint {
 		Debug.printDbgLine("NEW RUN!");
 		Debug.printDbgLine("**********************************************************");
 		Debug.printDbgLine("Sottotestogwt.java: onModuleLoad()");
+		
+		long homeTimeStart = System.currentTimeMillis();
+		
+		//show Loading Icon
+		RootPanel.get("homeLoading").setVisible(true);
 		
 		//Initialize items and load them on html page
 		initItems();		
@@ -61,7 +88,8 @@ public class Sottotestogwt implements EntryPoint {
 			public void onKeyUp(KeyUpEvent event) {				
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 					Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): textAreaOnKeyUpEnter()");
-					textArea.setText(textArea.getText().replace("\n", ""));
+					textArea.setText(textArea.getText().replace("\n", ""));	
+					
 					callTagme();					
 				}
 			}			
@@ -69,10 +97,15 @@ public class Sottotestogwt implements EntryPoint {
 
 		
 		// Add a handler to send the name to the server
-		Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): creating handlers...");
+		Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): creating handlers");
 		HomeInputHandler hihandler = new HomeInputHandler();
 		sendButton.addClickHandler(hihandler);
 		textArea.addKeyUpHandler(hihandler);
+		
+		//hide loading icon
+		RootPanel.get("homeLoading").setVisible(false);
+		
+		Debug.printDbgLine("Sottotestogwt.java: HomePage loaded in "+(System.currentTimeMillis()-homeTimeStart)+"ms, waiting input ...");
 	}
 	
 	
@@ -81,10 +114,16 @@ public class Sottotestogwt implements EntryPoint {
 	private void initItems(){
 		Debug.printDbgLine("Sottotestogwt.java: initItems()");
 		
+		
+		
 		tagmeResp = new TagmeResponse();
 		
+		textAreaLabel = new Label();
+		textAreaLabel.setText("Scrivi una frase:");
 		textAreaDefText = "Enter something here...";
 		textSendButton = "Send";
+		
+		
 		
 		sendButton = new Button(textSendButton);
 		textArea = new TextArea();
@@ -96,11 +135,14 @@ public class Sottotestogwt implements EntryPoint {
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
 
+				
 		// Add items to the RootPanel (Use RootPanel.get() to get the entire body element)
+		RootPanel.get("textAreaLabel").add(textAreaLabel);
 		RootPanel.get("textAreaContainer").add(textArea);
 		RootPanel.get("sendButtonContainer").add(sendButton);
-		RootPanel.get("errorLabelContainer").add(errorLabel);
+		RootPanel.get("errorLabelContainer").add(errorLabel);		
 		RootPanel.get("tagmetext").add(serverResponseLabel);
+		
 
 		// Focus the cursor on the name field when the app loads
 		textArea.setFocus(true);
@@ -119,8 +161,16 @@ public class Sottotestogwt implements EntryPoint {
 			return;
 		}
 		// Then, we send the input to the server.
+		
+		
 		sendButton.setEnabled(false);
 		serverResponseLabel.setText("");
+		
+		if (serviceStatusPanel != null) {serviceStatusPanel.clear();
+										 serviceStatusPanel.removeFromParent();
+		}
+		InitServiceStatusPanel();
+		HtmlTagmeService.setText("Tagme Service: Calling ...");
 		
 		tagmeService.sendToServer(textToServer, new AsyncCallback<TagmeResponse>() {
 					public void onFailure(Throwable caught) {
@@ -140,11 +190,19 @@ public class Sottotestogwt implements EntryPoint {
 							errMess += "Code: "+String.valueOf(tagmeResp.getCode())+"\n";
 							errMess += "Message: "+tagmeResp.getMessage()+"\n";
 							errMess += "Error: "+tagmeResp.getError();
-							serverResponseLabel.setText(errMess);							
+							serverResponseLabel.setText(errMess);						
+							
+							HtmlTagmeService.setText("Tagme Service: FAILED");
+							tagmeShowDataBTN.setVisible(true);
+							HtmlDBPediaService.setText("DBPedia Service: Skipped.");
 						}
 						else {
 							serverResponseLabel.setText(String.valueOf(tagmeResp.getCode())+": "+tagmeResp.getJson());
 							sendButton.setEnabled(true);
+							
+							HtmlTagmeService.setText("Tagme Service: OK");
+							tagmeShowDataBTN.setVisible(true);
+							HtmlDBPediaService.setText("DBPedia Service: Calling ...");
 							
 							//chiamiamo DBPedia
 							callDBPedia();
@@ -169,6 +227,8 @@ public class Sottotestogwt implements EntryPoint {
 
 		public void onSuccess(DBPediaResponse result) {			
 			String temp = serverResponseLabel.getText();
+			
+			HtmlDBPediaService.setText("DBPedia Service: OK");
 			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );			
 		}});
 		
@@ -189,6 +249,82 @@ public class Sottotestogwt implements EntryPoint {
 			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );			
 		}});
 		*/ 
+		
+	}
+	
+	private void InitServiceStatusPanel(){
+		Debug.printDbgLine("Sottotestogwt.java: initServiceStatusPanel()");
+		
+		//main panel
+		serviceStatusPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
+		serviceStatusPanel.setHeadingText("Service Status");
+		serviceStatusPanel.setPixelSize(RootPanel.get().getOffsetWidth(), 100);
+		serviceStatusPanel.setCollapsible(true);
+		serviceStatusPanelHC = new HorizontalLayoutContainer();
+		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
+		
+		//tagme service
+		HtmlTagmeService = new HTML();
+		HtmlTagmeService.setText("Tagme Service: Waiting.");
+		tagmeShowDataBTN = new Button();
+		tagmeShowDataBTN.setText("View Data");
+		tagmeShowDataBTN.setVisible(false);
+		tagmeStatusVLC = new VerticalLayoutContainer();
+		tagmeStatusVLC.add(HtmlTagmeService);
+		tagmeStatusVLC.add(tagmeShowDataBTN);
+		
+		//dbpedia service
+		HtmlDBPediaService = new HTML();
+		HtmlDBPediaService.setText("DBPedia Service: Waiting.");
+		
+		tagmeShowDataBTN.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {				
+				showTagmeDataDB();
+			}
+		});
+		
+		serviceStatusPanelHC.add(tagmeStatusVLC, new HorizontalLayoutData(0.5, 1, new Margins(4)));
+		serviceStatusPanelHC.add(HtmlDBPediaService, new HorizontalLayoutData(0.5, 1, new Margins(4)));
+		
+		RootPanel.get("serviceStatusPanel").add(serviceStatusPanel);
+		
+	}
+	
+	private void showTagmeDataDB(){
+		Debug.printDbgLine("Sottotestogwt.java: showTagmeData()");
+		
+		final DialogBox dialogBox = new DialogBox();
+		dialogBox.setText("Tagme Data");
+		dialogBox.setAnimationEnabled(true);
+		final Button closeButton = new Button("Close");
+		// We can set the id of a widget by accessing its Element
+		closeButton.getElement().setId("closeButton");
+
+		VerticalPanel dialogVPanel = new VerticalPanel();
+		dialogVPanel.addStyleName("dialogVPanel");
+		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(tagmeResp.getTime())));
+		dialogVPanel.add(new HTML("<b>Code:</b> "+String.valueOf(tagmeResp.getCode())));
+		dialogVPanel.add(new HTML("<br><b>Message:</b> "+tagmeResp.getMessage()));
+		dialogVPanel.add(new HTML("<br><b>ContentType:</b> "+tagmeResp.getContentType()));
+		
+		if (tagmeResp.getCode() != 200)
+			dialogVPanel.add(new HTML("<br><b>Error:</b> "+tagmeResp.getError()));
+		else{
+			dialogVPanel.add(new HTML("<br><b>Number of Json Resource:</b> "+tagmeResp.getResNum()));
+		}
+		
+		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+		dialogVPanel.add(closeButton);
+		dialogBox.setWidget(dialogVPanel);
+		
+		dialogBox.show();
+		
+		closeButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				Debug.printDbgLine("Sottotestogwt.java: closeTagmeData()");
+				dialogBox.hide();
+			}
+		});
 		
 	}
 }

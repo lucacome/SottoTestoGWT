@@ -45,14 +45,17 @@
     </noscript>
 
     <h1>SottoTesto Web Application</h1>
-
+	<div id="homeLoading"><center><img id="loadIcon" src="loading.gif"/></center></div>
     <table align="center">
       <tr>
-        <td colspan="2" style="font-weight:bold;">Scrivi una frase:</td>        
+        <td id="textAreaLabel" colspan="2" style="font-weight:bold;"></td>        
       </tr>
       <tr>
         <td id="textAreaContainer"></td>
         <td id="sendButtonContainer"></td>
+      </tr>
+      <tr >
+        <td id="serviceStatusPanel"></td> 
       </tr>
       <tr>
         <td colspan="2" style="color:red;" id="errorLabelContainer"></td>
