@@ -1,6 +1,6 @@
 package com.sottotesto.shared;
 
-public class DBPediaResponse implements java.io.Serializable{
+public class EkpResponse implements java.io.Serializable{
 	/**
 	 * 
 	 */
@@ -9,17 +9,17 @@ public class DBPediaResponse implements java.io.Serializable{
 	private String message;
 	private String contentType;
 	private String json;
-	private String jsonHTML;
-	private String queryResult;
+	private String jsonNL;
+	private String error;
 	private long time;
 	
-	public DBPediaResponse() {
+	public EkpResponse() {
 		code = 0;
 		message = "";
 		contentType = "";
 		json = "";
-		jsonHTML = "";
-		queryResult = "";
+		jsonNL = "";
+		error = "";
 		time = 0;
 	}
 	
@@ -33,10 +33,10 @@ public class DBPediaResponse implements java.io.Serializable{
 	public String getContentType(){return contentType;}
 	public void setJson(String x) {json = x;}
 	public String getJson(){return json;}
-	public void setJsonHTML(String x) {jsonHTML = x;}
-	public String getJsonHTML(){return jsonHTML;}
-	public void setQueryResult(String x) {queryResult = x;}
-	public String getQueryResult(){return queryResult;}
+	public void setJsonNL(String x) {jsonNL = x;}
+	public String getJsonNL(){return jsonNL;}
+	public void setError(String x) {error = x;}
+	public String getError(){return error;}
 	public void setTime(long x) {time = x;}
 	public long getTime(){return time;}
 }

@@ -10,15 +10,20 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Scanner;
 
+import com.google.gson.Gson;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.TagmeService;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.TagmeData;
 import com.sottotesto.shared.TagmeResponse;
+import com.sottotesto.shared.Utility;
 
 public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeService {
 	
 	public TagmeResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
+		
+		long StartTime = System.currentTimeMillis();
 		
 
 		TagmeResponse tagmeResp = new TagmeResponse();
@@ -49,6 +54,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 				if (output != null) try { output.close(); } 
 				catch (IOException err){ tagmeResp.setCode(-1);
 										 tagmeResp.setError("Error closing OutputStream");
+										 tagmeResp.setTime(Utility.calcTimeTookMs(StartTime));
 										 return tagmeResp;}			
 				}
 			
@@ -72,10 +78,11 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			responseTagTmp = "";
 			tagmeResp.setJsonNL(tagmeResp.getJson().replaceAll(",", ",\n"));
 			
-				
-			//andava a dbpedia		
-			//request.setAttribute("responsetag", responsetag);	
-			//request.getRequestDispatcher("/tagme.jsp").forward(request, response);
+			//converti Json -> gson
+			Gson gson = new Gson();
+			tagmeResp.setJsonData(gson.fromJson(tagmeResp.getJson(), TagmeData.class));
+			tagmeResp.setResNum(tagmeResp.getJsonData().annotations.size());
+			
 		} catch (MalformedURLException e) {
 			tagmeResp.setCode(-1);
 			 tagmeResp.setError("Error MalformedURLException");
@@ -93,10 +100,12 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			 tagmeResp.setError("Error IOException");
 			e.printStackTrace();
 		}
-		
-		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer(): "+String.valueOf(tagmeResp.getCode()));
-		
+						
+		tagmeResp.setTime(Utility.calcTimeTookMs(StartTime));
+		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer(): END -> "+String.valueOf(tagmeResp.getCode())+" ["+tagmeResp.getTime()+"ms]");
 		return tagmeResp;
 	}
+	
+	
 
 }

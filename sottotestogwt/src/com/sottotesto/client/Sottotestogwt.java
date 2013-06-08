@@ -26,10 +26,10 @@ public class Sottotestogwt implements EntryPoint {
 	 // The message displayed to the user when the server cannot be reached or returns an error.
 	private static final String SERVER_ERROR = "An error occurred while attempting to contact the server. Please check your network connection and try again.";
 	
-	// Create a remote service proxy to talk to the server-side Greeting service
+	// Create remote service proxyes to talk to the server-side services
 	private final TagmeServiceAsync tagmeService = GWT.create(TagmeService.class);	
 	private final DBPediaServiceAsync dbpediaService = GWT.create(DBPediaService.class);
-	
+	private final EkpServiceAsync ekpService = GWT.create(EkpService.class);
 	
 	private String textAreaDefText; //default text written on textarea
 	private String textSendButton;  //default tet written on send button
@@ -132,35 +132,63 @@ public class Sottotestogwt implements EntryPoint {
 
 					public void onSuccess(TagmeResponse result) {
 						Debug.printDbgLine("Sottotestogwt.java: callTagme(): tagmeService:onSuccess()");
-						tagmeResp = result;
-						serverResponseLabel.setText(String.valueOf(tagmeResp.getCode())+": "+tagmeResp.getJson());
-						sendButton.setEnabled(true);
-	
-						//chiamiamo DBPedia
-						callDBPedia();
+						tagmeResp = result;				
+						
+						if (!(tagmeResp.getCode()==200)){
+							//Tagme ha avuto qualche problema!
+							String errMess = "TAGME FAILED\n";
+							errMess += "Code: "+String.valueOf(tagmeResp.getCode())+"\n";
+							errMess += "Message: "+tagmeResp.getMessage()+"\n";
+							errMess += "Error: "+tagmeResp.getError();
+							serverResponseLabel.setText(errMess);							
+						}
+						else {
+							serverResponseLabel.setText(String.valueOf(tagmeResp.getCode())+": "+tagmeResp.getJson());
+							sendButton.setEnabled(true);
+							
+							//chiamiamo DBPedia
+							callDBPedia();
+							
+							//chiamiamo Ekp
+							//callEkp();
+						}
+						
+						
 					}
 				});
 	}
+	
 	private void callDBPedia(){
-		Debug.printDbgLine("Sottotestogwt.java: callDBPedia()");
+		Debug.printDbgLine("Sottotestogwt.java: callDBPedia()");		
 		
+		dbpediaService.sendToServer(tagmeResp.getJsonData(), new AsyncCallback<DBPediaResponse>() {
+		public void onFailure(Throwable caught) {
+			// Show the RPC error message to the user
+			serverResponseLabel.setText("Error calling DBPedia Service");			
+		}
+
+		public void onSuccess(DBPediaResponse result) {			
+			String temp = serverResponseLabel.getText();
+			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );			
+		}});
 		
+	}
+	
+	private void callEkp(){
+		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
+				
+		/*
 		dbpediaService.sendToServer(tagmeResp.getJson(), new AsyncCallback<DBPediaResponse>() {
 		public void onFailure(Throwable caught) {
 			// Show the RPC error message to the user
-			serverResponseLabel.setText("errore");
-			
+			serverResponseLabel.setText("Error calling DBPedia Service");			
 		}
 
-		public void onSuccess(DBPediaResponse result) {
-			
+		public void onSuccess(DBPediaResponse result) {			
 			String temp = serverResponseLabel.getText();
-			
-			//serverResponseLabel.setText(temp + result.getQueryResult());
-			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );
-			
-			
-		}}); 
+			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );			
+		}});
+		*/ 
 		
 	}
 }

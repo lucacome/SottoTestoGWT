@@ -25,6 +25,15 @@
     <url-pattern>/sottotestogwt/dbpedia</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>ekpServlet</servlet-name>
+    <servlet-class>com.sottotesto.server.EkpServiceImpl</servlet-class>
+  </servlet>  
+  <servlet-mapping>
+    <servlet-name>ekpServlet</servlet-name>
+    <url-pattern>/sottotestogwt/ekp</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Sottotestogwt.html</welcome-file>

@@ -2,7 +2,7 @@ package com.sottotesto.shared;
 
 import java.util.List;
 
-public class Annotation {
+public class Annotation implements java.io.Serializable{
 	public int id = 0;
 	public String title = null;
 	public List<String> dbpedia_categories = null;

@@ -1,5 +1,7 @@
 package com.sottotesto.server;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.hp.hpl.jena.query.Query;
@@ -12,6 +14,7 @@ import com.sottotesto.client.DBPediaService;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.TagmeData;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.Utility;
 
 public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaService {
 	
@@ -19,20 +22,21 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static org.apache.log4j.Logger log= Logger.getLogger(DBPediaServiceImpl.class);
 
-	public DBPediaResponse sendToServer(String input) throws IllegalArgumentException {
+	public DBPediaResponse sendToServer(TagmeData data) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
-		//Debug.writeDbgLine(request.getAttribute("responsetag").toString());
+		
+		long StartTime = System.currentTimeMillis();
 
+		DBPediaResponse resultquery2 = new DBPediaResponse();
+		
+		/*
 	
 		TagmeData data = new TagmeData();
-		Debug.printDbgLine("DBPediServiceImpl.java: 1");
 		Gson gson = new Gson();
-		Debug.printDbgLine("DBPediServiceImpl.java: 2");
 		String responsetag = input;
-		Debug.printDbgLine("DBPediServiceImpl.java: 3");
-		DBPediaResponse resultquery2 = new DBPediaResponse();
-		Debug.printDbgLine("DBPediServiceImpl.java: 4");
+		
 				//request.getAttribute("responsetag").toString();
 		data = gson.fromJson(responsetag, TagmeData.class);
 		Debug.printDbgLine("DBPediServiceImpl.java: dopo gson");
@@ -67,6 +71,10 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 
 		//request.getRequestDispatcher("/dbpedia.jsp").forward(request, response);
 		resultquery2.setQueryResult(resultquery);
+		
+		*/
+		resultquery2.setTime(Utility.calcTimeTookMs(StartTime));
+		Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+resultquery2.getTime()+"ms]");
 				
 		return resultquery2;
 		
