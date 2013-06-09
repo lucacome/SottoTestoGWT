@@ -44,21 +44,26 @@
       </div>
     </noscript>
 
-    <h1>SottoTesto Web Application</h1>
-	<div id="homeLoading"><center><img id="loadIcon" src="loading.gif"/></center></div>
-    <table align="center">
+    <h1 align="center">SottoTesto Web Application</h1>	
+    <table align="center" border="0px">
       <tr>
-        <td id="textAreaLabel" colspan="2" style="font-weight:bold;"></td>        
+        <td align="center" id="textAreaLabel" colspan="2" style="font-weight:bold;"></td>        
+      </tr>
+      <tr align="center">
+        <td id="textAreaContainer"></td>           
+      </tr>
+      <tr align="center">
+        <td colspan="2" style="color:red;" id="errorLabelContainer"></td>
+      </tr>
+      <tr  align="center">
+      	<td id="sendButtonContainer"></td>     
       </tr>
       <tr>
-        <td id="textAreaContainer"></td>
-        <td id="sendButtonContainer"></td>
+      	<td id="homeLoading" align="center">... Loading ...<br><img id="loadIcon" src="loading.gif"/></td>
       </tr>
-      <tr >
+      <tr  align="center">
         <td id="serviceStatusPanel"></td> 
       </tr>
-      <tr>
-        <td colspan="2" style="color:red;" id="errorLabelContainer"></td>
     </table>
     <div id="tagmetext"></div>
   </body>

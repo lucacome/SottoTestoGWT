@@ -1,5 +1,8 @@
 package com.sottotesto.client;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -22,12 +25,15 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.LayoutData;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.FieldVerifier;
 import com.sottotesto.shared.TagmeResponse;
+import com.sottotesto.shared.EkpResponse;
+import com.sottotesto.shared.Utility;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -52,13 +58,25 @@ public class Sottotestogwt implements EntryPoint {
 	//Service status panel items
 	ContentPanel serviceStatusPanel = null;
 	HorizontalLayoutContainer serviceStatusPanelHC;
-	VerticalLayoutContainer tagmeStatusVLC;
-	VerticalLayoutContainer dbpediaStatusVLC;
+	VerticalPanel tagmeStatusVP;
+	VerticalPanel dbpediaStatusVP;
 	HTML HtmlTagmeService;
 	HTML HtmlDBPediaService;
+	String HTMLtagmeServiceStringWaiting="Tagme Service: Waiting.";
+	String HTMLtagmeServiceStringCalling="Tagme Service: Calling ...";
+	String HTMLtagmeServiceStringOK="Tagme Service: <span style='color:green;'>SUCCESS</span>";
+	String HTMLtagmeServiceStringFAIL="Tagme Service: <span style='color:red;'>FAILED</span>";
+	String HTMLtagmeServiceStringSkipped="Tagme Service: <span style='color:yellow;'>Skipped</span>";
+	String HTMLdbpediaServiceStringWaiting="DBPedia Service: Waiting.";
+	String HTMLdbpediaServiceStringCalling="DBPedia Service: Calling ...";
+	String HTMLdbpediaServiceStringOK="DBPedia Service: <span style='color:green;'>SUCCESS</span>";
+	String HTMLdbpediaServiceStringFAIL="DBPedia Service: <span style='color:red;'>FAILED</span>";
+	String HTMLdbpediaServiceStringSkipped="DBPedia Service: <span style='color:yellow;'>Skipped</span>";
 	Button tagmeShowDataBTN;
+	Button dbpediaShowDataBTN;
 	
 	private TagmeResponse tagmeResp; //response of TAGME service
+	private DBPediaResponse dbpediaResp; //response of TAGME service
 	
 	
 	
@@ -162,15 +180,16 @@ public class Sottotestogwt implements EntryPoint {
 		}
 		// Then, we send the input to the server.
 		
-		
+		RootPanel.get("homeLoading").setVisible(true);
 		sendButton.setEnabled(false);
 		serverResponseLabel.setText("");
 		
 		if (serviceStatusPanel != null) {serviceStatusPanel.clear();
-										 serviceStatusPanel.removeFromParent();
+										 serviceStatusPanel.removeFromParent();										 
 		}
 		InitServiceStatusPanel();
-		HtmlTagmeService.setText("Tagme Service: Calling ...");
+		RootPanel.get("homeLoading").setVisible(false);
+		HtmlTagmeService.setHTML(HTMLtagmeServiceStringCalling);
 		
 		tagmeService.sendToServer(textToServer, new AsyncCallback<TagmeResponse>() {
 					public void onFailure(Throwable caught) {
@@ -178,37 +197,49 @@ public class Sottotestogwt implements EntryPoint {
 						// Show the RPC error message to the user
 						serverResponseLabel.addStyleName("serverResponseLabelError");
 						serverResponseLabel.setText("Remote Procedure Call - Failure");
+						
+						HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL);
+						tagmeShowDataBTN.setVisible(false);
+						HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 					}
 
 					public void onSuccess(TagmeResponse result) {
 						Debug.printDbgLine("Sottotestogwt.java: callTagme(): tagmeService:onSuccess()");
 						tagmeResp = result;				
-						
+												
 						if (!(tagmeResp.getCode()==200)){
 							//Tagme ha avuto qualche problema!
-							String errMess = "TAGME FAILED\n";
-							errMess += "Code: "+String.valueOf(tagmeResp.getCode())+"\n";
-							errMess += "Message: "+tagmeResp.getMessage()+"\n";
-							errMess += "Error: "+tagmeResp.getError();
-							serverResponseLabel.setText(errMess);						
 							
-							HtmlTagmeService.setText("Tagme Service: FAILED");
+							HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL);
 							tagmeShowDataBTN.setVisible(true);
-							HtmlDBPediaService.setText("DBPedia Service: Skipped.");
+							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
+						}
+						else if (tagmeResp.getResNum()<1){
+							//Tagme OK, ma non ha taggato nulla!
+							
+							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK);
+							tagmeShowDataBTN.setVisible(true);
+							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 						}
 						else {
+							//Tagme OK
+							
 							serverResponseLabel.setText(String.valueOf(tagmeResp.getCode())+": "+tagmeResp.getJson());
 							sendButton.setEnabled(true);
 							
-							HtmlTagmeService.setText("Tagme Service: OK");
+							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK);
 							tagmeShowDataBTN.setVisible(true);
-							HtmlDBPediaService.setText("DBPedia Service: Calling ...");
+							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling);
 							
 							//chiamiamo DBPedia
-							callDBPedia();
+							List<String> dbproperty = new ArrayList<String>();
+							dbproperty.add("birthDate");
+							dbproperty.add("title");
+							dbproperty.add("name");
+							callDBPedia(dbproperty);
 							
 							//chiamiamo Ekp
-							//callEkp();
+							callEkp();
 						}
 						
 						
@@ -216,39 +247,45 @@ public class Sottotestogwt implements EntryPoint {
 				});
 	}
 	
-	private void callDBPedia(){
+	private void callDBPedia(List<String> dbprop){
 		Debug.printDbgLine("Sottotestogwt.java: callDBPedia()");		
 		
-		dbpediaService.sendToServer(tagmeResp.getJsonData(), new AsyncCallback<DBPediaResponse>() {
+		dbpediaService.sendToServer(tagmeResp, dbprop, new AsyncCallback<DBPediaResponse>() {
 		public void onFailure(Throwable caught) {
 			// Show the RPC error message to the user
-			serverResponseLabel.setText("Error calling DBPedia Service");			
+			serverResponseLabel.setText("Error calling DBPedia Service");		
+			
+			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
+			dbpediaShowDataBTN.setVisible(false);
 		}
 
 		public void onSuccess(DBPediaResponse result) {			
 			String temp = serverResponseLabel.getText();
+			serverResponseLabel.setText(temp + new HTML(result.getQueryResultXML()) );
 			
-			HtmlDBPediaService.setText("DBPedia Service: OK");
-			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );			
+			dbpediaResp = result;
+			
+			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
+			dbpediaShowDataBTN.setVisible(true);
 		}});
 		
 	}
 	
 	private void callEkp(){
 		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
-				
-		/*
-		dbpediaService.sendToServer(tagmeResp.getJson(), new AsyncCallback<DBPediaResponse>() {
+		String temp = "Diego_Maradona";		
+
+		ekpService.sendToServer(temp, new AsyncCallback<EkpResponse>() {
 		public void onFailure(Throwable caught) {
 			// Show the RPC error message to the user
-			serverResponseLabel.setText("Error calling DBPedia Service");			
+			serverResponseLabel.setText("Error calling EkpService");			
 		}
 
-		public void onSuccess(DBPediaResponse result) {			
-			String temp = serverResponseLabel.getText();
-			serverResponseLabel.setText(temp + new HTML(result.getQueryResult()) );			
+		public void onSuccess(EkpResponse result) {			
+			String tempo = serverResponseLabel.getText();
+			serverResponseLabel.setText(tempo+result.getMessage());			
 		}});
-		*/ 
+		
 		
 	}
 	
@@ -258,108 +295,45 @@ public class Sottotestogwt implements EntryPoint {
 		//main panel
 		serviceStatusPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
 		serviceStatusPanel.setHeadingText("Service Status");
-		serviceStatusPanel.setPixelSize(RootPanel.get().getOffsetWidth(), 100);
+		serviceStatusPanel.setPixelSize(RootPanel.get().getOffsetWidth(), 90);
 		serviceStatusPanel.setCollapsible(true);
 		serviceStatusPanelHC = new HorizontalLayoutContainer();
-		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
 		
 		//tagme service
 		HtmlTagmeService = new HTML();
-		HtmlTagmeService.setText("Tagme Service: Waiting.");
+		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
 		tagmeShowDataBTN = new Button();
 		tagmeShowDataBTN.setText("View Data");
 		tagmeShowDataBTN.setVisible(false);
-		tagmeStatusVLC = new VerticalLayoutContainer();
-		tagmeStatusVLC.add(HtmlTagmeService);
-		tagmeStatusVLC.add(tagmeShowDataBTN);
+		tagmeStatusVP = new VerticalPanel();
+		tagmeStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+		tagmeStatusVP.add(HtmlTagmeService);
+		tagmeStatusVP.add(tagmeShowDataBTN);		
+		tagmeStatusVP.setBorderWidth(0);
+		tagmeShowDataBTN.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showTagmeDataDB(tagmeResp);}});
 		
 		//dbpedia service
 		HtmlDBPediaService = new HTML();
-		HtmlDBPediaService.setText("DBPedia Service: Waiting.");
+		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
+		dbpediaShowDataBTN = new Button();
+		dbpediaShowDataBTN.setText("View Data");
+		dbpediaShowDataBTN.setVisible(false);
+		dbpediaStatusVP = new VerticalPanel();
+		dbpediaStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+		dbpediaStatusVP.add(HtmlDBPediaService);
+		dbpediaStatusVP.add(dbpediaShowDataBTN);		
+		dbpediaStatusVP.setBorderWidth(0);
+		dbpediaShowDataBTN.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showDBPediaDataDB(dbpediaResp);}});
 		
-		tagmeShowDataBTN.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {				
-				showTagmeDataDB();
-			}
-		});
 		
-		serviceStatusPanelHC.add(tagmeStatusVLC, new HorizontalLayoutData(0.5, 1, new Margins(4)));
-		serviceStatusPanelHC.add(HtmlDBPediaService, new HorizontalLayoutData(0.5, 1, new Margins(4)));
+		serviceStatusPanelHC.add(tagmeStatusVP, new HorizontalLayoutData(0.5, 1, new Margins(4)));
+		serviceStatusPanelHC.add(dbpediaStatusVP, new HorizontalLayoutData(0.5, 1, new Margins(4)));
+		serviceStatusPanelHC.setBorders(true);
+		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
 		
 		RootPanel.get("serviceStatusPanel").add(serviceStatusPanel);
 		
 	}
 	
-	private void showTagmeDataDB(){
-		Debug.printDbgLine("Sottotestogwt.java: showTagmeData()");
-		
-		final DialogBox dialogBox = new DialogBox();
-		dialogBox.setText("Tagme Data");
-		dialogBox.setAnimationEnabled(true);
-		final Button closeButton = new Button("Close");
-		// We can set the id of a widget by accessing its Element
-		closeButton.getElement().setId("closeButton");
-
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(tagmeResp.getTime())));
-		dialogVPanel.add(new HTML("<b>Code:</b> "+String.valueOf(tagmeResp.getCode())));
-		dialogVPanel.add(new HTML("<br><b>Message:</b> "+tagmeResp.getMessage()));
-		dialogVPanel.add(new HTML("<br><b>ContentType:</b> "+tagmeResp.getContentType()));
-		
-		if (tagmeResp.getCode() != 200)
-			dialogVPanel.add(new HTML("<br><b>Error:</b> "+tagmeResp.getError()));
-		else{
-			dialogVPanel.add(new HTML("<br><b>Number of Json Resource:</b> "+tagmeResp.getResNum()));
-		}
-		
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-		dialogVPanel.add(closeButton);
-		dialogBox.setWidget(dialogVPanel);
-		
-		dialogBox.show();
-		
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				Debug.printDbgLine("Sottotestogwt.java: closeTagmeData()");
-				dialogBox.hide();
-			}
-		});
-		
-	}
+	
 }
-
-
-
-
-//FOR FUTURE REFERENCE:
-/*
-// Create the popup dialog box
-final DialogBox dialogBox = new DialogBox();
-dialogBox.setText("Remote Procedure Call");
-dialogBox.setAnimationEnabled(true);
-final Button closeButton = new Button("Close");
-// We can set the id of a widget by accessing its Element
-closeButton.getElement().setId("closeButton");
-
-VerticalPanel dialogVPanel = new VerticalPanel();
-dialogVPanel.addStyleName("dialogVPanel");
-dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-//dialogVPanel.add(textToServerLabel);
-dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-//dialogVPanel.add(serverResponseLabel);
-dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-dialogVPanel.add(closeButton);
-dialogBox.setWidget(dialogVPanel);
-
-
-
-// Add a handler to close the DialogBox
-closeButton.addClickHandler(new ClickHandler() {
-	public void onClick(ClickEvent event) {
-		Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): closeButtonOnClick()");
-		dialogBox.hide();
-		sendButton.setEnabled(true);
-		sendButton.setFocus(true);
-	}
-});*/
