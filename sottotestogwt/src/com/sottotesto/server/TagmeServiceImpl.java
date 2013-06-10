@@ -89,7 +89,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			tagmeResp.setJsonData(gson.fromJson(tagmeResp.getJson(), TagmeData.class));
 			tagmeResp.setResNum(tagmeResp.getJsonData().annotations.size());
 			for (int i=0; i<=tagmeResp.getResNum()-1; i++){
-				if ( tagmeResp.getJsonData().annotations.get(i).rho > 0.02){
+				if ( tagmeResp.getJsonData().annotations.get(i).rho > 0.05){
 
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
