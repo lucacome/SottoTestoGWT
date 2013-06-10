@@ -106,7 +106,9 @@ public class Utility {
 		VerticalPanel dialogVPanel = new VerticalPanel();
 		dialogVPanel.addStyleName("dialogVPanel");
 		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms"));			
-		dialogVPanel.add(new HTML("<br><b>Result Query:</b><br> "+dbpediaResp.getQueryResultXML()));		
+		dialogVPanel.add(new HTML("<br><b>Result Query:</b>"));
+		HTML XmlHtml = new HTML(); XmlHtml.setText(dbpediaResp.getQueryResultXML());
+		dialogVPanel.add(XmlHtml);
 		
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		dialogVPanel.add(closeButton);
@@ -134,36 +136,35 @@ public class Utility {
 		dialogBox.getElement().setId("ekpDataDB");
 		
 		
-		 TabPanel folder = new TabPanel();
-//		    folder.addSelectionHandler(handler);
-//		    folder.setWidth(450);
-		 
-		 int tabNum = ekpResp.size();
+		TabPanel folder = new TabPanel();		 
+		int tabNum = ekpResp.size();
 
-		 for (int i=0; i<tabNum; i++){
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(ekpResp.get(i).getTime())+"ms"));
-		dialogVPanel.add(new HTML("<br><b>Code:</b> "+String.valueOf(ekpResp.get(i).getCode())));
-		dialogVPanel.add(new HTML("<br><b>Message:</b> "+ekpResp.get(i).getMessage()));
-		dialogVPanel.add(new HTML("<br><b>ContentType:</b> "+ekpResp.get(i).getContentType()));
+		for (int i=0; i<tabNum; i++){
+			VerticalPanel dialogVPanel = new VerticalPanel();
+			dialogVPanel.addStyleName("dialogVPanel");
+			dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(ekpResp.get(i).getTime())+"ms"));
+			dialogVPanel.add(new HTML("<br><b>Code:</b> "+String.valueOf(ekpResp.get(i).getCode())));
+			dialogVPanel.add(new HTML("<br><b>Message:</b> "+ekpResp.get(i).getMessage()));
+			dialogVPanel.add(new HTML("<br><b>ContentType:</b> "+ekpResp.get(i).getContentType()));
 		
-		if (ekpResp.get(i).getCode() != 200)
-			dialogVPanel.add(new HTML("<br><b>Error:</b> "+ekpResp.get(i).getError()));
-		else{
-			dialogVPanel.add(new HTML("<br><b>Response:</b> "+ekpResp.get(i).getMessage()));
-		}
-		final Button closeButton = new Button("Close");
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				Debug.printDbgLine("Utility.java: closekpData()");
-				dialogBox.hide();
-				dialogBox.removeFromParent();
+			if (ekpResp.get(i).getCode() != 200)
+				dialogVPanel.add(new HTML("<br><b>Error:</b> "+ekpResp.get(i).getError()));
+			else{
+				dialogVPanel.add(new HTML("<br><b>Response:</b> "));
+				HTML rdfHtml = new HTML(); rdfHtml.setText(ekpResp.get(i).getRDF());
+				dialogVPanel.add(rdfHtml);
 			}
-		});
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-		dialogVPanel.add(closeButton);
-		folder.add(dialogVPanel, String.valueOf(i));
+			final Button closeButton = new Button("Close");
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					Debug.printDbgLine("Utility.java: closekpData()");
+					dialogBox.hide();
+					dialogBox.removeFromParent();
+				}
+			});
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+			dialogVPanel.add(closeButton);
+			folder.add(dialogVPanel, ekpResp.get(i).getTag());
 		}
 		
 		folder.selectTab(0);

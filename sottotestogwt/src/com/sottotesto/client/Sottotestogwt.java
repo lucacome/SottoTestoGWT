@@ -144,6 +144,7 @@ public class Sottotestogwt implements EntryPoint {
 		sendButton = new Button(textSendButton);
 		textArea = new TextArea();
 		textArea.setText(textAreaDefText);		
+		textArea.setSize("400px", "150px");
 		errorLabel = new Label();
 		serverResponseLabel = new Label();
 		sendButton.addStyleName("sendButton");
@@ -253,7 +254,7 @@ public class Sottotestogwt implements EntryPoint {
 							dbproperty.add("title");
 							dbproperty.add("name");
 							dbproperty2.add("placeOfBirth");
-							//callDBPedia(dbproperty);
+							callDBPedia(dbproperty);
 							//callDBPedia(dbproperty2);
 							
 							//chiamiamo Ekp
