@@ -67,17 +67,17 @@ public class Sottotestogwt implements EntryPoint {
 	HTML HtmlEkpService;
 	String HTMLloadIconString="<img src='loading.gif'/>";
 	String HTMLtagmeServiceStringWaiting="Tagme Service: Waiting.";
-	String HTMLtagmeServiceStringCalling=HTMLloadIconString+"Tagme Service: Calling ...";
+	String HTMLtagmeServiceStringCalling="Tagme Service: Calling ..."+HTMLloadIconString;
 	String HTMLtagmeServiceStringOK="Tagme Service: <span style='color:green;'>SUCCESS</span>";
 	String HTMLtagmeServiceStringFAIL="Tagme Service: <span style='color:red;'>FAILED</span>";
 	String HTMLtagmeServiceStringSkipped="Tagme Service: <span style='color:yellow;'>Skipped</span>";
 	String HTMLdbpediaServiceStringWaiting="DBPedia Service: Waiting.";
-	String HTMLdbpediaServiceStringCalling=HTMLloadIconString+"DBPedia Service: Calling ...";
+	String HTMLdbpediaServiceStringCalling="DBPedia Service: Calling ..."+HTMLloadIconString;
 	String HTMLdbpediaServiceStringOK="DBPedia Service: <span style='color:green;'>SUCCESS</span>";
 	String HTMLdbpediaServiceStringFAIL="DBPedia Service: <span style='color:red;'>FAILED</span>";
 	String HTMLdbpediaServiceStringSkipped="DBPedia Service: <span style='color:yellow;'>Skipped</span>";
 	String HTMLekpServiceStringWaiting="Ekp Service: Waiting.";
-	String HTMLekpServiceStringCalling=HTMLloadIconString+"Ekp Service: Calling ...";
+	String HTMLekpServiceStringCalling="Ekp Service: Calling ..."+HTMLloadIconString;
 	String HTMLekpServiceStringOK="Ekp Service: <span style='color:green;'>SUCCESS</span>";
 	String HTMLekpServiceStringFAIL="Ekp Service: <span style='color:red;'>FAILED</span>";
 	String HTMLekpServiceStringSkipped="Ekp Service: <span style='color:yellow;'>Skipped</span>";
@@ -243,7 +243,7 @@ public class Sottotestogwt implements EntryPoint {
 							HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 							ekpShowDataBTN.setVisible(false);
 						}
-						else if (tagmeResp.getResNum()<1){
+						else if (tagmeResp.getTitleTag().size()==0){
 							//Tagme OK, ma non ha taggato nulla!
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK+" (but 0!)");

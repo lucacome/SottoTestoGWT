@@ -1,5 +1,6 @@
 package com.sottotesto.shared;
 
+import java.util.Iterator;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -23,7 +24,7 @@ public class Utility {
 		
 		final ExtendedDialogBox dialogBox = new ExtendedDialogBox();
 		dialogBox.setText("Tagme Data");
-		dialogBox.setAnimationEnabled(true);
+		dialogBox.setAnimationEnabled(false);
 		dialogBox.getElement().setId("tagmeDataDB");
 		final Button closeButton = new Button("Close");
 
@@ -36,9 +37,26 @@ public class Utility {
 		
 		if (tagmeResp.getCode() != 200)
 			dialogVPanel.add(new HTML("<br><b>Error:</b> "+tagmeResp.getError()));
-		else{
-			dialogVPanel.add(new HTML("<br><b>Number of Json Resource:</b> "+tagmeResp.getResNum()));
-			dialogVPanel.add(new HTML("<br><b>Json data:</b><br> "+tagmeResp.getJson().replaceAll(",",",<br>")));
+		else{ // got 200			
+			dialogVPanel.add(new HTML("<br><b>Number of Total Json Resource:</b> "+tagmeResp.getResNum()));
+			if (tagmeResp.getResNum()>0)
+			{
+				dialogVPanel.add(new HTML("<br><b>Number of Relevant Tags found:</b> "+tagmeResp.getTitleTag().size()));
+				
+				if (!tagmeResp.getTitleTag().isEmpty())
+				{
+					String taggedTotal="";
+					Iterator<String> tagged = tagmeResp.getTitleTag().iterator();
+					while (tagged.hasNext()){
+						taggedTotal+=tagged.next()+"<br>";
+					}
+					dialogVPanel.add(new HTML("<br><b>Elements tagged:</b><br> "+taggedTotal));
+					dialogVPanel.add(new HTML("<br><b>Json data:</b><br> "+tagmeResp.getJson().replaceAll(",",",<br>")));
+				}
+					
+			}
+			
+			
 		}
 		
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
@@ -78,7 +96,7 @@ public class Utility {
 		
 		final ExtendedDialogBox dialogBox = new ExtendedDialogBox();
 		dialogBox.setText("DBPedia Data");
-		dialogBox.setAnimationEnabled(true);
+		dialogBox.setAnimationEnabled(false);
 		dialogBox.getElement().setId("dbPediaDataDB");
 		final Button closeButton = new Button("Close");
 
@@ -109,7 +127,7 @@ public class Utility {
 		
 		final ExtendedDialogBox dialogBox = new ExtendedDialogBox();
 		dialogBox.setText("Ekp Data");
-		dialogBox.setAnimationEnabled(true);
+		dialogBox.setAnimationEnabled(false);
 		dialogBox.getElement().setId("ekpDataDB");
 		final Button closeButton = new Button("Close");
 
@@ -135,7 +153,7 @@ public class Utility {
 		
 		closeButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Debug.printDbgLine("Utility.java: closeEkpData()");
+				Debug.printDbgLine("Utility.java: closekpData()");
 				dialogBox.hide();
 				dialogBox.removeFromParent();
 			}
