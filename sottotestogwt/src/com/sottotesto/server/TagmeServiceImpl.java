@@ -5,10 +5,16 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Scanner;
+
+import org.apache.http.ProtocolException;
 
 import com.google.gson.Gson;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -77,11 +83,23 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			//aggiungi la risposta formattata html
 			responseTagTmp = "";
 			tagmeResp.setJsonNL(tagmeResp.getJson().replaceAll(",", ",\n"));
-			
+			List<String> titletag = new ArrayList<String>();
 			//converti Json -> gson
 			Gson gson = new Gson();
 			tagmeResp.setJsonData(gson.fromJson(tagmeResp.getJson(), TagmeData.class));
 			tagmeResp.setResNum(tagmeResp.getJsonData().annotations.size());
+			for (int i=0; i<=tagmeResp.getResNum()-1; i++){
+				if ( tagmeResp.getJsonData().annotations.get(i).rho > 0.02){
+
+					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
+					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
+					titletag.add(responseTagTmp);	
+					responseTagTmp = "";
+				}else{
+					Debug.printDbgLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + "rho troppo basso");
+				}
+			}
+			tagmeResp.setTitleTag(titletag);
 			
 		} catch (MalformedURLException e) {
 			tagmeResp.setCode(-1);
@@ -90,10 +108,6 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 		} catch (UnsupportedEncodingException e) {
 			tagmeResp.setCode(-1);
 			 tagmeResp.setError("Error UnsupportedEncodingException");
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			tagmeResp.setCode(-1);
-			 tagmeResp.setError("Error ProtocolException");
 			e.printStackTrace();
 		} catch (IOException e) {
 			tagmeResp.setCode(-1);

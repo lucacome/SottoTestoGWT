@@ -1,5 +1,6 @@
 package com.sottotesto.client;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -224,7 +225,7 @@ public class Sottotestogwt implements EntryPoint {
 						else {
 							//Tagme OK
 							
-							serverResponseLabel.setText(String.valueOf(tagmeResp.getCode())+": "+tagmeResp.getJson());
+							//serverResponseLabel.setText(String.valueOf(tagmeResp.getCode())+": "+tagmeResp.getJson());
 							sendButton.setEnabled(true);
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK);
@@ -233,13 +234,20 @@ public class Sottotestogwt implements EntryPoint {
 							
 							//chiamiamo DBPedia
 							List<String> dbproperty = new ArrayList<String>();
+							List<String> dbproperty2 = new ArrayList<String>();
 							dbproperty.add("birthDate");
 							dbproperty.add("title");
 							dbproperty.add("name");
+							dbproperty2.add("placeOfBirth");
 							callDBPedia(dbproperty);
+							callDBPedia(dbproperty2);
 							
 							//chiamiamo Ekp
-							callEkp();
+							List<String> titletagme = tagmeResp.getTitleTag();
+							Iterator<String> itertitle =  titletagme.iterator();
+							while (itertitle.hasNext()){
+							callEkp(itertitle.next());
+							}
 						}
 						
 						
@@ -261,7 +269,8 @@ public class Sottotestogwt implements EntryPoint {
 
 		public void onSuccess(DBPediaResponse result) {			
 			String temp = serverResponseLabel.getText();
-			serverResponseLabel.setText(temp + new HTML(result.getQueryResultXML()) );
+			//serverResponseLabel.setText(temp + new HTML(result.getQueryResultXML()) );
+			Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
 			
 			dbpediaResp = result;
 			
@@ -271,11 +280,12 @@ public class Sottotestogwt implements EntryPoint {
 		
 	}
 	
-	private void callEkp(){
+	private void callEkp(String input){
 		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
-		String temp = "Diego_Maradona";		
+		//String temp = "Diego_Maradona";	
+		Debug.printDbgLine("Sottotestogwt.java: Ekp input="+input);
 
-		ekpService.sendToServer(temp, new AsyncCallback<EkpResponse>() {
+		ekpService.sendToServer(input, new AsyncCallback<EkpResponse>() {
 		public void onFailure(Throwable caught) {
 			// Show the RPC error message to the user
 			serverResponseLabel.setText("Error calling EkpService");			
@@ -283,7 +293,8 @@ public class Sottotestogwt implements EntryPoint {
 
 		public void onSuccess(EkpResponse result) {			
 			String tempo = serverResponseLabel.getText();
-			serverResponseLabel.setText(tempo+result.getMessage());			
+			serverResponseLabel.setText(tempo+result.getMessage());	
+			Debug.printDbgLine("Sottotestogwt.java: Ekp output="+result.getMessage());
 		}});
 		
 		

@@ -34,7 +34,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		
 		EkpResponse result = new EkpResponse();
 		String temp = "";
-		RDFReader rdfReader;
 		Model m = ModelFactory.createDefaultModel();
 		
 		RDFReader arp = m.getReader();
@@ -65,16 +64,18 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				responseEkpTemp = "empty";
 			}
 		    Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
-		    result.setMessage(responseEkpTemp);
+		    //TODO disabilitato temporenamente
+		    //result.setMessage(responseEkpTemp);
 		    InputStream in = new ByteArrayInputStream(responseEkpTemp.getBytes("UTF-8"));
 		    arp.read(m, in, null);
 		    String about = "http://dbpedia.org/resource/"+input;
 		    Resource link = m.getResource(about);
 		    for (StmtIterator i = link.listProperties(); i.hasNext(); ) {
 		        Statement s = i.next();
-		     
-		        Debug.printDbgLine( "link has property " + s.getPredicate() + " with value " + s.getObject() );
+		        temp += "link has property " + s.getPredicate() + " with value " + s.getObject();
+		       // Debug.printDbgLine( "link has property " + s.getPredicate() + " with value " + s.getObject() );
 		    }
+		    result.setMessage(temp);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

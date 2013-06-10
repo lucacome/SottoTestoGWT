@@ -1,6 +1,6 @@
 package com.sottotesto.shared;
 
-import com.sottotesto.shared.TagmeData;
+import java.util.List;
 
 public class TagmeResponse implements java.io.Serializable{
 	/**
@@ -16,6 +16,7 @@ public class TagmeResponse implements java.io.Serializable{
 	private TagmeData jsonData;
 	private int resNum;
 	private long time;
+	private List<String> titleTag;
 	
 	public TagmeResponse() {
 		code = 0;
@@ -27,6 +28,7 @@ public class TagmeResponse implements java.io.Serializable{
 		jsonData = new TagmeData();
 		resNum = 0;
 		time = 0;
+		titleTag = null;
 	}
 	
 	
@@ -49,4 +51,6 @@ public class TagmeResponse implements java.io.Serializable{
 	public int getResNum(){return resNum;}	
 	public void setTime(long x) {time = x;}
 	public long getTime(){return time;}	
+	public void setTitleTag(List<String> x) {titleTag = x;}
+	public List<String> getTitleTag(){return titleTag;}
 }

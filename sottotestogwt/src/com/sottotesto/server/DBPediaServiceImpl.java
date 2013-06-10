@@ -1,5 +1,6 @@
 package com.sottotesto.server;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,13 +34,13 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		ResultSet results = null;
 		String resultQueryXML = "";
 		String resultQueryText = "";
-		
-		
-		for (int i=0; i<=tagmResp.getResNum()-1; i++){
-			if ( tagmResp.getJsonData().annotations.get(i).rho > 0.02){
-
-				String titletag = tagmResp.getJsonData().annotations.get(i).title;	
-				titletag = titletag.replaceAll(" ", "_");
+		List<String> titletagme = tagmResp.getTitleTag();
+		Iterator<String> itertitle =  titletagme.iterator();
+		//for (int i=0; i<=tagmResp.getResNum()-1; i++){
+		while (itertitle.hasNext()){
+			
+				String titletag = itertitle.next();	
+				//titletag = titletag.replaceAll(" ", "_");
 				
 				for (int j=0; j <= dbprop.size()-1; j++){
 				String s2 = "PREFIX  dbpprop: <http://dbpedia.org/property/>\n" +
@@ -49,7 +50,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 				"<http://dbpedia.org/resource/" + titletag + "> dbpprop:"+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
 				"  }\n" +	            
 	            "";
-	            Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
+	         //   Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 				Query query2 = QueryFactory.create(s2); //s2 = the query above
 				QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
 				results = qExe.execSelect();
@@ -58,10 +59,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 				resultQueryText += ResultSetFormatter.asText(results);
 				}
 				//TODO output in json
-			}else{
-				Debug.printDbgLine("DBPediaServiceImpl.java: "+ tagmResp.getJsonData().annotations.get(i).title + "rho troppo basso");
 			
-			}
 		}
 	
 		responseQuery.setQueryResultXML(resultQueryXML);
