@@ -15,6 +15,7 @@ public class TagmeResponse implements java.io.Serializable{
 	private String error;
 	private TagmeData jsonData;
 	private int resNum;
+	private double maxrho;
 	private long time;
 	private List<String> titleTag;
 	
@@ -29,6 +30,7 @@ public class TagmeResponse implements java.io.Serializable{
 		resNum = 0;
 		time = 0;
 		titleTag = null;
+		maxrho = 0.1;
 	}
 	
 	
@@ -48,7 +50,9 @@ public class TagmeResponse implements java.io.Serializable{
 	public void setJsonData(TagmeData x) {jsonData = x;}
 	public TagmeData getJsonData(){return jsonData;}
 	public void setResNum(int x) {resNum = x;}
-	public int getResNum(){return resNum;}	
+	public int getResNum(){return resNum;}
+	public void setRho(double x) {maxrho = x;}
+	public double getRho(){return maxrho;}
 	public void setTime(long x) {time = x;}
 	public long getTime(){return time;}	
 	public void setTitleTag(List<String> x) {titleTag = x;}
