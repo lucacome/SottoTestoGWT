@@ -18,9 +18,11 @@ import com.hp.hpl.jena.rdf.model.RDFReader;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.sottotesto.client.EkpService;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
+import com.sottotesto.shared.Utility;
 
 
 public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
@@ -31,71 +33,94 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 	private static final long serialVersionUID = 1L;
 	public EkpResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("EkpServiceImpl.java: sendToServer()");
+		Debug.printDbgLine("EkpServiceImpl.java: input="+input);
+
+		long StartTime = System.currentTimeMillis();
 
 		EkpResponse result = new EkpResponse();
 		String temp = "";
-		Model m = ModelFactory.createDefaultModel();
 
-		RDFReader arp = m.getReader();
+		Model m = null;
+		m = ModelFactory.createDefaultModel();
+
+		RDFReader arp = null;
+		arp = m.getReader();
 
 
 		//	String url = "http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input;
 		try {
-			URL url = new URL ("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input);
+			//URL url = new URL ("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input);
 
 			//open TAGME connection
-			HttpURLConnection connessione = (HttpURLConnection) url.openConnection();
+			HttpURLConnection connessione = null;
+			InputStream stream = null;
+			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input).openConnection();			
 			connessione.setRequestMethod("GET");
 			connessione.setDoOutput(true);
 			connessione.setRequestProperty("Accept", "application/rdf+xml");
 
+			stream = connessione.getInputStream();
 			//read TAGME response
 			result.setCode(connessione.getResponseCode());
 			result.setMessage(connessione.getResponseMessage());
 			result.setContentType(connessione.getContentType());
+			result.setTag(input);
+			Debug.printDbgLine("URL="+connessione.getURL());
 			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
 			Debug.printDbgLine("EkpServiceImpl.java: respmessage="+connessione.getResponseMessage());
 			String responseEkpTemp = "";
 			if (result.getContentType().contains("application/rdf+xml")){		
-				Scanner inputs = new Scanner(connessione.getInputStream());	
+				Scanner inputs = new Scanner(stream);	
 				while (inputs.hasNextLine())
-					responseEkpTemp += (inputs.nextLine());
+					responseEkpTemp += inputs.nextLine();
 
-				inputs.close();		
+				inputs.close();
+				connessione.disconnect();
+				stream.close();
 			}else{
 				responseEkpTemp = "empty";
 			}
-			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
+			//Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
 			if (responseEkpTemp.isEmpty()){
-				result.setMessage("Stringa vuota");
+				result.setRDF("Stringa vuota");
 			}else{
-				//TODO disabilitato temporenamente
-				//result.setMessage(responseEkpTemp);
+
+				result.setRDF(responseEkpTemp);
 				InputStream in = new ByteArrayInputStream(responseEkpTemp.getBytes("UTF-8"));
 				arp.read(m, in, null);
 				String about = "http://dbpedia.org/resource/"+input;
-				Resource link = m.getResource(about);
-				for (StmtIterator i = link.listProperties(); i.hasNext(); ) {
+				Resource link = null;
+				link = m.getResource(about);
+				StmtIterator i = null;
+				for (i = link.listProperties(); i.hasNext(); ) {
 					Statement s = i.next();
 					temp += "link has property " + s.getPredicate() + " with value " + s.getObject();
-					// Debug.printDbgLine( "link has property " + s.getPredicate() + " with value " + s.getObject() );
+					Debug.printDbgLine( "link has property " + s.getPredicate().getLocalName() + " with value " + s.getObject() );
 				}
-				result.setMessage(temp);
+				//result.setRDF(temp);
 			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
+			result.setCode(-1);
+			result.setError("MalformedURLException");
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
+			result.setCode(-1);
+			result.setError("UnsupportedEncodingException");
 			e.printStackTrace();
 		} catch (ProtocolException e) {
 			// TODO Auto-generated catch block
+			result.setCode(-1);
+			result.setError("ProtocolException");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			result.setCode(-1);
+			result.setError("IOException");
 			e.printStackTrace();
 		}
-
+		result.setTime(Utility.calcTimeTookMs(StartTime));
 		return result;
 
 	}

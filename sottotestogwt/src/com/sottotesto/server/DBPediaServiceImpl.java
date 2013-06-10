@@ -28,6 +28,12 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 
 	public DBPediaResponse sendToServer(TagmeResponse tagmResp, List<String> dbprop) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
+		
+//		select*
+//		where { 
+//		  <http://dbpedia.org/resource/Diego_Maradona> ?p ?o
+//		filter regex(?p, dbpedia2:)
+//		}
 
 		long StartTime = System.currentTimeMillis();
 		DBPediaResponse responseQuery = new DBPediaResponse();
