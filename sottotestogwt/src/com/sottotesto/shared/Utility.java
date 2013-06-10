@@ -104,6 +104,45 @@ public class Utility {
 		
 	}
 	
+	public static void showEkpDataDB(EkpResponse ekpResp){
+		Debug.printDbgLine("Utility.java: showEkpDataDB()");
+		
+		final ExtendedDialogBox dialogBox = new ExtendedDialogBox();
+		dialogBox.setText("Ekp Data");
+		dialogBox.setAnimationEnabled(true);
+		dialogBox.getElement().setId("ekpDataDB");
+		final Button closeButton = new Button("Close");
+
+		VerticalPanel dialogVPanel = new VerticalPanel();
+		dialogVPanel.addStyleName("dialogVPanel");
+		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(ekpResp.getTime())+"ms"));
+		dialogVPanel.add(new HTML("<br><b>Code:</b> "+String.valueOf(ekpResp.getCode())));
+		dialogVPanel.add(new HTML("<br><b>Message:</b> "+ekpResp.getMessage()));
+		dialogVPanel.add(new HTML("<br><b>ContentType:</b> "+ekpResp.getContentType()));
+		
+		if (ekpResp.getCode() != 200)
+			dialogVPanel.add(new HTML("<br><b>Error:</b> "+ekpResp.getError()));
+		else{
+			dialogVPanel.add(new HTML("<br><b>Response:</b> "+ekpResp.getMessage()));
+		}
+		
+		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+		dialogVPanel.add(closeButton);
+		dialogBox.setWidget(dialogVPanel);
+		dialogBox.center();
+		
+		dialogBox.show();
+		
+		closeButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				Debug.printDbgLine("Utility.java: closeEkpData()");
+				dialogBox.hide();
+				dialogBox.removeFromParent();
+			}
+		});
+		
+	}
+	
 	
 	private static class ExtendedDialogBox extends DialogBox {
 

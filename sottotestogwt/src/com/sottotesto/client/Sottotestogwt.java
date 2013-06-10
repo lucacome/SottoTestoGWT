@@ -43,11 +43,6 @@ public class Sottotestogwt implements EntryPoint {
 	 // The message displayed to the user when the server cannot be reached or returns an error.
 	private static final String SERVER_ERROR = "An error occurred while attempting to contact the server. Please check your network connection and try again.";
 	
-	// Create remote service proxyes to talk to the server-side services
-	private final TagmeServiceAsync tagmeService = GWT.create(TagmeService.class);	
-	private final DBPediaServiceAsync dbpediaService = GWT.create(DBPediaService.class);
-	private final EkpServiceAsync ekpService = GWT.create(EkpService.class);
-	
 	private String textAreaDefText; //default text written on textarea
 	private String textSendButton;  //default tet written on send button
 	private Button sendButton;     //button to call tagme
@@ -56,28 +51,44 @@ public class Sottotestogwt implements EntryPoint {
 	private Label serverResponseLabel;
 	private Label textAreaLabel;
 	
+	// Create remote service proxyes to talk to the server-side services
+	private final TagmeServiceAsync tagmeService = GWT.create(TagmeService.class);	
+	private final DBPediaServiceAsync dbpediaService = GWT.create(DBPediaService.class);
+	private final EkpServiceAsync ekpService = GWT.create(EkpService.class);
+	
 	//Service status panel items
 	ContentPanel serviceStatusPanel = null;
 	HorizontalLayoutContainer serviceStatusPanelHC;
 	VerticalPanel tagmeStatusVP;
 	VerticalPanel dbpediaStatusVP;
+	VerticalPanel ekpStatusVP;
 	HTML HtmlTagmeService;
 	HTML HtmlDBPediaService;
+	HTML HtmlEkpService;
+	String HTMLloadIconString="<img src='loading.gif'/>";
 	String HTMLtagmeServiceStringWaiting="Tagme Service: Waiting.";
-	String HTMLtagmeServiceStringCalling="Tagme Service: Calling ...";
+	String HTMLtagmeServiceStringCalling=HTMLloadIconString+"Tagme Service: Calling ...";
 	String HTMLtagmeServiceStringOK="Tagme Service: <span style='color:green;'>SUCCESS</span>";
 	String HTMLtagmeServiceStringFAIL="Tagme Service: <span style='color:red;'>FAILED</span>";
 	String HTMLtagmeServiceStringSkipped="Tagme Service: <span style='color:yellow;'>Skipped</span>";
 	String HTMLdbpediaServiceStringWaiting="DBPedia Service: Waiting.";
-	String HTMLdbpediaServiceStringCalling="DBPedia Service: Calling ...";
+	String HTMLdbpediaServiceStringCalling=HTMLloadIconString+"DBPedia Service: Calling ...";
 	String HTMLdbpediaServiceStringOK="DBPedia Service: <span style='color:green;'>SUCCESS</span>";
 	String HTMLdbpediaServiceStringFAIL="DBPedia Service: <span style='color:red;'>FAILED</span>";
 	String HTMLdbpediaServiceStringSkipped="DBPedia Service: <span style='color:yellow;'>Skipped</span>";
+	String HTMLekpServiceStringWaiting="Ekp Service: Waiting.";
+	String HTMLekpServiceStringCalling=HTMLloadIconString+"Ekp Service: Calling ...";
+	String HTMLekpServiceStringOK="Ekp Service: <span style='color:green;'>SUCCESS</span>";
+	String HTMLekpServiceStringFAIL="Ekp Service: <span style='color:red;'>FAILED</span>";
+	String HTMLekpServiceStringSkipped="Ekp Service: <span style='color:yellow;'>Skipped</span>";
 	Button tagmeShowDataBTN;
 	Button dbpediaShowDataBTN;
+	Button ekpShowDataBTN;
 	
+	//service responses variables
 	private TagmeResponse tagmeResp; //response of TAGME service
-	private DBPediaResponse dbpediaResp; //response of TAGME service
+	private DBPediaResponse dbpediaResp; //response of DBPEDIA service
+	private EkpResponse ekpResp; //response of EKP service
 	
 	
 	
@@ -136,6 +147,8 @@ public class Sottotestogwt implements EntryPoint {
 		
 		
 		tagmeResp = new TagmeResponse();
+		dbpediaResp = new DBPediaResponse();
+		ekpResp = new EkpResponse();
 		
 		textAreaLabel = new Label();
 		textAreaLabel.setText("Scrivi una frase:");
@@ -195,13 +208,23 @@ public class Sottotestogwt implements EntryPoint {
 		tagmeService.sendToServer(textToServer, new AsyncCallback<TagmeResponse>() {
 					public void onFailure(Throwable caught) {
 						Debug.printDbgLine("Sottotestogwt.java: callTagme(): tagmeService:onFailure()");
-						// Show the RPC error message to the user
-						serverResponseLabel.addStyleName("serverResponseLabelError");
-						serverResponseLabel.setText("Remote Procedure Call - Failure");
+					
+						//set the error
+						tagmeResp = new TagmeResponse();
+						tagmeResp.setCode(-1);
+						tagmeResp.setError("Error Callig service Module:"+
+										   "<br>Cause: "+caught.getCause()+
+										   "<br><br>Message: "+caught.getMessage()+
+										   "<br><br>StackTrace: "+caught.getStackTrace().toString());
 						
-						HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL);
-						tagmeShowDataBTN.setVisible(false);
+						HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL); //show the fail
+						tagmeShowDataBTN.setVisible(true); //allow to see what gone wrong
+						
+						//skip all other services
 						HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
+						dbpediaShowDataBTN.setVisible(false);
+						HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
+						ekpShowDataBTN.setVisible(false);
 					}
 
 					public void onSuccess(TagmeResponse result) {
@@ -211,28 +234,37 @@ public class Sottotestogwt implements EntryPoint {
 						if (!(tagmeResp.getCode()==200)){
 							//Tagme ha avuto qualche problema!
 							
-							HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL);
-							tagmeShowDataBTN.setVisible(true);
+							HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL); //show the fail
+							tagmeShowDataBTN.setVisible(true); //allow to see what gone wrong
+							
+							//skip all other services
 							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
+							dbpediaShowDataBTN.setVisible(false);
+							HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
+							ekpShowDataBTN.setVisible(false);
 						}
 						else if (tagmeResp.getResNum()<1){
 							//Tagme OK, ma non ha taggato nulla!
 							
-							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK);
+							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK+" (but 0!)");
 							tagmeShowDataBTN.setVisible(true);
+							
+							//skip all other services
 							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
+							dbpediaShowDataBTN.setVisible(false);
+							HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
+							ekpShowDataBTN.setVisible(false);
 						}
 						else {
 							//Tagme OK
 							
-							//serverResponseLabel.setText(String.valueOf(tagmeResp.getCode())+": "+tagmeResp.getJson());
-							sendButton.setEnabled(true);
+							sendButton.setEnabled(true); //allow user to send new text
 							
-							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK);
-							tagmeShowDataBTN.setVisible(true);
-							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling);
-							
+							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
+							tagmeShowDataBTN.setVisible(true); //allow to see the data
+														
 							//chiamiamo DBPedia
+							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling);
 							List<String> dbproperty = new ArrayList<String>();
 							List<String> dbproperty2 = new ArrayList<String>();
 							dbproperty.add("birthDate");
@@ -243,6 +275,7 @@ public class Sottotestogwt implements EntryPoint {
 							callDBPedia(dbproperty2);
 							
 							//chiamiamo Ekp
+							HtmlEkpService.setHTML(HTMLekpServiceStringCalling);
 							List<String> titletagme = tagmeResp.getTitleTag();
 							Iterator<String> itertitle =  titletagme.iterator();
 							while (itertitle.hasNext()){
@@ -260,16 +293,19 @@ public class Sottotestogwt implements EntryPoint {
 		
 		dbpediaService.sendToServer(tagmeResp, dbprop, new AsyncCallback<DBPediaResponse>() {
 		public void onFailure(Throwable caught) {
-			// Show the RPC error message to the user
-			serverResponseLabel.setText("Error calling DBPedia Service");		
+			//set the error
+			dbpediaResp = new DBPediaResponse();
+			dbpediaResp.setCode(-1);
+			dbpediaResp.setQueryResultXML("Error Callig service Module:"+
+							   "<br>Cause: "+caught.getCause()+
+							   "<br><br>Message: "+caught.getMessage()+
+							   "<br><br>StackTrace: "+caught.getStackTrace().toString());
 			
-			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
-			dbpediaShowDataBTN.setVisible(false);
+			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL); //show the fail
+			dbpediaShowDataBTN.setVisible(true); //allow to see what gone wrong
 		}
 
-		public void onSuccess(DBPediaResponse result) {			
-			String temp = serverResponseLabel.getText();
-			//serverResponseLabel.setText(temp + new HTML(result.getQueryResultXML()) );
+		public void onSuccess(DBPediaResponse result) {	
 			Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
 			
 			dbpediaResp = result;
@@ -282,19 +318,29 @@ public class Sottotestogwt implements EntryPoint {
 	
 	private void callEkp(String input){
 		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
-		//String temp = "Diego_Maradona";	
 		Debug.printDbgLine("Sottotestogwt.java: Ekp input="+input);
 
 		ekpService.sendToServer(input, new AsyncCallback<EkpResponse>() {
 		public void onFailure(Throwable caught) {
-			// Show the RPC error message to the user
-			serverResponseLabel.setText("Error calling EkpService");			
+			//set the error
+			ekpResp = new EkpResponse();
+			ekpResp.setCode(-1);
+			ekpResp.setError("Error Callig service Module:"+
+							   "<br>Cause: "+caught.getCause()+
+							   "<br><br>Message: "+caught.getMessage()+
+							   "<br><br>StackTrace: "+caught.getStackTrace().toString());
+			
+			HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
+			ekpShowDataBTN.setVisible(true); //allow to see what gone wrong			
 		}
 
 		public void onSuccess(EkpResponse result) {			
-			String tempo = serverResponseLabel.getText();
-			serverResponseLabel.setText(tempo+result.getMessage());	
 			Debug.printDbgLine("Sottotestogwt.java: Ekp output="+result.getMessage());
+			
+			ekpResp = result;
+			
+			HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the fail
+			ekpShowDataBTN.setVisible(true); //allow to see what gone wrong		
 		}});
 		
 		
@@ -306,7 +352,7 @@ public class Sottotestogwt implements EntryPoint {
 		//main panel
 		serviceStatusPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
 		serviceStatusPanel.setHeadingText("Service Status");
-		serviceStatusPanel.setPixelSize(RootPanel.get().getOffsetWidth(), 90);
+		serviceStatusPanel.setPixelSize(RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*10/100), 90);
 		serviceStatusPanel.setCollapsible(true);
 		serviceStatusPanelHC = new HorizontalLayoutContainer();
 		
@@ -336,9 +382,22 @@ public class Sottotestogwt implements EntryPoint {
 		dbpediaStatusVP.setBorderWidth(0);
 		dbpediaShowDataBTN.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showDBPediaDataDB(dbpediaResp);}});
 		
+		//ekp service
+		HtmlEkpService = new HTML();
+		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
+		ekpShowDataBTN = new Button();
+		ekpShowDataBTN.setText("View Data");
+		ekpShowDataBTN.setVisible(false);
+		ekpStatusVP = new VerticalPanel();
+		ekpStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+		ekpStatusVP.add(HtmlEkpService);
+		ekpStatusVP.add(ekpShowDataBTN);		
+		ekpStatusVP.setBorderWidth(0);
+		ekpShowDataBTN.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showEkpDataDB(ekpResp);}});
 		
-		serviceStatusPanelHC.add(tagmeStatusVP, new HorizontalLayoutData(0.5, 1, new Margins(4)));
-		serviceStatusPanelHC.add(dbpediaStatusVP, new HorizontalLayoutData(0.5, 1, new Margins(4)));
+		serviceStatusPanelHC.add(tagmeStatusVP, new HorizontalLayoutData(0.33, 1, new Margins(4)));
+		serviceStatusPanelHC.add(dbpediaStatusVP, new HorizontalLayoutData(0.33, 1, new Margins(4)));
+		serviceStatusPanelHC.add(ekpStatusVP, new HorizontalLayoutData(0.33, 1, new Margins(4)));
 		serviceStatusPanelHC.setBorders(true);
 		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
 		
