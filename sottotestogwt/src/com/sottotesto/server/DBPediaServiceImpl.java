@@ -19,7 +19,7 @@ import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
 
 public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaService {
-	
+
 	/**
 	 * 
 	 */
@@ -28,7 +28,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 
 	public DBPediaResponse sendToServer(TagmeResponse tagmResp, List<String> dbprop) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
-		
+
 		long StartTime = System.currentTimeMillis();
 		DBPediaResponse responseQuery = new DBPediaResponse();
 		ResultSet results = null;
@@ -36,39 +36,38 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		String resultQueryText = "";
 		List<String> titletagme = tagmResp.getTitleTag();
 		Iterator<String> itertitle =  titletagme.iterator();
-		//for (int i=0; i<=tagmResp.getResNum()-1; i++){
+
 		while (itertitle.hasNext()){
-			
-				String titletag = itertitle.next();	
-				//titletag = titletag.replaceAll(" ", "_");
-				
-				for (int j=0; j <= dbprop.size()-1; j++){
+
+			String titletag = itertitle.next();	
+
+			for (int j=0; j <= dbprop.size()-1; j++){
 				String s2 = "PREFIX  dbpprop: <http://dbpedia.org/property/>\n" +
-	    		"\n" +
-	    		"SELECT  *\n" +
-	            "WHERE {\n" +
-				"<http://dbpedia.org/resource/" + titletag + "> dbpprop:"+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
-				"  }\n" +	            
-	            "";
-	         //   Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
+						"\n" +
+						"SELECT  *\n" +
+						"WHERE {\n" +
+						"<http://dbpedia.org/resource/" + titletag + "> dbpprop:"+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
+						"  }\n" +	            
+						"";
+				//   Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 				Query query2 = QueryFactory.create(s2); //s2 = the query above
 				QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
 				results = qExe.execSelect();
 				//TODO fix xmlresult
 				resultQueryXML += ResultSetFormatter.asXMLString(results);
 				resultQueryText += ResultSetFormatter.asText(results);
-				}
-				//TODO output in json
-			
+			}
+			//TODO output in json
+
 		}
-	
+
 		responseQuery.setQueryResultXML(resultQueryXML);
 		responseQuery.setQueryResultText(resultQueryText);
-		
+
 		responseQuery.setTime(Utility.calcTimeTookMs(StartTime));
 		Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+responseQuery.getTime()+"ms]");
-				
+
 		return responseQuery;
-		
+
 	}
 }
