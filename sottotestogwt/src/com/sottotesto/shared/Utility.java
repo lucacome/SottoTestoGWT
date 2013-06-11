@@ -1,5 +1,8 @@
 package com.sottotesto.shared;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
 
@@ -105,10 +108,18 @@ public class Utility {
 
 		VerticalPanel dialogVPanel = new VerticalPanel();
 		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms"));			
-		dialogVPanel.add(new HTML("<br><b>Result Query:</b>"));
-		HTML XmlHtml = new HTML(); XmlHtml.setText(dbpediaResp.getQueryResultXML());
-		dialogVPanel.add(XmlHtml);
+		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms"));
+		dialogVPanel.add(new HTML("<br><b>Code:</b> "+String.valueOf(dbpediaResp.getCode())));
+		
+
+		if (dbpediaResp.getCode()==200){
+			dialogVPanel.add(new HTML("<br><b>Result Query:</b><br>"+dbpediaResp.getQueryResultXML()));
+		}
+		else{
+			dialogVPanel.add(new HTML("<br><b>Error:</b><br>"+dbpediaResp.getError()));			
+		}
+		 
+
 		
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		dialogVPanel.add(closeButton);
@@ -190,6 +201,36 @@ public class Utility {
 	                break;
 	        }
 	    }
+	}
+	
+	public static String getErrorHtmlString (Throwable throwable) {
+	    String ret="";
+	    while (throwable!=null) {
+	            if (throwable instanceof com.google.gwt.event.shared.UmbrellaException){
+	                    for (Throwable thr2 :((com.google.gwt.event.shared.UmbrellaException)throwable).getCauses()){
+	                            if (ret != "")
+	                            ret += thr2.toString();
+	                            ret += "<br><b>Caused by:</b> ";
+	                            ret += "<br>  at "+getErrorHtmlString(thr2);
+	                    }
+	            } else if (throwable instanceof com.google.web.bindery.event.shared.UmbrellaException){
+	                    for (Throwable thr2 :((com.google.web.bindery.event.shared.UmbrellaException)throwable).getCauses()){
+	                            if (ret != "")
+	                                    ret += "<br><b>Caused by:</b> ";
+	                            ret += thr2.toString();
+	                            ret += "<br>  at "+getErrorHtmlString(thr2);
+	                    }
+	            } else {
+	                    if (ret != "")
+	                            ret += "<br><b>Caused by:</b> ";
+	                    ret += throwable.toString();
+	                    for (StackTraceElement sTE : throwable.getStackTrace())
+	                            ret += "<br>  at "+sTE;
+	            }
+	            throwable = throwable.getCause();
+	    }
+
+	    return ret;
 	}
 	
 }

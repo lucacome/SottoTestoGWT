@@ -3,6 +3,9 @@ package com.sottotesto.client;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -196,9 +199,7 @@ public class Sottotestogwt implements EntryPoint {
 						tagmeResp = new TagmeResponse();
 						tagmeResp.setCode(-1);
 						tagmeResp.setError("Error Callig service Module:"+
-										   "<br>Cause: "+caught.getCause()+
-										   "<br><br>Message: "+caught.getMessage()+
-										   "<br><br>StackTrace: "+caught.getStackTrace().toString());
+										   "<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 						
 						HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL); //show the fail
 						tagmeShowDataBTN.setVisible(true); //allow to see what gone wrong
@@ -282,12 +283,10 @@ public class Sottotestogwt implements EntryPoint {
 		dbpediaService.sendToServer(tagmeResp, dbprop, new AsyncCallback<DBPediaResponse>() {
 		public void onFailure(Throwable caught) {
 			//set the error
-			dbpediaResp = new DBPediaResponse();
+			dbpediaResp = new DBPediaResponse(); 
 			dbpediaResp.setCode(-1);
 			dbpediaResp.setQueryResultXML("Error Callig service Module:"+
-							   "<br>Cause: "+caught.getCause()+
-							   "<br><br>Message: "+caught.getMessage()+
-							   "<br><br>StackTrace: "+caught.getStackTrace().toString());
+							   "<br><br><b>StackTrace: </b><br>"+Utility.getErrorHtmlString(caught));
 			
 			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL); //show the fail
 			dbpediaShowDataBTN.setVisible(true); //allow to see what gone wrong
@@ -298,7 +297,9 @@ public class Sottotestogwt implements EntryPoint {
 			
 			dbpediaResp = result;
 			
-			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
+			if (dbpediaResp.getCode()!=200) HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
+			else HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
+			
 			dbpediaShowDataBTN.setVisible(true);
 		}});
 		
@@ -321,9 +322,7 @@ public class Sottotestogwt implements EntryPoint {
 			EkpResponse ekpRespTmp = new EkpResponse();
 			ekpRespTmp.setCode(-1);
 			ekpRespTmp.setError("Error Callig service Module:"+
-							   "<br>Cause: "+caught.getCause()+
-							   "<br><br>Message: "+caught.getMessage()+
-							   "<br><br>StackTrace: "+caught.getStackTrace().toString());
+							   "<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 			
 			ekpResp.add(ekpRespTmp);
 			HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail

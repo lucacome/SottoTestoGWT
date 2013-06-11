@@ -7,6 +7,7 @@ public class DBPediaResponse implements java.io.Serializable{
 	private static final long serialVersionUID = 1L;
 	private int code;
 	private String message;
+	private String error;
 	private String contentType;
 	private String queryResultText;
 	private String queryResultJson;
@@ -21,6 +22,7 @@ public class DBPediaResponse implements java.io.Serializable{
 		queryResultJson = "";
 		queryResultXML = "";
 		time = 0;
+		error = "";
 	}
 	
 	
@@ -39,4 +41,6 @@ public class DBPediaResponse implements java.io.Serializable{
 	public String getQueryResultXML(){return queryResultXML;}
 	public void setTime(long x) {time = x;}
 	public long getTime(){return time;}
+	public String getError(){return error;}
+	public void setError(String x) {error = x;}
 }
