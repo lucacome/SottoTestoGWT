@@ -112,8 +112,9 @@ public class Sottotestogwt implements EntryPoint {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 					Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): textAreaOnKeyUpEnter()");
 					textArea.setText(textArea.getText().replace("\n", ""));	
-					if (sendButton.isEnabled())
-						callTagme();					
+					if (sendButton.isEnabled()){
+						callTagme();			
+					}
 				}
 			}			
 		}
@@ -293,7 +294,7 @@ public class Sottotestogwt implements EntryPoint {
 		}
 
 		public void onSuccess(DBPediaResponse result) {	
-			Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
+			//Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
 			
 			dbpediaResp = result;
 			

@@ -35,6 +35,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 		TagmeResponse tagmeResp = new TagmeResponse();
 		try {
 			//config TAGME request parameters
+			tagmeResp.setRho(0.08);
 			URL url = new URL ("http://tagme.di.unipi.it/tag");
 			String charset = "UTF-8";
 			String param1name = "text";
@@ -96,7 +97,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 					titletag.add(responseTagTmp);	
 					responseTagTmp = "";
 				}else{
-					Debug.printDbgLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + "rho troppo basso");
+					Debug.printDbgLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + " rho troppo basso("+tagmeResp.getJsonData().annotations.get(i).rho+") e max="+tagmeResp.getRho());
 				}
 			}
 			tagmeResp.setTitleTag(titletag);
