@@ -2,6 +2,8 @@ package com.sottotesto.shared;
 
 import java.util.List;
 
+import com.google.gson.JsonObject;
+
 public class TagmeResponse implements java.io.Serializable{
 	/**
 	 * 
@@ -18,6 +20,7 @@ public class TagmeResponse implements java.io.Serializable{
 	private double maxrho;
 	private long time;
 	private List<String> titleTag;
+
 	
 	public TagmeResponse() {
 		code = 0;

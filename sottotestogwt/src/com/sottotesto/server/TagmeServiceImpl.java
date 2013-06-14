@@ -17,6 +17,9 @@ import java.util.Scanner;
 import org.apache.http.ProtocolException;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.TagmeService;
 import com.sottotesto.shared.Debug;
@@ -25,17 +28,21 @@ import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
 
 public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeService {
+;
 
 	public TagmeResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
 
 		long StartTime = System.currentTimeMillis();
+		
+		//JData.InitJData();
+
 
 
 		TagmeResponse tagmeResp = new TagmeResponse();
 		try {
 			//config TAGME request parameters
-			tagmeResp.setRho(0.08);
+			tagmeResp.setRho(0.06);
 			URL url = new URL ("http://tagme.di.unipi.it/tag");
 			String charset = "UTF-8";
 			String param1name = "text";
@@ -87,12 +94,15 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			List<String> titletag = new ArrayList<String>();
 			//converti Json -> gson
 			Gson gson = new Gson();
+			JsonArray jarray = new JsonArray();
 			tagmeResp.setJsonData(gson.fromJson(tagmeResp.getJson(), TagmeData.class));
 			tagmeResp.setResNum(tagmeResp.getJsonData().annotations.size());
 			for (int i=0; i<=tagmeResp.getResNum()-1; i++){
 				if ( tagmeResp.getJsonData().annotations.get(i).rho > tagmeResp.getRho()){
 
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
+					//JData.jdata.add("title"+i, jarray);
+					//JData.jdata.addProperty("title"+i, responseTagTmp);
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
 					titletag.add(responseTagTmp);	
 					responseTagTmp = "";
@@ -101,7 +111,14 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 				}
 			}
 			tagmeResp.setTitleTag(titletag);
-
+			//JsonElement jelement = null;
+			
+			//jarray.add(jelement);
+			
+//			Gson prova = new Gson();
+//			String prova2 = prova.toJson();
+//			Debug.printDbgLine("BOH"+prova2);
+			//Debug.printDbgLine("BOH"+JData.jdata.toString());
 		} catch (MalformedURLException e) {
 			tagmeResp.setCode(-1);
 			tagmeResp.setError("Error MalformedURLException");

@@ -7,6 +7,6 @@ import com.sottotesto.shared.EkpResponse;
  * The async counterpart of <code>GreetingService</code>.
  */
 public interface EkpServiceAsync {
-	void sendToServer(String input, AsyncCallback<EkpResponse> callback)
+	void sendToServer(String input, String data, AsyncCallback<EkpResponse> callback)
 			throws IllegalArgumentException;
 }

@@ -9,5 +9,5 @@ import com.sottotesto.shared.EkpResponse;
  */
 @RemoteServiceRelativePath("ekp")
 public interface EkpService extends RemoteService {
-	EkpResponse sendToServer(String name) throws IllegalArgumentException;
+	EkpResponse sendToServer(String name, String data) throws IllegalArgumentException;
 }

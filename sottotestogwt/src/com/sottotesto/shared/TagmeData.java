@@ -1,9 +1,14 @@
 package com.sottotesto.shared;
 
 import java.util.List;
-import com.sottotesto.shared.Annotation;
+
+
 	
 public class TagmeData implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5636155407078511943L;
 	String timestamp = null;
 	int time = 0;
 	String api = null;
