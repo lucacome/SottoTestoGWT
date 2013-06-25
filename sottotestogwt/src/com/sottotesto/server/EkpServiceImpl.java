@@ -1,9 +1,11 @@
 package com.sottotesto.server;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -12,12 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Scanner;
+import org.openjena.riot.*;
+import org.apache.jena.riot.out.RDFJSONWriter;
+import org.apache.jena.riot.system.JenaWriterBase;
 
 import com.google.appengine.labs.repackaged.com.google.common.collect.ArrayListMultimap;
 import com.google.appengine.labs.repackaged.com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFReader;
@@ -93,7 +99,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			if (responseEkpTemp.isEmpty()){
 				result.setRDF("Stringa vuota");
 			}else{
-				List<String> a;
 				result.setRDF(responseEkpTemp);
 				InputStream in = new ByteArrayInputStream(responseEkpTemp.getBytes("UTF-8"));
 				arp.read(m, in, null);
@@ -112,23 +117,23 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				}
 				//jdata.tag.put(input, jdata.linkmap);
 				jdata.setLink(linkmap);
-				Debug.printDbgLine(jdata.getLink().toString());
+				Debug.printDbgLine("EkpServiceImpl.java: linkMap= \n"+jdata.getLink().toString());
 				Map<String,Multimap<String,String>> tag = new HashMap<String,Multimap<String,String>>();
 				tag.put(input, jdata.getLink());
 				jdata.setTag(tag);
-				Debug.printDbgLine(jdata.getTag().toString());
-				Debug.printDbgLine(jdata.getLink().toString());
+				Debug.printDbgLine("EkpServiceImpl.java: tag= \n"+jdata.getTag().toString());
+				Debug.printDbgLine("EkpServiceImpl.java: linkMap2= \n"+jdata.getLink().toString());
 				//Type fooType = new TypeToken<Multimap<String,String>>() {}.getType();
 				//JData.InitJData();
 				//result.setRDF(temp);
 				Gson ekpj = new Gson();
 				String p;
-				p = ekpj.toJson(jdata);
-				Debug.printDbgLine("EE "+p);
+				p = ekpj.toJson(jdata, JData.class);
+				Debug.printDbgLine("EkpServiceImpl.java: jdata.ToJson= \n"+p);
 				result.jdata=data+p;
 				//	Debug.printDbgLine("aa "+JData.tag);
-
-
+				
+			
 			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
