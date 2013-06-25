@@ -8,5 +8,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gson"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gxt"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jena"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gwt_extra"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

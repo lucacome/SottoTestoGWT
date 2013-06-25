@@ -1,22 +1,20 @@
-$entry(@com.sottotesto.shared.Debug::printDbgLine(Ljava/lang/String;)("greaphvisualizer.js: started");
 var labelType, useGradients, nativeTextSupport, animate;
 
 (function() {
-	$entry(@com.sottotesto.shared.Debug::printDbgLine(Ljava/lang/String;)("greaphvisualizer.js: function()");
-  var ua = navigator.userAgent,
-      iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
-      typeOfCanvas = typeof HTMLCanvasElement,
-      nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
-      textSupport = nativeCanvasSupport 
-        && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
-  //I'm setting this based on the fact that ExCanvas provides text support for IE
-  //and that as of today iPhone/iPad current text support is lame
-  labelType = (!nativeCanvasSupport || (textSupport && !iStuff))? 'Native' : 'HTML';
-  nativeTextSupport = labelType == 'Native';
-  useGradients = nativeCanvasSupport;
-  animate = !(iStuff || !nativeCanvasSupport);
-  $entry(@com.sottotesto.shared.Debug::printDbgLine(Ljava/lang/String;)("greaphvisualizer.js: function() ended");
-})();
+	  var ua = navigator.userAgent,
+	      iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
+	      typeOfCanvas = typeof HTMLCanvasElement,
+	      nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
+	      textSupport = nativeCanvasSupport 
+	        && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
+	  //I'm setting this based on the fact that ExCanvas provides text support for IE
+	  //and that as of today iPhone/iPad current text support is lame
+	  labelType = (!nativeCanvasSupport || (textSupport && !iStuff))? 'Native' : 'HTML';
+	  nativeTextSupport = labelType == 'Native';
+	  useGradients = nativeCanvasSupport;
+	  animate = !(iStuff || !nativeCanvasSupport);
+	})();
+  
 
 var Log = {
   elem: false,
@@ -29,31 +27,10 @@ var Log = {
 };
 
 
-function init(){
-	$entry(@com.sottotesto.shared.Debug::printDbgLine(Ljava/lang/String;)("greaphvisualizer.js: init()");
+function init(jdata){
     //init data
-    var json = {
-            "id": "1",
-            "name": "Main",
-            "children": [{
-                "id": "2",
-                "name": "Child1",
-                "data": {
-                    "band": "Nine Inch Nails",
-                    "relation": "member of band"
-                	},
-                "children": [{
-    	        "id": "3",
-                	"name": "SubChild1",
-                	"data": {
-                    	"band": "Nine Inch Nails",
-                    	"relation": "member of band"
-                		},
-    		"children": []
-                }]
-            }],
-            "data": []
-        };
+    var json = jdata;
+    
     //end
     var infovis = document.getElementById('infovis');
     var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;

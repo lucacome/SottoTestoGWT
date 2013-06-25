@@ -12,22 +12,22 @@ import com.google.appengine.labs.repackaged.com.google.common.collect.Multimap;
 
 
 
-public class JData {
+public class JData implements java.io.Serializable{
+	
+	private static final long serialVersionUID = 1L;
+	
 	//public static JsonObject jdata = new JsonObject();
-	public String title = null;
-	public static String type = null;
+//	public String title = null;
+//	public static String type = null;
 //	public Map<String, List<String>> linkmap = ArrayListMultimap.create();
-	public Multimap<String, String> linkmap = ArrayListMultimap.create();
-	public Map<String, Multimap<String,String>> tag; 
+	private Multimap<String, String> linkmap = ArrayListMultimap.create();
+	private Map<String, Multimap<String,String>> tag; 
 	
 	public JData() {
-		// TODO Auto-generated constructor stub
-		//linkmap =
 		tag = new HashMap<String,Multimap<String,String>>();
-	}
-	public void CleanLink() {
 		linkmap = ArrayListMultimap.create();
 	}
+
 	public void setLink(Multimap<String,String> x) {linkmap = x;}
 	public Multimap<String,String> getLink(){return linkmap;}
 	public void setTag(Map<String,Multimap<String,String>> x) {tag = x;}
