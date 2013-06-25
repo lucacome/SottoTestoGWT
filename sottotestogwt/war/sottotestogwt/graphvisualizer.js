@@ -29,7 +29,6 @@ var Log = {
 
 function init(jdata){
     //init data
-	alert("init!");
     var json = jdata;
     
     //end
