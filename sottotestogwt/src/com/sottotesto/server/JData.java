@@ -3,29 +3,25 @@ package com.sottotesto.server;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.appengine.labs.repackaged.com.google.common.collect.ArrayListMultimap;
+import com.google.appengine.labs.repackaged.com.google.common.collect.HashMultimap;
 import com.google.appengine.labs.repackaged.com.google.common.collect.Multimap;
 
 
-
-
-
-
-
-public class JData implements java.io.Serializable{
-	
-	private static final long serialVersionUID = 1L;
-	
+public class JData {
 	//public static JsonObject jdata = new JsonObject();
-//	public String title = null;
-//	public static String type = null;
+	public String title = null;
+	public String type = null;
 //	public Map<String, List<String>> linkmap = ArrayListMultimap.create();
-	private Multimap<String, String> linkmap = ArrayListMultimap.create();
+	private Multimap<String, String> linkmap;
 	private Map<String, Multimap<String,String>> tag; 
 	
 	public JData() {
+		// TODO Auto-generated constructor stub
+		//linkmap =
+		linkmap = HashMultimap.create();
+		linkmap.clear();
 		tag = new HashMap<String,Multimap<String,String>>();
-		linkmap = ArrayListMultimap.create();
+		tag.clear();
 	}
 
 	public void setLink(Multimap<String,String> x) {linkmap = x;}

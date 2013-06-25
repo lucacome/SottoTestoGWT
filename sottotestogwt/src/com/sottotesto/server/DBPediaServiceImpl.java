@@ -33,24 +33,24 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 
 	public DBPediaResponse sendToServer(TagmeResponse tagmResp, List<String> dbprop) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
-		
-//		select*
-//		where { 
-//		  <http://dbpedia.org/resource/Diego_Maradona> ?p ?o
-//		filter regex(?p, dbpedia2:)
-//		}
+
+		//		select*
+		//		where { 
+		//		  <http://dbpedia.org/resource/Diego_Maradona> ?p ?o
+		//		filter regex(?p, dbpedia2:)
+		//		}
 
 		DBPediaResponse responseQuery;
 		ResultSet results = null;
 		long StartTime = System.currentTimeMillis();
 		responseQuery = new DBPediaResponse();
-		
+
 		String resultQueryXML = "";
 		String resultQueryText = "";
 		List<String> titletagme = tagmResp.getTitleTag();
 		Iterator<String> itertitle =  titletagme.iterator();
 		try {
-			
+
 
 			while (itertitle.hasNext()){
 
@@ -79,19 +79,19 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 			responseQuery.setQueryResultXML(resultQueryXML);
 			responseQuery.setQueryResultText(resultQueryText);
 
-			
+
 			Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+responseQuery.getTime()+"ms]");
 		} catch (Exception e) {			
 			Debug.printDbgLine("DBPediaServiceImpl.java: Exception: "+e.getMessage());
-			
+
 			//set error code
 			responseQuery.setCode(500);
-			
+
 			//set error message
 			if (e.getMessage().contains("imeout")){responseQuery.setError("Timeout contacting DBPedia");}
 			if (e.getMessage().contains("IOException")){responseQuery.setError("Unable to fetch URL");}
 			else responseQuery.setError("Error processing Request");
-			
+
 			responseQuery.setTime(Utility.calcTimeTookMs(StartTime));
 			return responseQuery;			
 		}

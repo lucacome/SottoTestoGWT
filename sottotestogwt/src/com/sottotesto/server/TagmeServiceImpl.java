@@ -28,13 +28,13 @@ import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
 
 public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeService {
-;
+	;
 
 	public TagmeResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
 
 		long StartTime = System.currentTimeMillis();
-		
+
 		//JData.InitJData();
 
 
@@ -112,12 +112,12 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			}
 			tagmeResp.setTitleTag(titletag);
 			//JsonElement jelement = null;
-			
+
 			//jarray.add(jelement);
-			
-//			Gson prova = new Gson();
-//			String prova2 = prova.toJson();
-//			Debug.printDbgLine("BOH"+prova2);
+
+			//			Gson prova = new Gson();
+			//			String prova2 = prova.toJson();
+			//			Debug.printDbgLine("BOH"+prova2);
 			//Debug.printDbgLine("BOH"+JData.jdata.toString());
 		} catch (MalformedURLException e) {
 			tagmeResp.setCode(-1);

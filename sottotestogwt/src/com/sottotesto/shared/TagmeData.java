@@ -3,7 +3,7 @@ package com.sottotesto.shared;
 import java.util.List;
 
 
-	
+
 public class TagmeData implements java.io.Serializable{
 	/**
 	 * 
@@ -14,9 +14,8 @@ public class TagmeData implements java.io.Serializable{
 	String api = null;
 	public List<Annotation> annotations = null;
 	String lang = null;
-	
-	public TagmeData(){}
 
+	public TagmeData(){}
 
 
 }

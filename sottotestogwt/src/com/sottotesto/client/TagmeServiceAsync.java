@@ -9,4 +9,5 @@ import com.sottotesto.shared.TagmeResponse;
 public interface TagmeServiceAsync {
 	void sendToServer(String input, AsyncCallback<TagmeResponse> callback)
 			throws IllegalArgumentException;
+	
 }

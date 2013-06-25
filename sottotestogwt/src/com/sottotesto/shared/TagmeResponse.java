@@ -21,7 +21,7 @@ public class TagmeResponse implements java.io.Serializable{
 	private long time;
 	private List<String> titleTag;
 
-	
+
 	public TagmeResponse() {
 		code = 0;
 		message = "";
@@ -35,9 +35,9 @@ public class TagmeResponse implements java.io.Serializable{
 		titleTag = null;
 		maxrho = 0.1;
 	}
-	
-	
-	
+
+
+
 	public void setCode(int x) {code = x;}
 	public int getCode(){return code;}	
 	public void setMessage(String x) {message = x;}

@@ -10,7 +10,7 @@ public class Annotation implements java.io.Serializable{
 	public double rho = 0.0;
 	public int end = 0;
 	public String spot = null;
-	
+
 	public Annotation(){}
 
 }

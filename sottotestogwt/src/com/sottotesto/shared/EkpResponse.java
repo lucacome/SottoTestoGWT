@@ -15,7 +15,7 @@ public class EkpResponse implements java.io.Serializable{
 	private String tag;
 	private long time;
 	public String jdata;
-	
+
 	public EkpResponse() {
 		code = 0;
 		message = "";
@@ -26,9 +26,9 @@ public class EkpResponse implements java.io.Serializable{
 		type = "";
 		jdata = "";
 	}
-	
-	
-	
+
+
+
 	public void setCode(int x) {code = x;}
 	public int getCode(){return code;}	
 	public void setMessage(String x) {message = x;}
