@@ -2,6 +2,7 @@
 
 /** Add css rules here for your application. */
 	/** Example rules used by the template application (remove for your app) */
+
 h1 {
 	font-size: 2em;
 	font-weight: bold;
@@ -15,7 +16,7 @@ h1 {
 	font-size: 16pt;
 }
 
-/** Most GWT widgets already have a style name defined */
+
 .gwt-DialogBox {
 	width: 400px;
 }
@@ -23,6 +24,12 @@ h1 {
 .gwt-StackPanel {
 	width: 200px;
 }
+
+
+#infovis-canvaswidget {
+  margin:25px 0 0 25px;
+}
+
 
 .infovis-RGraph {
 	width: 800px;
@@ -61,7 +68,6 @@ span.name {
   cursor: pointer;
 }
 
-/*TOOLTIPS*/
 .tip {
    text-align: left;
    width:auto;
@@ -179,9 +185,9 @@ a {
     height:600px;
     margin:auto;
     overflow:hidden;
+    background-color: black;
 }
 
-/*TOOLTIPS*/
 .tip {
     color: #111;
     width: 139px;
@@ -202,7 +208,7 @@ a {
   color: red;
 }
 
-/** Set ids using widget.getElement().setId("idOfElement") */
+
 #closeButton {
   margin: 15px 6px 6px;
 }

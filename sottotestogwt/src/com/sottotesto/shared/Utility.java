@@ -16,8 +16,11 @@ import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
+import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 
 public class Utility {
 
@@ -67,7 +70,12 @@ public class Utility {
 		
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		dialogVPanel.add(closeButton);
-		dialogBox.setWidget(dialogVPanel);
+		
+FlowLayoutContainer container = new FlowLayoutContainer();
+container.setScrollMode(ScrollMode.AUTO);
+container.setHeight(RootPanel.get("body").getOffsetHeight());
+container.add(dialogVPanel);
+dialogBox.setWidget(container);
 		dialogBox.center();
 		
 		dialogBox.show();
@@ -123,7 +131,12 @@ public class Utility {
 		
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		dialogVPanel.add(closeButton);
-		dialogBox.setWidget(dialogVPanel);
+		FlowLayoutContainer container = new FlowLayoutContainer();
+		container.setScrollMode(ScrollMode.AUTO);
+		container.setHeight(RootPanel.get("body").getOffsetHeight());
+		container.add(dialogVPanel);
+		dialogVPanel.setHeight(String.valueOf(dialogVPanel.getParent().getOffsetHeight())+"px");
+		dialogBox.setWidget(container);
 		dialogBox.center();
 		
 		dialogBox.show();
@@ -179,7 +192,11 @@ public class Utility {
 		}
 		
 		folder.selectTab(0);
-		dialogBox.setWidget(folder);
+		FlowLayoutContainer container = new FlowLayoutContainer();
+		container.setScrollMode(ScrollMode.AUTO);
+		container.setHeight(RootPanel.get("body").getOffsetHeight());
+		container.add(folder);
+		dialogBox.setWidget(container);
 		dialogBox.center();
 		
 		dialogBox.show();	
