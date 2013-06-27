@@ -250,4 +250,43 @@ dialogBox.setWidget(container);
 	    return ret;
 	}
 	
+	public static String getFakeEkpResponse(){
+		String resp = "";
+		
+		//header with prefixes
+		resp = "<rdf:RDF ...prefixes...>";
+		
+		//data: type-label pairs
+		resp += "<rdf:Description rdf:about=\"http://dbpedia.org/resource/University_of_Pisa\">";
+		resp += 	"<rdf:type rdf:resource=\"http://dbpedia.org/resource/Organization\"></rdf:type>";
+		resp +=		"<rdfs:label xml:lang=\"en\">University of Pisa</rdfs:label>";
+		resp += "</rdf:Description>";
+		resp += "<rdf:Description rdf:about=\"http://dbpedia.org/resource/Queen_Band\">";
+		resp += 	"<rdf:type rdf:resource=\"http://dbpedia.org/resource/Organization\"></rdf:type>";
+		resp +=		"<rdfs:label xml:lang=\"en\">Queen Band</rdfs:label>";
+		resp += "</rdf:Description>";
+		resp += "<rdf:Description rdf:about=\"http://dbpedia.org/resource/Siena\">";
+		resp += 	"<rdf:type rdf:resource=\"http://dbpedia.org/resource/Place\"></rdf:type>";
+		resp +=		"<rdfs:label xml:lang=\"en\">Siena</rdfs:label>";
+		resp += "</rdf:Description>";
+		resp += "<rdf:Description rdf:about=\"http://dbpedia.org/resource/Pisa\">";
+		resp += 	"<rdf:type rdf:resource=\"http://dbpedia.org/resource/Place\"></rdf:type>";
+		resp +=		"<rdfs:label xml:lang=\"en\">Siena</rdfs:label>";
+		resp += "</rdf:Description>";
+		
+		//data: linksTo entries (same of data type-label pairs)
+		resp += "<rdf:Description rdf:about=\"http://dbpedia.org/resource/Galileo_Galilei\">";
+		resp += 	"<j.o:linksToOrganization rdf:resource=\"http://dbpedia.org/resource/University_of_Pisa\">";
+		resp += 	"<j.o:linksToOrganization rdf:resource=\"http://dbpedia.org/resource/Queen_Band\">";
+		resp += 	"<j.o:linksToPlace rdf:resource=\"http://dbpedia.org/resource/Siena\">";
+		resp += 	"<j.o:linksToPlace rdf:resource=\"http://dbpedia.org/resource/Pisa\">";
+		resp += 	"<j.o:linksToPerson rdf:resource=\"http://dbpedia.org/resource/Galileo_Galilei\">";
+		resp += "</rdf:Description>";
+		
+		//end
+		resp += "</rdf:RDF>";
+		
+		return resp;
+	}
+	
 }
