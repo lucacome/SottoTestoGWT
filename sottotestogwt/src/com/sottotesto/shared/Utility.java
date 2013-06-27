@@ -1,16 +1,14 @@
 package com.sottotesto.shared;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.Button;
@@ -23,6 +21,9 @@ import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 
 public class Utility {
+	
+	private static int dbMaxHeight = RootPanel.get().getOffsetHeight();
+	private static int dbMaxWidth = RootPanel.get().getOffsetWidth()/3;
 
 	public static long calcTimeTookMs(long StartTimeMs){
 		return (System.currentTimeMillis()-StartTimeMs);
@@ -35,7 +36,6 @@ public class Utility {
 		dialogBox.setText("Tagme Data");
 		dialogBox.setAnimationEnabled(false);
 		dialogBox.getElement().setId("tagmeDataDB");
-		final Button closeButton = new Button("Close");
 
 		VerticalPanel dialogVPanel = new VerticalPanel();
 		dialogVPanel.addStyleName("dialogVPanel");
@@ -69,39 +69,21 @@ public class Utility {
 		}
 		
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-		dialogVPanel.add(closeButton);
+
+		FlowLayoutContainer container = new FlowLayoutContainer();
+		container.setScrollMode(ScrollMode.AUTO);		
+		container.add(dialogVPanel);		
+		dialogBox.setWidget(container);		
+		dialogBox.center(); //must be done for updating data for resizing
+		if (container.getOffsetHeight()>dbMaxHeight) container.setHeight(dbMaxHeight);
+		if (container.getOffsetWidth()>dbMaxWidth) container.setWidth(dbMaxWidth);
 		
-FlowLayoutContainer container = new FlowLayoutContainer();
-container.setScrollMode(ScrollMode.AUTO);
-container.setHeight(RootPanel.get("body").getOffsetHeight());
-container.add(dialogVPanel);
-dialogBox.setWidget(container);
 		dialogBox.center();
-		
 		dialogBox.show();
 		
-		// Create a handler for the sendButton and nameField
-		class DBInputHandler implements ClickHandler, KeyUpHandler {
-					public void onClick(ClickEvent event) {
-						dialogBox.hide();
-						dialogBox.removeFromParent();
-					}
-					public void onKeyUp(KeyUpEvent event) {				
-						if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER ||
-							event.getNativeKeyCode() == KeyCodes.KEY_ESCAPE) {
-							dialogBox.hide();
-							dialogBox.removeFromParent();					
-						}
-					}			
-				}
 		
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				Debug.printDbgLine("Utility.java: closeTagmeData()");
-				dialogBox.hide();
-				dialogBox.removeFromParent();
-			}
-		});
+		
+		
 		
 	}
 	
@@ -112,7 +94,6 @@ dialogBox.setWidget(container);
 		dialogBox.setText("DBPedia Data");
 		dialogBox.setAnimationEnabled(false);
 		dialogBox.getElement().setId("dbPediaDataDB");
-		final Button closeButton = new Button("Close");
 
 		VerticalPanel dialogVPanel = new VerticalPanel();
 		dialogVPanel.addStyleName("dialogVPanel");
@@ -130,25 +111,16 @@ dialogBox.setWidget(container);
 
 		
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-		dialogVPanel.add(closeButton);
 		FlowLayoutContainer container = new FlowLayoutContainer();
 		container.setScrollMode(ScrollMode.AUTO);
-		container.setHeight(RootPanel.get("body").getOffsetHeight());
 		container.add(dialogVPanel);
-		dialogVPanel.setHeight(String.valueOf(dialogVPanel.getParent().getOffsetHeight())+"px");
 		dialogBox.setWidget(container);
-		dialogBox.center();
+		dialogBox.center(); //must be done for updating data for resizing
+		if (container.getOffsetHeight()>dbMaxHeight) container.setHeight(dbMaxHeight);
+		if (container.getOffsetWidth()>dbMaxWidth) container.setWidth(dbMaxWidth);
 		
+		dialogBox.center();		
 		dialogBox.show();
-		
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				Debug.printDbgLine("Utility.java: closeDBPediaData()");
-				dialogBox.hide();
-				dialogBox.removeFromParent();
-			}
-		});
-		
 	}
 	
 	public static void showEkpDataDB(List<EkpResponse> ekpResp){
@@ -178,36 +150,56 @@ dialogBox.setWidget(container);
 				HTML rdfHtml = new HTML(); rdfHtml.setText(ekpResp.get(i).jdata);
 				dialogVPanel.add(rdfHtml);
 			}
-			final Button closeButton = new Button("Close");
-			closeButton.addClickHandler(new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					Debug.printDbgLine("Utility.java: closekpData()");
-					dialogBox.hide();
-					dialogBox.removeFromParent();
-				}
-			});
 			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-			dialogVPanel.add(closeButton);
 			folder.add(dialogVPanel, ekpResp.get(i).getTag());
 		}
 		
 		folder.selectTab(0);
 		FlowLayoutContainer container = new FlowLayoutContainer();
 		container.setScrollMode(ScrollMode.AUTO);
-		container.setHeight(RootPanel.get("body").getOffsetHeight());
 		container.add(folder);
 		dialogBox.setWidget(container);
-		dialogBox.center();
+		dialogBox.center(); //must be done for updating data for resizing
+		if (container.getOffsetHeight()>dbMaxHeight) container.setHeight(dbMaxHeight);
+		if (container.getOffsetWidth()>dbMaxWidth) container.setWidth(dbMaxWidth);
 		
+		dialogBox.center();		
 		dialogBox.show();	
 	}
 	
 	
 	private static class ExtendedDialogBox extends DialogBox {
+		
+		private Node closeEventTarget = null;
+		
+		public ExtendedDialogBox() {
+			 // get the "dialogTopRight" class td
+		    Element dialogTopRight = getCellElement(0, 2);
+
+		    // close button image html
+		    dialogTopRight.setInnerHTML(
+		            "<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\">" + 
+		            "<img src=\"closeicon.gif\" height=\"20px\"/>" + 
+		            "</div>");
+
+		    // set the event target
+		    closeEventTarget = dialogTopRight.getChild(0).getChild(0);
+		}
 
 	    @Override
 	    protected void onPreviewNativeEvent(NativePreviewEvent event) {
 	        super.onPreviewNativeEvent(event);
+	        
+	        NativeEvent nativeEvent = event.getNativeEvent();
+	        
+	        if (!event.isCanceled() 
+	                && (event.getTypeInt() == Event.ONCLICK)
+	                && isCloseEvent(nativeEvent))
+	        {
+	            this.hide();
+	            this.removeFromParent();
+	        }
+	        
 	        switch (event.getTypeInt()) {
 	            case Event.ONKEYDOWN:
 	                if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ESCAPE ||
@@ -218,6 +210,11 @@ dialogBox.setWidget(container);
 	                break;
 	        }
 	    }
+	    
+	 // see if the click target is the close button
+	    private boolean isCloseEvent(NativeEvent event) {
+	        return event.getEventTarget().equals(closeEventTarget); //compares equality of the underlying DOM elements
+	    } 
 	}
 	
 	public static String getErrorHtmlString (Throwable throwable) {
