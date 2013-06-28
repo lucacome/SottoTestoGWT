@@ -146,8 +146,8 @@ public class Utility {
 				dialogVPanel.add(new HTML("<br><b>Error:</b> "+ekpResp.get(i).getError()));
 			else{
 				dialogVPanel.add(new HTML("<br><b>Response:</b> "));
-				HTML rdfHtml = new HTML(); rdfHtml.setText(ekpResp.get(i).jdata);
-				dialogVPanel.add(rdfHtml);
+	//			HTML rdfHtml = new HTML(); rdfHtml.setText(ekpResp.get(i).jdata);
+	//			dialogVPanel.add(rdfHtml);
 			}
 			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 			folder.add(dialogVPanel, ekpResp.get(i).getTag());

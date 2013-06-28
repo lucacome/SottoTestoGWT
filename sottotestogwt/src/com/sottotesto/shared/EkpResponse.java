@@ -1,5 +1,7 @@
 package com.sottotesto.shared;
 
+import com.google.gwt.json.client.JSONObject;
+
 
 public class EkpResponse implements java.io.Serializable{
 	/**
