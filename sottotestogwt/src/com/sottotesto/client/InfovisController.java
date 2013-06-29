@@ -55,16 +55,19 @@ public class InfovisController {
 	}
 	
 	
-	public void showGraph(String json){
+	public void showGraph(String json, String type){
 		Debug.printDbgLine("InfovisController.java: showGraph()");
-		callJit(json);
+		callJit(json, type);
 	}
 
-	private native void callJit(String jdata)/*-{
+	private native void callJit(String jdata, String type)/*-{
   		var myObject = eval('(' + jdata + ')');
 		var json = myObject;
   		console.log(json);
-  		new $wnd.init(json);
+  		
+  		if (type=="forcedirected") new $wnd.init_fd(json);
+  		else if (type=="hypertree") new $wnd.init_ht(json);
+  		else console.log("callJit(): tipo di grafo richiesto sconosciuto");
 	}-*/;
 
 }

@@ -26,7 +26,7 @@ var Log = {
 };
 
 
-function init(jdata){
+function init_fd(jdata){
   // init data
   var json = [
     {

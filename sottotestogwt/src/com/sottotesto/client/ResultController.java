@@ -138,10 +138,12 @@ public class ResultController {
 		treeStore.add(r1);
 		treeStore.add(r1, new Data(1, "Tag1", "value2"));
 		treeStore.add(r1, new Data(2, "Tag2", "value3"));
-		Data r2 = new Data(3, "Maps", "value4");
+		Data r2 = new Data(3, "Hypertree Graph", "valueboh");
 		treeStore.add(r2);
-		treeStore.add(r2, new Data(4, "Tag3", "value5"));
-		treeStore.add(r2, new Data(5, "Tag4", "value6"));	
+		Data r3 = new Data(4, "Maps", "value4");
+		treeStore.add(r3);
+		treeStore.add(r3, new Data(5, "Tag3", "value5"));
+		treeStore.add(r3, new Data(6, "Tag4", "value6"));	
 		tree = new Tree<Data, String>(treeStore, dp.name());
 		
 		//TREE CLICK HANDLER
@@ -180,6 +182,7 @@ public class ResultController {
 			         public ImageResource getIcon( Data model )
 			         {
 			            if ( model.getName().equals("ForceDirected Graph") ) return STResources.INSTANCE.iconHyperTree();
+			            if ( model.getName().equals("Hypertree Graph") ) return STResources.INSTANCE.iconHyperTree();
 			            if ( model.getName().equals("Maps") ) return STResources.INSTANCE.iconMap();
 			            else return STResources.INSTANCE.iconTreeEntity();
 			            //else return null;
@@ -203,9 +206,17 @@ public class ResultController {
 			centerPanel.setWidget(infovis.init()); // add the graph in centerpanel
 			infovis.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 			infovis.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-			infovis.showGraph(jsonFD); //load json to graph
+			infovis.showGraph(jsonFD, "forcedirected"); //load json to graph
 		}
-		
+		else if (value.equals("Hypertree Graph")) {
+			Debug.printDbgLine("ResultController.java: handleTreeClick(): showing ht graph...");
+			infovis = new InfovisController();	// initialize new infovis controller
+			centerPanel.clear(); 				// clear centerpanel contents
+			centerPanel.setWidget(infovis.init()); // add the graph in centerpanel
+			infovis.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
+			infovis.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+			infovis.showGraph(jsonFD,"hypertree"); //load json to graph
+		}
 				
 	}
 	

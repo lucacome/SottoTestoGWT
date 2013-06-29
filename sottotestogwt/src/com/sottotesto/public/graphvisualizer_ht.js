@@ -27,7 +27,7 @@ var Log = {
 };
 
 
-function init(jdata){
+function init_ht(jdata){
     //init data
     var json = jdata;
     
