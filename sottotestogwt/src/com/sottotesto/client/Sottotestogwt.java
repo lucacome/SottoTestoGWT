@@ -14,8 +14,11 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
+import com.google.gwt.resources.client.DataResource;
+import com.google.gwt.resources.client.TextResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -27,10 +30,14 @@ import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
+import com.sottotesto.client.jit.JITGraph;
+import com.sottotesto.client.jit.NativeJITGraph;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.FieldVerifier;
+import com.sottotesto.shared.HTMLInjector;
+import com.sottotesto.shared.STResources;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
 /**
@@ -83,12 +90,21 @@ public class Sottotestogwt implements EntryPoint {
 	Button dbpediaShowDataBTN;
 	Button ekpShowDataBTN;
 	
+	//results items
+	ResultController rc;
+	
 	//service responses variables
 	private TagmeResponse tagmeResp; //response of TAGME service
 	private DBPediaResponse dbpediaResp; //response of DBPEDIA service
 	private List<EkpResponse> ekpResp; //response of EKP service
-	String jdata;
-
+	
+	//resources
+	TextResource resourceHTMLmap;
+	DataResource resourceHTMLdata;
+	Frame frameHTML;
+	
+	static JITGraph jitGraph = new JITGraph();
+	private NativeJITGraph graph;
 	
 	//This is the entry point method.
 	public void onModuleLoad() {
@@ -104,7 +120,6 @@ public class Sottotestogwt implements EntryPoint {
 		
 		//Initialize items and load them on html page
 		initItems();	
-		
 
 		// Create a handler for the sendButton and nameField
 		class HomeInputHandler implements ClickHandler, KeyUpHandler {
@@ -133,7 +148,45 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("homeLoading").setVisible(false);
 		
 		Debug.printDbgLine("Sottotestogwt.java: HomePage loaded in "+(System.currentTimeMillis()-homeTimeStart)+"ms, waiting input ...");
+		
+		//PORVA JIT NEO4J
+		/*
+		VerticalPanel mainPanel = new VerticalPanel();
+	    graph = new ForceDirected();//RGraph();
+	    final Button button = new Button("Load Path");
+	    button.addClickHandler(new ClickHandler() {
+	        public void onClick(ClickEvent event) {
+	            jitGraph.getPathREST("3", new MyAsyncCallback(graph));
+	        }
+	    });
+	    mainPanel.add((Widget)graph);
+		mainPanel.add(button);
+	    RootPanel.get("fondo").add(mainPanel);
+		*/
+		
+		
 	}
+	
+	/**
+	 * callback class which displays the JSON object
+	 */
+	private static class MyAsyncCallback implements AsyncCallback<String> {
+	    private NativeJITGraph graph;
+
+	    public MyAsyncCallback(NativeJITGraph graph) {
+	    	Debug.printDbgLine("JITGraph.java: MyAsyncCallback()");
+	        this.graph = graph;
+	    }
+
+	    public void onSuccess(String data) {
+	    	Debug.printDbgLine("JITGraph.java: MyAsyncCallback(): on success()");
+	        graph.loadData(data);
+	    }
+
+	    public void onFailure(Throwable throwable) {
+	    	Debug.printDbgLine("JITGraph.java: MyAsyncCallback(): onFailure()");
+	    }
+	}	
 	
 	//initialize items and load them on page
 	private void initItems(){
@@ -144,7 +197,7 @@ public class Sottotestogwt implements EntryPoint {
 		dbpediaResp = new DBPediaResponse();
 		ekpResp = new ArrayList<EkpResponse>();
 		
-		//initi input section items
+		//init input section items
 		textAreaLabel = new Label();
 		textAreaLabel.setText("Scrivi una frase:");
 		textAreaDefText = "Enter something here...";
@@ -157,6 +210,9 @@ public class Sottotestogwt implements EntryPoint {
 		serverResponseLabel = new Label();
 		sendButton.addStyleName("sendButton");
 		
+		//init Resources
+		resourceHTMLmap = STResources.INSTANCE.HTMLmap();
+		
 		// Add items to the RootPanel (Use RootPanel.get() to get the entire body element)
 		RootPanel.get("textAreaLabel").add(textAreaLabel);
 		RootPanel.get("textAreaContainer").add(textArea);
@@ -164,15 +220,90 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("errorLabelContainer").add(errorLabel);		
 		RootPanel.get("tagmetext").add(serverResponseLabel);
 		
+		
+		
+		//TEST BUTTON: FOR TESTING... OF COURSE
+		Button testButton = new Button();
+		testButton.setText("Test");
+		testButton.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				Debug.printDbgLine("Sottotestogwt.java: testButtonClick()");
+				//showGraph("nulla");
+				ResultController rc = new ResultController();
+				rc.init();
+			}
+		});
+		RootPanel.get("sendButtonContainer").add(testButton);
+		
+		//PROVA EXHIBIT
+		/*
+		String jsonItaly = "{\"items\": [{\"id\": \"it\",\"code\": \"it\",\"type\": \"Flag\",\"label\": \"Italy\"},{\"id\": \"it\",\"latlng\": \"42.8333,12.8333\"}],\"types\": {\"Flag\": {\"pluralLabel\":\"Flags\"}}}";
+		String jsonDivString = "";//"<div id=\"jsondata\" style=\"display:none\">"+jsonItaly+"</div>";
+		String htmlPage = resourceHTMLmap.getText();		
+		Debug.printDbgLine("htmlPage="+htmlPage); 		
+		String htmlPageFull = htmlPage+jsonDivString;		
+			htmlPageFull = URL.encode(htmlPageFull);
+		Debug.printDbgLine("htmlPageFullEncoded="+htmlPageFull);
+		HTML mapHTML = new HTML(); //mapHTML.setHTML(resourceHTMLmap.getText()+jsonDivString);
+		SafeHtml mapSafeHTML = SafeHtmlUtils.fromTrustedString(jsonDivString+htmlPage);
+		Debug.printDbgLine("Sottotestogwt.java: mapHTML="+mapHTML.getHTML());
+		Debug.printDbgLine("Sottotestogwt.java: mapSafeHTML="+mapSafeHTML.asString());
+		//mapHTML.setHTML((HTML)mapSafeHTML.asString());
+		Debug.printDbgLine("Sottotestogwt.java: mapHTML="+mapHTML.getHTML());
+		HTMLPanel panelHTML = new HTMLPanel(mapSafeHTML);
+		//RootPanel.get("jsondata").add(new HTML(jsonItaly));
+		HTMLInjector.modifyDiv("jsondata", jsonItaly);		
+		//String resURL = resourceHTMLdata.getSafeUri().asString();
+		String resURLwar = "map.html";
+		frameHTML = new Frame(resURLwar);
+		frameHTML.setPixelSize(RootPanel.get().getOffsetWidth(), 500);
+		//RootPanel.get("fondo").add(frameHTML);*/		
+		//HTMLInjector.injectLinkExhibit("#jsondata");
+		//HTMLInjector.injectJsScriptExternal("http://api.simile-widgets.org/exhibit/3.0.0/exhibit-api.js");
+		//ExhibitLoad("testa di cazzo");
+		
+		
+		
 		// Focus the cursor on the name field when the app loads
 		textArea.setFocus(true);
 		textArea.selectAll();
 		
+		
 	}	
+	
+	private native void showGraph(String name)/*-{
+	  name = {
+        "id": "1",
+        "name": "Main",
+        "children": [{
+            "id": "2",
+            "name": "Child1",
+            "data": {
+                "band": "Nine Inch Nails",
+                "relation": "member of band"
+            	},
+            "children": [{
+	        "id": "3",
+            	"name": "SubChild1",
+            	"data": {
+                	"band": "Nine Inch Nails",
+                	"relation": "member of band"
+            		},
+		"children": []
+            }]
+        }],
+        "data": []
+    };
+    
+    var json = name;
+	new $wnd.init(json);
+}-*/;
 	
 	//send input from textarea to tagme
 	private void callTagme() {
 		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
+		HTMLInjector.injectJsScriptExternal("http://api.simile-widgets.org/exhibit/3.0.0/exhibit-api.js");
 		// First, we validate the input.
 		errorLabel.setText("");
 		String textToServer = textArea.getText();
@@ -180,6 +311,27 @@ public class Sottotestogwt implements EntryPoint {
 			errorLabel.setText("Inserisci qualcosa!");
 			return;
 		}
+		
+		 
+		//PROVA MAPPA
+		/*
+		SimplePanel mapPanel = new SimplePanel() ;
+		mapPanel.setSize("1000px", "500px");
+		MapOptions options  = MapOptions.create();
+        options.setCenter(LatLng.create(39.509, -98.434)); 
+        options.setZoom(6);
+        options.setMapTypeId(MapTypeId.ROADMAP);
+        options.setDraggable(true);
+        options.setMapTypeControl(true);
+        options.setScaleControl(true);
+        options.setScrollwheel(true);
+        GoogleMap theMap = GoogleMap.create(mapPanel.getElement(), options) ;
+        mapPanel.setVisible(true);
+		Marker marker = Marker.create();
+		marker.setPosition(LatLng.create(42.8333, 12.8333));
+		marker.setMap(theMap);
+	    RootPanel.get("fondo").add( mapPanel ) ;
+		*/
 		
 		//reinitialize graphic
 		RootPanel.get("homeLoading").setVisible(true);
@@ -252,6 +404,10 @@ public class Sottotestogwt implements EntryPoint {
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
 							tagmeShowDataBTN.setVisible(true); //allow to see the data
+							
+							//initialize results panel
+							rc = new ResultController();
+							rc.init();
 														
 							//chiamiamo DBPedia							
 							List<String> dbproperty = new ArrayList<String>();
@@ -276,8 +432,6 @@ public class Sottotestogwt implements EntryPoint {
 							}
 							ekpResp = new ArrayList<EkpResponse>();
 							callEkp();
-						
-							
 						}						
 					}
 				});
@@ -316,7 +470,6 @@ public class Sottotestogwt implements EntryPoint {
 		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
 		
 		String input="";
-
 		
 		if (ekpRemainingCallNum>0){
 			input=ekpRemainingCallInputs.remove(0);
@@ -324,7 +477,6 @@ public class Sottotestogwt implements EntryPoint {
 		} else return;		
 		
 		Debug.printDbgLine("Sottotestogwt.java: Ekp input="+input);
-		
 		ekpService.sendToServer(input, new AsyncCallback<EkpResponse>() {
 		public void onFailure(Throwable caught) {
 			//set the error
@@ -345,13 +497,14 @@ public class Sottotestogwt implements EntryPoint {
 			
 			EkpResponse ekpRespTmp = new EkpResponse();
 			ekpRespTmp = result;
-
+			
 			String tem = "["+result.jdata+"]";
-			showGraph(tem);
+			rc.setJsonFD(tem);
 			Debug.printDbgLine("MAIN="+tem);
 			
 			ekpResp.add(ekpRespTmp);
-			HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
+			if (ekpRespTmp.getCode()==200) HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
+			else HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 			ekpShowDataBTN.setVisible(true); //allow to see data
 			
 			if (ekpRemainingCallNum>0){callEkp();}
@@ -416,12 +569,5 @@ public class Sottotestogwt implements EntryPoint {
 		
 		//show the status panel
 		RootPanel.get("serviceStatusPanel").add(serviceStatusPanel);		
-	}
-	private native void showGraph(String name)/*-{
-	  //name = '{{"id":"http://dbpedia.org/resource/Galileo_Galilei","name":"Galileo Galilei","data":{"owlType":"individual","tips":"Galileo Galilei http://dbpedia.org/resource/Galileo_Galilei","$type":"square","$color":"#BD1B89"},"adjacencies":[{"nodeTo":"http://dbpedia.org/ontology/University","data":{"$dim":30,"$type":"custom-line","edge":{"name":"has University","label":"links to"}}},{"nodeTo":"http://dbpedia.org/ontology/Scientist","data":{"$dim":30,"$type":"custom-line","edge":{"name":"has Scientist","label":"links to"}}},{"nodeTo":"http://dbpedia.org/ontology/Disease","data":{"$dim":30,"$type":"custom-line","edge":{"name":"has Disease","label":"links to"}}},{"nodeTo":"http://dbpedia.org/ontology/Country","data":{"$dim":30,"$type":"custom-line","edge":{"name":"has Country","label":"links to"}}}]},{"id":"http://dbpedia.org/ontology/University","name":"University","data":{"source":["wikipedia"],"owlType":"class","$type":"circle","$color":"#EB6F24"}},{"id":"http://dbpedia.org/ontology/Scientist","name":"Scientist","data":{"source":["wikipedia"],"owlType":"class","$type":"circle","$color":"#EB6F24"}},{"id":"http://dbpedia.org/ontology/Disease","name":"Disease","data":{"source":["wikipedia"],"owlType":"class","$type":"circle","$color":"#EB6F24"}},{"id":"http://dbpedia.org/ontology/Country","name":"Country","data":{"source":["wikipedia"],"owlType":"class","$type":"circle","$color":"#EB6F24"}}}';
-var myObject = eval('(' + name + ')');
-	var json = myObject;
-  console.log(json);
-  	new $wnd.init(json);
-}-*/;
+	}	
 }

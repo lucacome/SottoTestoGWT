@@ -1,6 +1,5 @@
 package com.sottotesto.client;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
@@ -10,7 +9,6 @@ import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.text.shared.SimpleSafeHtmlRenderer;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ImageBundle.Resource;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.ValueProvider;
@@ -27,6 +25,7 @@ import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutData;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.VBoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VBoxLayoutContainer.VBoxLayoutAlign;
@@ -36,6 +35,7 @@ import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.STResources;
 
 
 /* USAGE:
@@ -48,8 +48,12 @@ public class ResultController {
 	private BorderLayoutContainer border;
 	private VBoxLayoutContainer lcwest;
 	private BorderLayoutData west;
-	private MarginData center;
 	private BoxLayoutData vBoxData;
+	private HTML defaultCenterHTML;
+
+	//infovis data
+	private InfovisController infovis;
+	String jsonFD; //json string for forcedirected graph
 
 	//tree data
 	DataProperties dp;
@@ -81,8 +85,11 @@ public class ResultController {
 
 		centerPanel = new ContentPanel();
 		centerPanel.setHeaderVisible(false);
-		centerPanel.add(new HTML(
-				"<p style=\"padding:10px;color:#556677;font-size:11px;\">Seleziona una vista dall'elenco a sinistra</p>"));
+		defaultCenterHTML = new HTML();
+		defaultCenterHTML.setHTML("<p style=\"padding:10px;color:#556677;font-size:11px;\">Seleziona una vista dall'elenco a sinistra</p>");
+		centerPanel.add(defaultCenterHTML);
+				
+
 
 		MarginData center = new MarginData(new Margins(5));
 
@@ -127,7 +134,7 @@ public class ResultController {
 		//TREE DATA LOADER
 		dp = GWT.create(DataProperties.class); // Generate the key provider and value provider for the Data class
 		treeStore = new TreeStore<Data>(dp.key()); // Create the store that the contains the data to display in the tree
-		Data r1 = new Data(0, "HyperTree", "value1");
+		Data r1 = new Data(0, "ForceDirected Graph", "value1");
 		treeStore.add(r1);
 		treeStore.add(r1, new Data(1, "Tag1", "value2"));
 		treeStore.add(r1, new Data(2, "Tag2", "value3"));
@@ -144,7 +151,7 @@ public class ResultController {
 					ValueUpdater<String> valueUpdater) {
 				super.onBrowserEvent(context, parent, value, event, valueUpdater);
 				if ("click".equals(event.getType())) {
-					Info.display("Click", "You clicked \"" + value + "\"!");
+					//Info.display("Click", "You clicked \"" + value + "\"!");
 					handleTreeClick(value);
 				}
 			}
@@ -172,8 +179,10 @@ public class ResultController {
 			         @Override
 			         public ImageResource getIcon( Data model )
 			         {
-			            if ( model.getName().endsWith( "1" ) ) return null; //Resources.I.icon1();			            
-			            else return null;
+			            if ( model.getName().equals("ForceDirected Graph") ) return STResources.INSTANCE.iconHyperTree();
+			            if ( model.getName().equals("Maps") ) return STResources.INSTANCE.iconMap();
+			            else return STResources.INSTANCE.iconTreeEntity();
+			            //else return null;
 			         }
 			      } );
 		
@@ -187,10 +196,21 @@ public class ResultController {
 	public void handleTreeClick(String value){
 		Debug.printDbgLine("ResultController.java: handleTreeClick("+value+")");
 		
+		if (value.equals("ForceDirected Graph")) {
+			Debug.printDbgLine("ResultController.java: handleTreeClick(): showing fd graph...");
+			infovis = new InfovisController();	// initialize new infovis controller
+			centerPanel.clear(); 				// clear centerpanel contents
+			centerPanel.setWidget(infovis.init()); // add the graph in centerpanel
+			infovis.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
+			infovis.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+			infovis.showGraph(jsonFD); //load json to graph
+		}
+		
+				
 	}
 	
 
-	public interface DataProperties extends PropertyAccess {
+	public interface DataProperties extends PropertyAccess<Data> {
 		@Path("name")
 		ModelKeyProvider<Data> key();
 		ValueProvider<Data, int[]> id();
@@ -217,5 +237,9 @@ public class ResultController {
 		public void setValue(String value) {this.value = value;}
 		
 		
+	}
+	
+	public void setJsonFD(String jdata){
+		jsonFD = jdata;
 	}
 }
