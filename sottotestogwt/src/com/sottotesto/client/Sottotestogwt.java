@@ -30,16 +30,20 @@ import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
-import com.sottotesto.client.jit.JITGraph;
-import com.sottotesto.client.jit.NativeJITGraph;
+
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.FieldVerifier;
-import com.sottotesto.shared.HTMLInjector;
 import com.sottotesto.shared.STResources;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
+
+//prove exhibit e neo4j
+/*import com.sottotesto.client.jit.JITGraph;
+import com.sottotesto.client.jit.NativeJITGraph;
+import com.sottotesto.shared.HTMLInjector;*/
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -103,8 +107,9 @@ public class Sottotestogwt implements EntryPoint {
 	DataResource resourceHTMLdata;
 	Frame frameHTML;
 	
-	static JITGraph jitGraph = new JITGraph();
-	private NativeJITGraph graph;
+	//prove neo4j
+	//static JITGraph jitGraph = new JITGraph();
+	//private NativeJITGraph graph;
 	
 	//This is the entry point method.
 	public void onModuleLoad() {
@@ -167,9 +172,9 @@ public class Sottotestogwt implements EntryPoint {
 		
 	}
 	
-	/**
-	 * callback class which displays the JSON object
-	 */
+	
+	//prova neo4j
+	/*
 	private static class MyAsyncCallback implements AsyncCallback<String> {
 	    private NativeJITGraph graph;
 
@@ -187,6 +192,7 @@ public class Sottotestogwt implements EntryPoint {
 	    	Debug.printDbgLine("JITGraph.java: MyAsyncCallback(): onFailure()");
 	    }
 	}	
+	*/
 	
 	//initialize items and load them on page
 	private void initItems(){
@@ -303,7 +309,7 @@ public class Sottotestogwt implements EntryPoint {
 	//send input from textarea to tagme
 	private void callTagme() {
 		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
-		HTMLInjector.injectJsScriptExternal("http://api.simile-widgets.org/exhibit/3.0.0/exhibit-api.js");
+		//HTMLInjector.injectJsScriptExternal("http://api.simile-widgets.org/exhibit/3.0.0/exhibit-api.js");
 		// First, we validate the input.
 		errorLabel.setText("");
 		String textToServer = textArea.getText();
