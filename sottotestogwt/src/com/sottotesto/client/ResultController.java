@@ -58,17 +58,17 @@ public class ResultController {
 	
 	//infovis data
 	private InfovisController infovis;
-	String jsonFD; //json string for forcedirected graph
+	private String jsonFD; //json string for forcedirected graph
 
 	//tree data
-	DataProperties dp;
-	SimpleSafeHtmlCell<String> cell;
-	TreeStore<Data> treeStore;
-	Tree<Data, String> tree;
-	FlowLayoutContainer treeContainer;
-	ButtonBar treeButtonBar;
-	TextButton treeExpandButton, treeCollapseButton;
-	StoreFilterField<Data> treeFilter;
+	private DataProperties dp;
+	private SimpleSafeHtmlCell<String> cell;
+	private TreeStore<Data> treeStore;
+	private Tree<Data, String> tree;
+	private FlowLayoutContainer treeContainer;
+	private ButtonBar treeButtonBar;
+	private TextButton treeExpandButton, treeCollapseButton;
+	private StoreFilterField<Data> treeFilter;
 
 	public void init(){
 		Debug.printDbgLine("ResultController.java: init()");
@@ -94,6 +94,7 @@ public class ResultController {
 
 		centerPanel = new ContentPanel();
 		centerPanel.setHeaderVisible(false);
+		centerPanel.setId("centerPanel");
 		defaultCenterHTML = new HTML();
 		defaultCenterHTML.setHTML("<p style=\"padding:10px;color:#556677;font-size:11px;\">Effettua Una ricerca!</p>");
 		centerPanel.add(defaultCenterHTML);
@@ -218,7 +219,7 @@ public class ResultController {
 	}
 
 	
-	public void handleTreeClick(String value){
+	private void handleTreeClick(String value){
 		Debug.printDbgLine("ResultController.java: handleTreeClick("+value+")");
 		
 		if (value.equals("ForceDirected Graph")) {
