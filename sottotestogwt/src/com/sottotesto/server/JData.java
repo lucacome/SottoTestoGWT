@@ -14,7 +14,7 @@ public class JData {
 	public String id = null;
 	public String name = null;
 	public transient String type = null;
-	public List<Map<String,String>> data;
+	public Map<String,String> data;
 //	public Map<String, String> temp = new HashMap<String, String>();
 	public List<Map<String,String>> adjacencies;
 //	public Map<String, List<String>> linkmap = ArrayListMultimap.create();
@@ -24,7 +24,7 @@ public class JData {
 	public JData() {
 		// TODO Auto-generated constructor stub
 		//linkmap =
-		data = new ArrayList<Map<String, String>>();
+		data = new HashMap<String, String>();
 		adjacencies = new ArrayList<Map<String, String>>();
 		linkmap = HashMultimap.create();
 		linkmap.clear();

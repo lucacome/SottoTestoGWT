@@ -11,16 +11,6 @@ public interface STResources extends ClientBundle {
 	  public static final STResources INSTANCE =  GWT.create(STResources.class);
 
 
-
-	  @Source("../resources/prova.html")
-	  public TextResource HTMLprova();
-	  
-	  @Source("../resources/map.html")
-	  public TextResource HTMLmap();
-	  	  
-	  @Source("../resources/map.html")
-	  public DataResource HTMLmapData();
-	  
 	  @Source("../resources/icon_hypertree.png")
 	  public ImageResource iconHyperTree();
 	  

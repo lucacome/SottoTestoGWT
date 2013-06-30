@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -46,13 +47,14 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			URL url = new URL ("http://tagme.di.unipi.it/tag");
 			String charset = "UTF-8";
 			String param1name = "text";
-			String param1value = input;
+			String param1value = Normalizer.normalize(input, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 			String param2name = "key";
 			String param2value = "plclcd321";
 			String param3name = "include_categories";
 			String param3value = "true";	
 			String query = String.format("%s=%s&%s=%s&%s=%s", URLEncoder.encode(param1name, charset), URLEncoder.encode(param1value, charset), URLEncoder.encode(param2name, charset), URLEncoder.encode(param2value, charset), URLEncoder.encode(param3name, charset), URLEncoder.encode(param3value, charset));
 
+			//Debug.printDbgLine(query);
 			//open TAGME connection
 			HttpURLConnection connessione = (HttpURLConnection) url.openConnection();
 			connessione.setRequestMethod("POST");

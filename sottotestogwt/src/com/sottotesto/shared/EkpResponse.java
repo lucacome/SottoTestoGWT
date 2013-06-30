@@ -1,6 +1,5 @@
 package com.sottotesto.shared;
 
-import com.google.gwt.json.client.JSONObject;
 
 
 public class EkpResponse implements java.io.Serializable{
@@ -16,7 +15,8 @@ public class EkpResponse implements java.io.Serializable{
 	private String type;
 	private String tag;
 	private long time;
-	public String jdata;
+	public String jdataHT;
+	public String jdataFD;
 
 	public EkpResponse() {
 		code = 0;
@@ -26,7 +26,8 @@ public class EkpResponse implements java.io.Serializable{
 		error = "";
 		time = 0;
 		type = "";
-		jdata = "";
+		jdataHT = "";
+		jdataFD = "";
 	}
 
 

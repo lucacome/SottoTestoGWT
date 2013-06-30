@@ -492,9 +492,11 @@ public class Sottotestogwt implements EntryPoint {
 			EkpResponse ekpRespTmp = new EkpResponse();
 			ekpRespTmp = result;
 			
-			String tem = "["+result.jdata+"]";
-			rc.setJsonFD(tem);
-			Debug.printDbgLine("MAIN="+tem);
+			String tem = "["+result.jdataHT+"]";
+			String tem2 = "["+result.jdataFD+"]";
+			rc.setJsonHT(tem);
+			rc.setJsonFD(tem2);
+			//Debug.printDbgLine("MAIN="+tem);
 			rc.initTree();
 			
 			ekpResp.add(ekpRespTmp);

@@ -59,7 +59,7 @@ public class ResultController {
 	//infovis data
 	private InfovisController infovis;
 	private String jsonFD; //json string for forcedirected graph
-
+	private String jsonHT;
 	//tree data
 	private DataProperties dp;
 	private SimpleSafeHtmlCell<String> cell;
@@ -238,7 +238,7 @@ public class ResultController {
 			centerPanel.setWidget(infovis.init()); // add the graph in centerpanel
 			infovis.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 			infovis.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-			infovis.showGraph(jsonFD,"hypertree"); //load json to graph
+			infovis.showGraph(jsonHT,"hypertree"); //load json to graph
 		}
 				
 	}
@@ -274,8 +274,18 @@ public class ResultController {
 	}
 	
 	public void setJsonFD(String jdata){
-		jsonFD = jdata;
+
+			jsonFD = jdata;
+
+	//Debug.printDbgLine("JSONDF="+jsonFD);	
 	}
+	public void setJsonHT(String jdata){
+
+			jsonHT = jdata;
+
+	//Debug.printDbgLine("JSONHT="+jsonHT);	
+	}
+
 	
 	public ContentPanel getPanel(){
 		if (panel!=null) return panel;
