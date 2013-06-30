@@ -44,13 +44,18 @@ import com.sottotesto.shared.STResources;
  */
 public class ResultController {
 
+	private int panelMaxWidth, panelMaxHeight;
+	
 	private ContentPanel panel, centerPanel;
 	private BorderLayoutContainer border;
 	private VBoxLayoutContainer lcwest;
 	private BorderLayoutData west;
 	private BoxLayoutData vBoxData;
 	private HTML defaultCenterHTML;
-
+	private String HTMLloadIconString="<p style=\"padding:10px;color:#556677;font-size:11px;\"><img src='loading.gif'/></p>";
+	private String HTMLselectSomethingString="<p style=\"padding:10px;color:#556677;font-size:11px;\">Seleziona una vista dall'elenco a sinistra</p>";
+	private String HTMLerrorString="<p style=\"padding:10px;color:red;font-size:11px;\">E' avvenuto un errore, rieffettua la tua ricerca!</p>";
+	
 	//infovis data
 	private InfovisController infovis;
 	String jsonFD; //json string for forcedirected graph
@@ -67,10 +72,14 @@ public class ResultController {
 
 	public void init(){
 		Debug.printDbgLine("ResultController.java: init()");
+		
+		panelMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100);
+		panelMaxHeight = (RootPanel.get().getOffsetHeight()) + (RootPanel.get().getOffsetHeight()*40/100);
+		
 		panel = new ContentPanel();
 		panel.setHeadingText("Risultati");		
-		panel.setPixelSize(RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100), 700);
-		panel.setCollapsible(true);
+		panel.setPixelSize(panelMaxWidth, panelMaxHeight);
+		panel.setCollapsible(false);
 
 		border = new BorderLayoutContainer();
 		panel.setWidget(border);
@@ -86,7 +95,7 @@ public class ResultController {
 		centerPanel = new ContentPanel();
 		centerPanel.setHeaderVisible(false);
 		defaultCenterHTML = new HTML();
-		defaultCenterHTML.setHTML("<p style=\"padding:10px;color:#556677;font-size:11px;\">Seleziona una vista dall'elenco a sinistra</p>");
+		defaultCenterHTML.setHTML("<p style=\"padding:10px;color:#556677;font-size:11px;\">Effettua Una ricerca!</p>");
 		centerPanel.add(defaultCenterHTML);
 				
 
@@ -96,15 +105,22 @@ public class ResultController {
 		border.setCenterWidget(centerPanel, center);
 
 		vBoxData = new BoxLayoutData(new Margins(5, 5, 5, 5));
-		vBoxData.setFlex(1);
-
-		initTree();
-		lcwest.add(treeContainer);
-
-		// Add the panel
-		RootPanel.get("results").add(panel);
+		vBoxData.setFlex(1);		
+		
 	}
 
+	public void reInit(){
+		lcwest.clear(); //remove tree
+		centerPanel.clear();	// clear centerpanel contents
+		centerPanel.add(new HTML(HTMLloadIconString));
+	}
+	
+	public void showError(){
+		lcwest.clear(); //remove tree
+		centerPanel.clear();	// clear centerpanel contents
+		centerPanel.add(new HTML(HTMLerrorString));
+	}
+	
 	public void initTree(){
 
 		Debug.printDbgLine("ResultController.java: initTree()");
@@ -193,6 +209,12 @@ public class ResultController {
 		treeContainer.add(treeFilter);    
 		treeContainer.add(treeButtonBar);
 		treeContainer.add(tree);
+		
+		lcwest.add(treeContainer);
+		
+		centerPanel.clear();	// clear centerpanel contents
+		centerPanel.add(new HTML(HTMLselectSomethingString));
+		
 	}
 
 	
@@ -252,5 +274,10 @@ public class ResultController {
 	
 	public void setJsonFD(String jdata){
 		jsonFD = jdata;
+	}
+	
+	public ContentPanel getPanel(){
+		if (panel!=null) return panel;
+		else return null;
 	}
 }

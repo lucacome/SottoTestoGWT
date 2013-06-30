@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import java_cup.internal_error;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,6 +26,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.sencha.gxt.core.client.Style.VerticalAlignment;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
@@ -49,6 +52,9 @@ import com.sottotesto.shared.HTMLInjector;*/
  */
 public class Sottotestogwt implements EntryPoint {
 	
+	private int panelsMaxWidth;
+	
+	//title panel items
 	private String textAreaDefText; //default text written on textarea
 	private String textSendButton;  //default tet written on send button
 	private Button sendButton;     //button to call tagme
@@ -56,6 +62,10 @@ public class Sottotestogwt implements EntryPoint {
 	private Label textAreaLabel;   //label for text area
 	private Label errorLabel;      //errorlabel for textarea misuse
 	private Label serverResponseLabel;
+	private ContentPanel titleContentPanel;
+	private HTML titleHTML;
+	private HorizontalLayoutContainer searchPanelHC;
+	private VerticalPanel textAreaVP, searchAreaVP;
 	
 	
 	// Create remote service proxyes to talk to the server-side services
@@ -125,6 +135,8 @@ public class Sottotestogwt implements EntryPoint {
 		
 		//Initialize items and load them on html page
 		initItems();	
+		
+		
 
 		// Create a handler for the sendButton and nameField
 		class HomeInputHandler implements ClickHandler, KeyUpHandler {
@@ -147,7 +159,24 @@ public class Sottotestogwt implements EntryPoint {
 		Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): creating handlers");
 		HomeInputHandler hihandler = new HomeInputHandler();
 		sendButton.addClickHandler(hihandler);
-		textArea.addKeyUpHandler(hihandler);
+		textArea.addClickHandler(new ClickHandler() {	
+			@Override
+			public void onClick(ClickEvent event) {
+				if (textArea.getText().equals(textAreaDefText)) textArea.setText("");				
+			}
+		});
+		textArea.addKeyUpHandler(new KeyUpHandler() {			
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): textAreaOnKeyUpEnter()");
+					textArea.setText(textArea.getText().replace("\n", ""));	
+					if (sendButton.isEnabled()){
+						callTagme();			
+					}
+				}
+			}
+		});
 		
 		//hide loading icon
 		RootPanel.get("homeLoading").setVisible(false);
@@ -198,37 +227,28 @@ public class Sottotestogwt implements EntryPoint {
 	private void initItems(){
 		Debug.printDbgLine("Sottotestogwt.java: initItems()");
 
+		panelsMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100);
+		
 		//init services responses
 		tagmeResp = new TagmeResponse();
 		dbpediaResp = new DBPediaResponse();
 		ekpResp = new ArrayList<EkpResponse>();
 		
-		//init input section items
-		textAreaLabel = new Label();
-		textAreaLabel.setText("Scrivi una frase:");
-		textAreaDefText = "Enter something here...";
-		textSendButton = "Send";
-		sendButton = new Button(textSendButton);
-		textArea = new TextArea();
-		textArea.setText(textAreaDefText);		
-		textArea.setSize("400px", "150px");
-		errorLabel = new Label();
-		serverResponseLabel = new Label();
-		sendButton.addStyleName("sendButton");
+		//add search panel to page
+		initSearchPanel();		
+		RootPanel.get("searchContainer").add(titleContentPanel);
 		
-		//init Resources
-		resourceHTMLmap = STResources.INSTANCE.HTMLmap();
+		//add service panel to page
+		InitServiceStatusPanel();
+		RootPanel.get("servicesContainer").add(serviceStatusPanel);
 		
-		// Add items to the RootPanel (Use RootPanel.get() to get the entire body element)
-		RootPanel.get("textAreaLabel").add(textAreaLabel);
-		RootPanel.get("textAreaContainer").add(textArea);
-		RootPanel.get("sendButtonContainer").add(sendButton);
-		RootPanel.get("errorLabelContainer").add(errorLabel);		
-		RootPanel.get("tagmetext").add(serverResponseLabel);
-		
-		
+		//add results panel to page
+		rc = new ResultController();
+		rc.init();
+		RootPanel.get("resultsContainer").add(rc.getPanel());
 		
 		//TEST BUTTON: FOR TESTING... OF COURSE
+		/*
 		Button testButton = new Button();
 		testButton.setText("Test");
 		testButton.addClickHandler(new ClickHandler() {			
@@ -241,71 +261,58 @@ public class Sottotestogwt implements EntryPoint {
 			}
 		});
 		RootPanel.get("sendButtonContainer").add(testButton);
-		
-		//PROVA EXHIBIT
-		/*
-		String jsonItaly = "{\"items\": [{\"id\": \"it\",\"code\": \"it\",\"type\": \"Flag\",\"label\": \"Italy\"},{\"id\": \"it\",\"latlng\": \"42.8333,12.8333\"}],\"types\": {\"Flag\": {\"pluralLabel\":\"Flags\"}}}";
-		String jsonDivString = "";//"<div id=\"jsondata\" style=\"display:none\">"+jsonItaly+"</div>";
-		String htmlPage = resourceHTMLmap.getText();		
-		Debug.printDbgLine("htmlPage="+htmlPage); 		
-		String htmlPageFull = htmlPage+jsonDivString;		
-			htmlPageFull = URL.encode(htmlPageFull);
-		Debug.printDbgLine("htmlPageFullEncoded="+htmlPageFull);
-		HTML mapHTML = new HTML(); //mapHTML.setHTML(resourceHTMLmap.getText()+jsonDivString);
-		SafeHtml mapSafeHTML = SafeHtmlUtils.fromTrustedString(jsonDivString+htmlPage);
-		Debug.printDbgLine("Sottotestogwt.java: mapHTML="+mapHTML.getHTML());
-		Debug.printDbgLine("Sottotestogwt.java: mapSafeHTML="+mapSafeHTML.asString());
-		//mapHTML.setHTML((HTML)mapSafeHTML.asString());
-		Debug.printDbgLine("Sottotestogwt.java: mapHTML="+mapHTML.getHTML());
-		HTMLPanel panelHTML = new HTMLPanel(mapSafeHTML);
-		//RootPanel.get("jsondata").add(new HTML(jsonItaly));
-		HTMLInjector.modifyDiv("jsondata", jsonItaly);		
-		//String resURL = resourceHTMLdata.getSafeUri().asString();
-		String resURLwar = "map.html";
-		frameHTML = new Frame(resURLwar);
-		frameHTML.setPixelSize(RootPanel.get().getOffsetWidth(), 500);
-		//RootPanel.get("fondo").add(frameHTML);*/		
-		//HTMLInjector.injectLinkExhibit("#jsondata");
-		//HTMLInjector.injectJsScriptExternal("http://api.simile-widgets.org/exhibit/3.0.0/exhibit-api.js");
-		//ExhibitLoad("testa di cazzo");
-		
-		
-		
-		// Focus the cursor on the name field when the app loads
-		textArea.setFocus(true);
-		textArea.selectAll();
-		
-		
+		*/
 	}	
 	
-	private native void showGraph(String name)/*-{
-	  name = {
-        "id": "1",
-        "name": "Main",
-        "children": [{
-            "id": "2",
-            "name": "Child1",
-            "data": {
-                "band": "Nine Inch Nails",
-                "relation": "member of band"
-            	},
-            "children": [{
-	        "id": "3",
-            	"name": "SubChild1",
-            	"data": {
-                	"band": "Nine Inch Nails",
-                	"relation": "member of band"
-            		},
-		"children": []
-            }]
-        }],
-        "data": []
-    };
-    
-    var json = name;
-	new $wnd.init(json);
-}-*/;
+	private void initSearchPanel(){
+		//init input section items
+				textAreaLabel = new Label();
+				textAreaLabel.setText("Scrivi una frase:");
+				textAreaLabel.addStyleName("margin-top:10px");
+				textAreaDefText = "Enter something here...";
+				textSendButton = "Send";
+				sendButton = new Button(textSendButton);
+				textArea = new TextArea();
+				textArea.setText(textAreaDefText);		
+				textArea.setSize("550px", "25px");				
+				textArea.setFocus(true);
+				textArea.selectAll();
+				errorLabel = new Label();
+				serverResponseLabel = new Label();
+				sendButton.addStyleName("sendButton");
+				
+				titleHTML = new HTML();
+				titleHTML.setHTML("<h1>Sottotesto Web App</h1>");
+				titleHTML.setHeight("10px");
+				titleContentPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
+				titleContentPanel.setHeadingHtml("Search Area");
+				titleContentPanel.setWidth(panelsMaxWidth);
+				titleContentPanel.setHeight(100);
+				
+				textAreaVP = new VerticalPanel();
+				textAreaVP.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+				textAreaVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+				textAreaVP.add(textArea);
+				textAreaVP.add(errorLabel);
+				
+				searchPanelHC = new HorizontalLayoutContainer();
+				searchPanelHC.setWidth(panelsMaxWidth);
+				searchPanelHC.setBorders(true);
+				searchPanelHC.add(textAreaLabel, new HorizontalLayoutData(0.15, 1, new Margins(14)));
+				searchPanelHC.add(textAreaVP, new HorizontalLayoutData(0.70, 1, new Margins(4)));
+				searchPanelHC.add(sendButton, new HorizontalLayoutData(0.15, 0.1, new Margins(14)));			
+				
+				searchAreaVP = new VerticalPanel();
+				searchAreaVP.setWidth(String.valueOf(panelsMaxWidth)+"px");
+				searchAreaVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+				searchAreaVP.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+				searchAreaVP.add(titleHTML);
+				searchAreaVP.add(searchPanelHC);
+				
+				titleContentPanel.setWidget(searchPanelHC);
+	}
 	
+
 	//send input from textarea to tagme
 	private void callTagme() {
 		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
@@ -317,39 +324,20 @@ public class Sottotestogwt implements EntryPoint {
 			errorLabel.setText("Inserisci qualcosa!");
 			return;
 		}
-		
-		 
-		//PROVA MAPPA
-		/*
-		SimplePanel mapPanel = new SimplePanel() ;
-		mapPanel.setSize("1000px", "500px");
-		MapOptions options  = MapOptions.create();
-        options.setCenter(LatLng.create(39.509, -98.434)); 
-        options.setZoom(6);
-        options.setMapTypeId(MapTypeId.ROADMAP);
-        options.setDraggable(true);
-        options.setMapTypeControl(true);
-        options.setScaleControl(true);
-        options.setScrollwheel(true);
-        GoogleMap theMap = GoogleMap.create(mapPanel.getElement(), options) ;
-        mapPanel.setVisible(true);
-		Marker marker = Marker.create();
-		marker.setPosition(LatLng.create(42.8333, 12.8333));
-		marker.setMap(theMap);
-	    RootPanel.get("fondo").add( mapPanel ) ;
-		*/
-		
-		//reinitialize graphic
-		RootPanel.get("homeLoading").setVisible(true);
+			
 		sendButton.setEnabled(false);
 		serverResponseLabel.setText("");		
-		if (serviceStatusPanel != null) {serviceStatusPanel.hide();
-										 serviceStatusPanel.clear();
-										 serviceStatusPanel.removeFromParent();										 
-		}
-		InitServiceStatusPanel();
-		RootPanel.get("homeLoading").setVisible(false);
 		
+		//reinit service status panel items
+		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
+		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
+		dbpediaShowDataBTN.setVisible(false);
+		ekpShowDataBTN.setVisible(false);
+		tagmeShowDataBTN.setVisible(false);
+		
+		//reinit results panel items
+		rc.reInit();
+				
 		//actually call tagme service
 		HtmlTagmeService.setHTML(HTMLtagmeServiceStringCalling);		
 		tagmeService.sendToServer(textToServer, new AsyncCallback<TagmeResponse>() {
@@ -372,6 +360,7 @@ public class Sottotestogwt implements EntryPoint {
 						dbpediaShowDataBTN.setVisible(false);
 						HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 						ekpShowDataBTN.setVisible(false);
+						rc.showError();
 					}
 
 					public void onSuccess(TagmeResponse result) {
@@ -392,6 +381,7 @@ public class Sottotestogwt implements EntryPoint {
 							dbpediaShowDataBTN.setVisible(false);
 							HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 							ekpShowDataBTN.setVisible(false);
+							rc.showError();
 						}
 						else if (tagmeResp.getTitleTag().size()==0){
 							//Tagme OK, ma non ha taggato nulla!
@@ -404,16 +394,14 @@ public class Sottotestogwt implements EntryPoint {
 							dbpediaShowDataBTN.setVisible(false);
 							HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 							ekpShowDataBTN.setVisible(false);
+							rc.showError();
 						}
 						else {
 							//Tagme OK
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
-							tagmeShowDataBTN.setVisible(true); //allow to see the data
+							tagmeShowDataBTN.setVisible(true); //allow to see the data		
 							
-							//initialize results panel
-							rc = new ResultController();
-							rc.init();
 														
 							//chiamiamo DBPedia							
 							List<String> dbproperty = new ArrayList<String>();
@@ -507,6 +495,7 @@ public class Sottotestogwt implements EntryPoint {
 			String tem = "["+result.jdata+"]";
 			rc.setJsonFD(tem);
 			Debug.printDbgLine("MAIN="+tem);
+			rc.initTree();
 			
 			ekpResp.add(ekpRespTmp);
 			if (ekpRespTmp.getCode()==200) HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
@@ -523,8 +512,8 @@ public class Sottotestogwt implements EntryPoint {
 		//main panel
 		serviceStatusPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
 		serviceStatusPanel.setHeadingText("Service Status");
-		serviceStatusPanel.setPixelSize(RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100), 100);
-		serviceStatusPanel.setCollapsible(true);
+		serviceStatusPanel.setPixelSize(panelsMaxWidth, 100);
+		//serviceStatusPanel.setCollapsible(true);
 		serviceStatusPanelHC = new HorizontalLayoutContainer();
 		
 		//tagme service
@@ -572,8 +561,58 @@ public class Sottotestogwt implements EntryPoint {
 		serviceStatusPanelHC.add(ekpStatusVP, new HorizontalLayoutData(0.33, 1, new Margins(4)));
 		serviceStatusPanelHC.setBorders(true);
 		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
-		
-		//show the status panel
-		RootPanel.get("serviceStatusPanel").add(serviceStatusPanel);		
+				
 	}	
 }
+
+
+//PROVA EXHIBIT
+		/*
+		String jsonItaly = "{\"items\": [{\"id\": \"it\",\"code\": \"it\",\"type\": \"Flag\",\"label\": \"Italy\"},{\"id\": \"it\",\"latlng\": \"42.8333,12.8333\"}],\"types\": {\"Flag\": {\"pluralLabel\":\"Flags\"}}}";
+		String jsonDivString = "";//"<div id=\"jsondata\" style=\"display:none\">"+jsonItaly+"</div>";
+		String htmlPage = resourceHTMLmap.getText();		
+		Debug.printDbgLine("htmlPage="+htmlPage); 		
+		String htmlPageFull = htmlPage+jsonDivString;		
+			htmlPageFull = URL.encode(htmlPageFull);
+		Debug.printDbgLine("htmlPageFullEncoded="+htmlPageFull);
+		HTML mapHTML = new HTML(); //mapHTML.setHTML(resourceHTMLmap.getText()+jsonDivString);
+		SafeHtml mapSafeHTML = SafeHtmlUtils.fromTrustedString(jsonDivString+htmlPage);
+		Debug.printDbgLine("Sottotestogwt.java: mapHTML="+mapHTML.getHTML());
+		Debug.printDbgLine("Sottotestogwt.java: mapSafeHTML="+mapSafeHTML.asString());
+		//mapHTML.setHTML((HTML)mapSafeHTML.asString());
+		Debug.printDbgLine("Sottotestogwt.java: mapHTML="+mapHTML.getHTML());
+		HTMLPanel panelHTML = new HTMLPanel(mapSafeHTML);
+		//RootPanel.get("jsondata").add(new HTML(jsonItaly));
+		HTMLInjector.modifyDiv("jsondata", jsonItaly);		
+		//String resURL = resourceHTMLdata.getSafeUri().asString();
+		String resURLwar = "map.html";
+		frameHTML = new Frame(resURLwar);
+		frameHTML.setPixelSize(RootPanel.get().getOffsetWidth(), 500);
+		//RootPanel.get("fondo").add(frameHTML);
+		 * */		
+		//HTMLInjector.injectLinkExhibit("#jsondata");
+		//HTMLInjector.injectJsScriptExternal("http://api.simile-widgets.org/exhibit/3.0.0/exhibit-api.js");
+		//ExhibitLoad("testa di cazzo");
+
+
+//PROVA MAPPA
+		/*
+		SimplePanel mapPanel = new SimplePanel() ;
+		mapPanel.setSize("1000px", "500px");
+		MapOptions options  = MapOptions.create();
+      options.setCenter(LatLng.create(39.509, -98.434)); 
+      options.setZoom(6);
+      options.setMapTypeId(MapTypeId.ROADMAP);
+      options.setDraggable(true);
+      options.setMapTypeControl(true);
+      options.setScaleControl(true);
+      options.setScrollwheel(true);
+      GoogleMap theMap = GoogleMap.create(mapPanel.getElement(), options) ;
+      mapPanel.setVisible(true);
+		Marker marker = Marker.create();
+		marker.setPosition(LatLng.create(42.8333, 12.8333));
+		marker.setMap(theMap);
+	    RootPanel.get("fondo").add( mapPanel ) ;
+		*/
+
+
