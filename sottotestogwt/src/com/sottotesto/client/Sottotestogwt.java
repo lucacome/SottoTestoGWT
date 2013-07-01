@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sencha.gxt.core.client.Style.VerticalAlignment;
 import com.sencha.gxt.core.client.util.Margins;
+import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
@@ -40,6 +41,8 @@ import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.FieldVerifier;
 import com.sottotesto.shared.STResources;
 import com.sottotesto.shared.TagmeResponse;
+import com.sottotesto.shared.TreeData;
+import com.sottotesto.shared.TreeDataProperties;
 import com.sottotesto.shared.Utility;
 
 //prove exhibit e neo4j
@@ -106,6 +109,14 @@ public class Sottotestogwt implements EntryPoint {
 	
 	//results items
 	ResultController rc;
+	
+	//tree items
+	TreeDataProperties treeProperties;
+	TreeStore<TreeData> treeStore;
+	TreeData tdForcedirected;
+	TreeData tdHyperTree;
+	List<TreeData> tdEntriesList;
+	int treeDataIdProvider;
 	
 	//service responses variables
 	private TagmeResponse tagmeResp; //response of TAGME service
@@ -424,6 +435,10 @@ public class Sottotestogwt implements EntryPoint {
 								ekpRemainingCallNum++;
 								ekpRemainingCallInputs.add(itertitle.next());
 							}
+							
+							//intialize an empty tree
+							initEmptyTree();
+							
 							ekpResp = new ArrayList<EkpResponse>();
 							callEkp();
 						}						
@@ -462,7 +477,7 @@ public class Sottotestogwt implements EntryPoint {
 	
 	private void callEkp(){
 		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
-		
+					
 		String input="";
 		
 		if (ekpRemainingCallNum>0){
@@ -492,12 +507,21 @@ public class Sottotestogwt implements EntryPoint {
 			EkpResponse ekpRespTmp = new EkpResponse();
 			ekpRespTmp = result;
 			
-			String tem = "["+result.jdataHT+"]";
-			String tem2 = "["+result.jdataFD+"]";
-			rc.setJsonHT(tem);
-			rc.setJsonFD(tem2);
+			String jsonHT = "["+result.jdataHT+"]";
+			String jsonFD = "["+result.jdataFD+"]";			
+			//rc.setJsonHT(tem);
+			//rc.setJsonFD(tem2);
 			//Debug.printDbgLine("MAIN="+tem);
-			rc.initTree();
+			
+			// create tree entry for frocedirected graph
+			tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_FD));
+			tdEntriesList.get(tdEntriesList.size()-1).setJsonFD(jsonFD);
+			treeStore.add(tdForcedirected, tdEntriesList.get(tdEntriesList.size()-1));
+			
+			// create tree entry for hypertree graph
+			tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
+			tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
+			treeStore.add(tdHyperTree, tdEntriesList.get(tdEntriesList.size()-1));		
 			
 			ekpResp.add(ekpRespTmp);
 			if (ekpRespTmp.getCode()==200) HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
@@ -505,6 +529,7 @@ public class Sottotestogwt implements EntryPoint {
 			ekpShowDataBTN.setVisible(true); //allow to see data
 			
 			if (ekpRemainingCallNum>0){callEkp();}
+			else {rc.loadTree(treeStore); rc.getTree().expandAll();}
 		}});		
 	}
 	
@@ -565,6 +590,21 @@ public class Sottotestogwt implements EntryPoint {
 		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
 				
 	}	
+	
+	private void initEmptyTree(){	
+		Debug.printDbgLine("Sottotestogwt.java: initEmptyTree()");
+		
+		tdEntriesList = new ArrayList<TreeData>();
+		
+		treeDataIdProvider = 0; //tree entries id counter
+		treeProperties = GWT.create(TreeDataProperties.class); // Generate the key provider and value provider for the Data class
+		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
+		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph");
+		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Hypertree Graph");
+		
+		treeStore.add(tdForcedirected);
+		treeStore.add(tdHyperTree);
+	}
 }
 
 

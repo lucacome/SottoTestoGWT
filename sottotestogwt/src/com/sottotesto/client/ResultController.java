@@ -5,17 +5,16 @@ import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.editor.client.Editor.Path;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.text.shared.SimpleSafeHtmlRenderer;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
-import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.IconProvider;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.ContentPanel;
@@ -25,7 +24,6 @@ import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutData;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.VBoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VBoxLayoutContainer.VBoxLayoutAlign;
@@ -36,6 +34,8 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.STResources;
+import com.sottotesto.shared.TreeData;
+import com.sottotesto.shared.TreeDataProperties;
 
 
 /* USAGE:
@@ -60,15 +60,16 @@ public class ResultController {
 	private InfovisController infovis;
 	private String jsonFD; //json string for forcedirected graph
 	private String jsonHT;
+	
 	//tree data
-	private DataProperties dp;
+	private TreeDataProperties treeProperties;
 	private SimpleSafeHtmlCell<String> cell;
-	private TreeStore<Data> treeStore;
-	private Tree<Data, String> tree;
+	private TreeStore<TreeData> treeStore;
+	private Tree <TreeData, String> tree;
 	private FlowLayoutContainer treeContainer;
 	private ButtonBar treeButtonBar;
 	private TextButton treeExpandButton, treeCollapseButton;
-	private StoreFilterField<Data> treeFilter;
+	private StoreFilterField<TreeData> treeFilter;
 
 	public void init(){
 		Debug.printDbgLine("ResultController.java: init()");
@@ -122,7 +123,7 @@ public class ResultController {
 		centerPanel.add(new HTML(HTMLerrorString));
 	}
 	
-	public void initTree(){
+	public void loadTree(TreeStore<TreeData> ts){
 
 		Debug.printDbgLine("ResultController.java: initTree()");
 		
@@ -149,22 +150,35 @@ public class ResultController {
 	    
 		
 		//TREE DATA LOADER
-		dp = GWT.create(DataProperties.class); // Generate the key provider and value provider for the Data class
-		treeStore = new TreeStore<Data>(dp.key()); // Create the store that the contains the data to display in the tree
-		Data r1 = new Data(0, "ForceDirected Graph", "value1");
+		treeProperties = GWT.create(TreeDataProperties.class); // Generate the key provider and value provider for the Data class
+		/*
+		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
+		TreeData r1 = new TreeData("1","ForceDirected Graph"); r1.setClickAction(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD); r1.setJsonFD(jsonFD);
 		treeStore.add(r1);
-		treeStore.add(r1, new Data(1, "Tag1", "value2"));
-		treeStore.add(r1, new Data(2, "Tag2", "value3"));
-		Data r2 = new Data(3, "Hypertree Graph", "valueboh");
+		treeStore.add(r1, new TreeData("3","Tag1"));
+		treeStore.add(r1, new TreeData("4","Tag1"));
+		TreeData r2 = new TreeData("2","Hypertree Graph"); r2.setClickAction(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT); r2.setJsonHT(jsonHT);
 		treeStore.add(r2);
-		Data r3 = new Data(4, "Maps", "value4");
+		TreeData r3 = new TreeData("5","Maps");
 		treeStore.add(r3);
-		treeStore.add(r3, new Data(5, "Tag3", "value5"));
-		treeStore.add(r3, new Data(6, "Tag4", "value6"));	
-		tree = new Tree<Data, String>(treeStore, dp.name());
+		treeStore.add(r3, new TreeData("6","Tag3"));
+		treeStore.add(r3, new TreeData("7","Tag4"));	
+		*/
+		treeStore = ts;
+		tree = new Tree<TreeData, String>(treeStore, treeProperties.name());
 		
-		//TREE CLICK HANDLER
-		cell = new SimpleSafeHtmlCell<String>(SimpleSafeHtmlRenderer.getInstance(), "click") {
+		//TREE CLICK HANDLER		
+		tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+	    tree.getSelectionModel().addSelectionHandler(new SelectionHandler<TreeData>() {
+
+	        public void onSelection(SelectionEvent<TreeData> event) {
+	        	TreeData treeDataSelected = event.getSelectedItem();
+	        	handleTreeClick(treeDataSelected);
+	            //Info.display("Tree Handler", mnu.getName());
+	        }
+	    });
+	    /*
+	     * cell = new SimpleSafeHtmlCell<String>(SimpleSafeHtmlRenderer.getInstance(), "click") {
 			@Override
 			public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event,
 					ValueUpdater<String> valueUpdater) {
@@ -176,11 +190,12 @@ public class ResultController {
 			}
 		};
 		tree.setCell(cell);
+	     */
 		
 		//TREE FILTERING
-		treeFilter = new StoreFilterField<Data>() {			 
+		treeFilter = new StoreFilterField<TreeData>() {			 
 		      @Override
-		      protected boolean doSelect(Store<Data> store, Data parent, Data item, String filter) {	 
+		      protected boolean doSelect(Store<TreeData> store, TreeData parent, TreeData item, String filter) {	 
 		        String name = item.getName();
 		        name = name.toLowerCase();
 		        if (name.startsWith(filter.toLowerCase())) {
@@ -193,10 +208,10 @@ public class ResultController {
 		
 		
 		//TREE ICON PROVIDER
-		tree.setIconProvider( new IconProvider<Data>()
+		tree.setIconProvider( new IconProvider<TreeData>()
 			      {
 			         @Override
-			         public ImageResource getIcon( Data model )
+			         public ImageResource getIcon( TreeData model )
 			         {
 			            if ( model.getName().equals("ForceDirected Graph") ) return STResources.INSTANCE.iconHyperTree();
 			            if ( model.getName().equals("Hypertree Graph") ) return STResources.INSTANCE.iconHyperTree();
@@ -219,59 +234,26 @@ public class ResultController {
 	}
 
 	
-	private void handleTreeClick(String value){
-		Debug.printDbgLine("ResultController.java: handleTreeClick("+value+")");
+	private void handleTreeClick(TreeData treeDataSelected){
+		Debug.printDbgLine("ResultController.java: handleTreeClick("+treeDataSelected.getName()+")");
 		
-		if (value.equals("ForceDirected Graph")) {
-			Debug.printDbgLine("ResultController.java: handleTreeClick(): showing fd graph...");
+		if (!treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.NOTHING)){
 			infovis = new InfovisController();	// initialize new infovis controller
 			centerPanel.clear(); 				// clear centerpanel contents
 			centerPanel.setWidget(infovis.init()); // add the graph in centerpanel
 			infovis.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 			infovis.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-			infovis.showGraph(jsonFD, "forcedirected"); //load json to graph
-		}
-		else if (value.equals("Hypertree Graph")) {
-			Debug.printDbgLine("ResultController.java: handleTreeClick(): showing ht graph...");
-			infovis = new InfovisController();	// initialize new infovis controller
-			centerPanel.clear(); 				// clear centerpanel contents
-			centerPanel.setWidget(infovis.init()); // add the graph in centerpanel
-			infovis.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
-			infovis.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-			infovis.showGraph(jsonHT,"hypertree"); //load json to graph
-		}
-				
-	}
-	
-
-	public interface DataProperties extends PropertyAccess<Data> {
-		@Path("name")
-		ModelKeyProvider<Data> key();
-		ValueProvider<Data, int[]> id();
-		ValueProvider<Data, String> name();
-		ValueProvider<Data, String> value();
+			
+			if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD)) {
+				infovis.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
+			}
+			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
+				infovis.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
+			}
+			else Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
+		}		
 	}
 
-	public class Data {
-		private int id;
-		private String name;
-		private String value;
-
-		public Data(int id, String name, String value) {
-			super();
-			this.id = id;
-			this.name = name;
-			this.value = value;
-		}
-		public int getId() {return id;}
-		public void setId(int givenId) {this.id=givenId;}
-		public String getName() {return name;}
-		public void setName(String name) {this.name = name;}
-		public String getValue() {return value;}
-		public void setValue(String value) {this.value = value;}
-		
-		
-	}
 	
 	public void setJsonFD(String jdata){
 
@@ -285,7 +267,12 @@ public class ResultController {
 
 	//Debug.printDbgLine("JSONHT="+jsonHT);	
 	}
+	
 
+	public Tree<TreeData, String> getTree(){
+		if (tree!=null) return tree;
+		else return null;
+	}
 	
 	public ContentPanel getPanel(){
 		if (panel!=null) return panel;

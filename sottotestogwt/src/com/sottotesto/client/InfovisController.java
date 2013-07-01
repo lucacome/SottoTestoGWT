@@ -11,6 +11,11 @@ import com.sottotesto.shared.Debug;
 
 public class InfovisController {
 
+	public static final class GRAPH_TYPE {
+		public static final String FORCEDIRECTED = "forceDirected";
+		public static final String HYPERTREE = "hyperTree";		  
+	}
+	
 	//infovis container
 	private HorizontalLayoutContainer infovisContainer;
 	private VerticalLayoutContainer logDetailsContainer;
@@ -82,8 +87,8 @@ public class InfovisController {
 		var json = myObject;
   		console.log(json);
   		
-  		if (type=="forcedirected") new $wnd.init_fd(json);
-  		else if (type=="hypertree") new $wnd.init_ht(json);
+  		if (type=="forceDirected") new $wnd.init_fd(json);
+  		else if (type=="hyperTree") new $wnd.init_ht(json);
   		else console.log("callJit(): tipo di grafo richiesto sconosciuto");
 	}-*/;
 
