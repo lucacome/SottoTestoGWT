@@ -47,6 +47,9 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 
 		String resultQueryXML = "";
 		String resultQueryText = "";
+		String prefix,prefixlink;
+		prefix = "dbo:";
+		prefixlink = "<http://dbpedia.org/ontology/>";
 		List<String> titletagme = tagmResp.getTitleTag();
 		Iterator<String> itertitle =  titletagme.iterator();
 		try {
@@ -57,27 +60,35 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 				String titletag = itertitle.next();	
 
 				for (int j=0; j <= dbprop.size()-1; j++){
-					String s2 = "PREFIX  dbpprop: <http://dbpedia.org/property/>\n" +
+					String s2 = "PREFIX "+prefix+prefixlink+"\n" +
 							"\n" +
 							"SELECT  *\n" +
 							"WHERE {\n" +
-							"<http://dbpedia.org/resource/" + titletag + "> dbpprop:"+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
-							"  }\n" +	            
+							"<http://dbpedia.org/resource/" + titletag + "> "+prefix+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
+							//"FILTER (LANG(?"+dbprop.get(j)+") = \"en\") .\n"+
+							" }\n" +	            
 							"";
-					//   Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
+					  Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 					Query query2 = QueryFactory.create(s2); //s2 = the query above
+					Debug.printDbgLine("1");
 					QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
+					Debug.printDbgLine("2");
 					results = qExe.execSelect();
 					//TODO fix xmlresult
+					Debug.printDbgLine("3");
 					resultQueryXML += ResultSetFormatter.asXMLString(results);
+					Debug.printDbgLine("4");
 					resultQueryText += ResultSetFormatter.asText(results);
+					Debug.printDbgLine("5");
 				}
 				//TODO output in json
 
 			}
-
+			Debug.printDbgLine("6");
 			responseQuery.setQueryResultXML(resultQueryXML);
+			Debug.printDbgLine("7");
 			responseQuery.setQueryResultText(resultQueryText);
+			Debug.printDbgLine("8");
 
 
 			Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+responseQuery.getTime()+"ms]");

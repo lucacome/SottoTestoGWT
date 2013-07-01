@@ -417,10 +417,11 @@ public class Sottotestogwt implements EntryPoint {
 							//chiamiamo DBPedia							
 							List<String> dbproperty = new ArrayList<String>();
 							List<String> dbproperty2 = new ArrayList<String>();
-							dbproperty.add("birthDate");
-							dbproperty.add("title");
-							dbproperty.add("name");
-							dbproperty2.add("placeOfBirth");
+							//dbproperty.add("birthDate");
+							//dbproperty.add("title");
+							//dbproperty.add("name");
+							//dbproperty2.add("placeOfBirth");
+							dbproperty.add("abstract");
 							callDBPedia(dbproperty);
 							//callDBPedia(dbproperty2);
 							
