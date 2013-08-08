@@ -23,7 +23,11 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
  
   	<!-- Other module inherits                                      -->
-    
+    <inherits name="com.google.maps.gwt.GoogleMaps" />
+	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<inherits name='com.orange.links.Links' />
+	<inherits name='com.google.gwt.widgetideas.WidgetIdeas' />   
+	<inherits name='com.google.gwt.libideas.LibIdeas' />
    
 
   <!-- Specify the app entry point class.                         -->

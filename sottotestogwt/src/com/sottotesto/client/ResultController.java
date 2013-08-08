@@ -57,9 +57,12 @@ public class ResultController {
 	private String HTMLerrorString="<p style=\"padding:10px;color:red;font-size:11px;\">E' avvenuto un errore, rieffettua la tua ricerca!</p>";
 	
 	//infovis data
-	private InfovisController infovis;
+	private InfovisController infovisC;
 	private String jsonFD; //json string for forcedirected graph
 	private String jsonHT;
+	
+	//map data
+	private MapController mapC;
 	
 	//tree data
 	private TreeDataProperties treeProperties;
@@ -215,7 +218,7 @@ public class ResultController {
 			         {
 			            if ( model.getName().equals("ForceDirected Graph") ) return STResources.INSTANCE.iconHyperTree();
 			            if ( model.getName().equals("Hypertree Graph") ) return STResources.INSTANCE.iconHyperTree();
-			            if ( model.getName().equals("Maps") ) return STResources.INSTANCE.iconMap();
+			            if ( model.getName().equals("Map") ) return STResources.INSTANCE.iconMap();
 			            else return STResources.INSTANCE.iconTreeEntity();
 			            //else return null;
 			         }
@@ -238,17 +241,31 @@ public class ResultController {
 		Debug.printDbgLine("ResultController.java: handleTreeClick("+treeDataSelected.getName()+")");
 		
 		if (!treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.NOTHING)){
-			infovis = new InfovisController();	// initialize new infovis controller
-			centerPanel.clear(); 				// clear centerpanel contents
-			centerPanel.setWidget(infovis.init()); // add the graph in centerpanel
-			infovis.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
-			infovis.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+			
+					
 			
 			if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD)) {
-				infovis.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
+				infovisC = new InfovisController();	// initialize new infovis controller
+				centerPanel.clear(); 				// clear centerpanel contents	
+				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
+				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
+				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+				infovisC.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
-				infovis.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
+				infovisC = new InfovisController();	// initialize new infovis controller
+				centerPanel.clear(); 				// clear centerpanel contents	
+				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
+				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
+				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
+			}
+			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
+				mapC = new MapController(); //initialize map controller				
+				centerPanel.clear(); 				// clear centerpanel contents	
+				centerPanel.setWidget(mapC.init()); // add the graph in centerpanel
+				mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
+				mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 			}
 			else Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
 		}		

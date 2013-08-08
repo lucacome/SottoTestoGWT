@@ -24,8 +24,14 @@ import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.maps.gwt.client.GoogleMap;
+import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.MapOptions;
+import com.google.maps.gwt.client.MapTypeId;
+import com.google.maps.gwt.client.Marker;
 import com.sencha.gxt.core.client.Style.VerticalAlignment;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.TreeStore;
@@ -115,6 +121,7 @@ public class Sottotestogwt implements EntryPoint {
 	TreeStore<TreeData> treeStore;
 	TreeData tdForcedirected;
 	TreeData tdHyperTree;
+	TreeData tdMap;
 	List<TreeData> tdEntriesList;
 	int treeDataIdProvider;
 	
@@ -258,22 +265,7 @@ public class Sottotestogwt implements EntryPoint {
 		rc.init();
 		RootPanel.get("resultsContainer").add(rc.getPanel());
 		
-		//TEST BUTTON: FOR TESTING... OF COURSE
-		/*
-		Button testButton = new Button();
-		testButton.setText("Test");
-		testButton.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				Debug.printDbgLine("Sottotestogwt.java: testButtonClick()");
-				//showGraph("nulla");
-				ResultController rc = new ResultController();
-				rc.init();
-			}
-		});
-		RootPanel.get("sendButtonContainer").add(testButton);
-		*/
-	}	
+	}		
 	
 	private void initSearchPanel(){
 		//init input section items
@@ -321,7 +313,38 @@ public class Sottotestogwt implements EntryPoint {
 				searchAreaVP.add(searchPanelHC);
 				
 				titleContentPanel.setWidget(searchPanelHC);
-	}
+				
+				//TEST BUTTON: FOR TESTING... OF COURSE		
+				/*
+				Button testButton = new Button();
+				testButton.setText("Test");
+				testButton.addClickHandler(new ClickHandler() {			
+					@Override
+					public void onClick(ClickEvent event) {
+						Debug.printDbgLine("Sottotestogwt.java: testButtonClick()");
+						
+						SimplePanel mapPanel = new SimplePanel() ;
+						mapPanel.setSize("1000px", "500px");
+						MapOptions options  = MapOptions.create();
+						options.setCenter(LatLng.create(39.509, -98.434)); 
+				      options.setZoom(6);
+				      options.setMapTypeId(MapTypeId.SATELLITE);
+				      options.setDraggable(true);
+				      options.setMapTypeControl(true);
+				      options.setScaleControl(true);
+				      options.setScrollwheel(true);
+				      GoogleMap theMap = GoogleMap.create(mapPanel.getElement(), options) ;
+				      mapPanel.setVisible(true);
+						Marker marker = Marker.create();
+						marker.setPosition(LatLng.create(42.8333, 12.8333));
+						marker.setMap(theMap);
+					    RootPanel.get("testContainer").add( mapPanel ) ;
+						
+					}
+				});
+				RootPanel.get("testContainer").add(testButton);
+				*/
+				}
 	
 
 	//send input from textarea to tagme
@@ -602,9 +625,11 @@ public class Sottotestogwt implements EntryPoint {
 		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
 		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph");
 		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Hypertree Graph");
+		tdMap = new TreeData(String.valueOf(treeDataIdProvider++),"Map"); tdMap.setClickAction(TreeData.CLICK_ACTIONS.SHOWMAP);
 		
 		treeStore.add(tdForcedirected);
 		treeStore.add(tdHyperTree);
+		treeStore.add(tdMap);
 	}
 }
 
