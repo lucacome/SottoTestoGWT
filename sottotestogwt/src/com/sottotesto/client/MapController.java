@@ -21,7 +21,7 @@ public class MapController {
 	GoogleMap theMap;
 	
 	public Widget init(){
-		Debug.printDbgLine("InfovisController.java: init()");
+		Debug.printDbgLine("MapController.java: init()");
 		
 		mapContainer = new SimplePanel() ;
 		//mapContainer.setSize("1000px", "500px");
@@ -40,6 +40,10 @@ public class MapController {
 		marker.setTitle("Marker");
 		marker.setMap(theMap);
 		
+//		LatLng ll; ll=geocodeJS("via treves 3, bologna");
+		String retjs = geocodeJS("via treves 3, bologna");
+		Debug.printDbgLine("MapController.java: init(): geocode:" + retjs);
+		
 		return mapContainer;
 	}
 	
@@ -48,23 +52,28 @@ public class MapController {
 		else return null;
 	}
 	
-	private void geocode (String place){
-		
-	}
-
-	private native void geocodeJS(String place)/*-{
+	
+	
+	private native String geocodeJS(String place)/*-{
 		var geocoder;
-		geocoder = new google.maps.Geocoder();
-		
-		 geocoder.geocode( { 'address': address}, function(results, status) {
-    		if (status == google.maps.GeocoderStatus.OK) {
-      			map.setCenter(results[0].geometry.location);
-      			var marker = new google.maps.Marker({
-          		map: map,
-          		position: results[0].geometry.location});
-    } else {
-      alert('Geocode was not successful for the following reason: ' + status);
-    }
-  });
-}-*/;
+		var latlong;
+		geocoder = new $wnd.google.maps.Geocoder();
+
+		 geocoder.geocode( { 'address': place}, function(results, status) {
+    		if (status == $wnd.google.maps.GeocoderStatus.OK) {
+    			alert('ok, return: ' + results[0].geometry.location);
+    			//latlong = results[0].geometry.location.lat() + '-' + results[0].geometry.location.lng();
+    			latlong="prova2";
+    			alert('latlong: ' + latlong);
+    			return latlong;
+
+    		} else {
+      			alert('Geocode was not successful for the following reason: ' + status);
+      			latlong="shit";
+    		}
+  		});
+  		
+  		return latlong;
+	}-*/;
+
 }
