@@ -11,6 +11,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.text.shared.SimpleSafeHtmlRenderer;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.maps.gwt.client.LatLng;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.util.Margins;
@@ -116,14 +117,18 @@ public class ResultController {
 
 	public void reInit(){
 		lcwest.clear(); //remove tree
-		centerPanel.clear();	// clear centerpanel contents
-		centerPanel.add(new HTML(HTMLloadIconString));
+		showLoading(); //show loading gif
 	}
 	
 	public void showError(){
 		lcwest.clear(); //remove tree
 		centerPanel.clear();	// clear centerpanel contents
 		centerPanel.add(new HTML(HTMLerrorString));
+	}
+	
+	public void showLoading(){
+		centerPanel.clear();	// clear centerpanel contents
+		centerPanel.add(new HTML(HTMLloadIconString));
 	}
 	
 	public void loadTree(TreeStore<TreeData> ts){
@@ -171,7 +176,7 @@ public class ResultController {
 		tree = new Tree<TreeData, String>(treeStore, treeProperties.name());
 		
 		//TREE CLICK HANDLER		
-		tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		tree.getSelectionModel().setSelectionMode(SelectionMode.SIMPLE);
 	    tree.getSelectionModel().addSelectionHandler(new SelectionHandler<TreeData>() {
 
 	        public void onSelection(SelectionEvent<TreeData> event) {
@@ -242,7 +247,8 @@ public class ResultController {
 		
 		if (!treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.NOTHING)){
 			
-					
+			//show loading gif
+			showLoading();
 			
 			if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD)) {
 				infovisC = new InfovisController();	// initialize new infovis controller
@@ -266,8 +272,18 @@ public class ResultController {
 				centerPanel.setWidget(mapC.init()); // add the graph in centerpanel
 				mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
 				mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+				
+				//BUGFIX - the map doesn't show correctly for the second time, this is the fix
+				mapC.getMap().triggerResize();
+				mapC.getMap().setCenter(LatLng.create(35,-40)); 
+				//END BUGFIX
 			}
-			else Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
+			else {
+				Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
+				showError(); //show red error on center page
+			}
+						
+			tree.getSelectionModel().deselectAll(); //deselect to allow reclick of same treedata
 		}		
 	}
 

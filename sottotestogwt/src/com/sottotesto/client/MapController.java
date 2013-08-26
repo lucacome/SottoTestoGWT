@@ -52,6 +52,11 @@ public class MapController {
 		else return null;
 	}
 	
+	public GoogleMap getMap(){
+		if (theMap!=null) return theMap;
+		else return null;
+	}
+	
 	
 	
 	private native String geocodeJS(String place)/*-{
