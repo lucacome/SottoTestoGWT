@@ -34,6 +34,16 @@
     <url-pattern>/sottotestogwt/ekp</url-pattern>
   </servlet-mapping>
   
+  
+  <servlet>
+    <servlet-name>dbpqServlet</servlet-name>
+    <servlet-class>com.sottotesto.server.DBPediaQueryImpl</servlet-class>
+  </servlet>  
+  <servlet-mapping>
+    <servlet-name>dbpqServlet</servlet-name>
+    <url-pattern>/sottotestogwt/dbpq</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Sottotestogwt.html</welcome-file>

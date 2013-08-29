@@ -2,6 +2,8 @@ package com.sottotesto.shared;
 
 
 
+
+
 public class EkpResponse implements java.io.Serializable{
 	/**
 	 * 

@@ -1,12 +1,8 @@
 package com.sottotesto.server;
 
-import java.io.IOException;
-import java.net.SocketImpl;
-import java.net.SocketTimeoutException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -16,7 +12,6 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.sparql.engine.http.HttpQuery;
 import com.sottotesto.client.DBPediaService;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
@@ -70,16 +65,12 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 							"";
 					  Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 					Query query2 = QueryFactory.create(s2); //s2 = the query above
-					Debug.printDbgLine("1");
 					QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
-					Debug.printDbgLine("2");
 					results = qExe.execSelect();
 					//TODO fix xmlresult
-					Debug.printDbgLine("3");
 					resultQueryXML += ResultSetFormatter.asXMLString(results);
-					Debug.printDbgLine("4");
 					resultQueryText += ResultSetFormatter.asText(results);
-					Debug.printDbgLine("5");
+					
 				}
 				//TODO output in json
 

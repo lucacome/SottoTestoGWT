@@ -25,6 +25,7 @@ public class JData {
 		// TODO Auto-generated constructor stub
 		//linkmap =
 		data = new HashMap<String, String>();
+		data.clear();
 		adjacencies = new ArrayList<Map<String, String>>();
 		linkmap = HashMultimap.create();
 		linkmap.clear();
