@@ -10,18 +10,6 @@ a {
     color:#23A4FF;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 #inner-details {
     font-size:0.8em;
     list-style:none;
@@ -89,3 +77,60 @@ span.name {
   text-align:center;
   margin-bottom:2px;
 }
+
+
+/*********************************************************************************************************/
+/* AGGIUNTI DA LOLLO */
+/*********************************************************************************************************/
+
+/* #x -> accede al campo id = "x"     */
+/* .x -> accede al campo class = "x"  */
+
+/*-----------------------------------------------------------------------*/
+/*ALBERI*/
+.GB2UA-DDEOB { /*entrate principali (padri con sottoelementi + figli)*/
+	text-align:left; margin:0px; border:1px;
+}
+.GB2UA-DDDOB{ /*clear.gif*/
+	width:0px; display:none;
+}
+/*-----------------------------------------------------------------------*/
+
+
+
+/*-----------------------------------------------------------------------*/
+/* PANNELLO RISULTATI */
+#centerPanel{
+	text-align:left;
+}
+.result_htmlContainer{
+	text-align:left; color:black; position:relative;
+}
+.result_loadingGifContainer{
+	text-align:center; vertical-align:middle; width:100%; height:100%;
+}
+.result_loadingGif{	
+	width:5%; height:auto; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;
+}
+.result_searchSomethingString {
+	font-size:large; height:50px; line-height:50px; text-align:center; vertical-align:middle; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;	
+}
+.result_selectSomethingString{
+	padding:10px; font-size:large; text-align:center; vertical-align:top; position:absolute; left:0; right:0; margin:auto;
+}
+.result_errorString {
+	font-size:large; height:50px; line-height:50px; color:red; text-align:center; vertical-align:middle; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;
+}
+.result_taggedElementsTitle{
+	position: absolute; padding:20px; padding-top:80px; font-size:large;	text-align:left; vertical-align:top;
+}
+.result_searchedPhrase{
+	position:absolute;	padding:20px; padding-top:100px; font-size:large; text-align:left; vertical-align:top;
+}
+.result_taggedWord{
+	font-weight:bold; color:green; text-decoration:underline; font-style:italic; background-color:yellow;
+}
+.result_skippedWord{
+	color:orange; text-decoration:line-through;
+}
+/*-----------------------------------------------------------------------*/

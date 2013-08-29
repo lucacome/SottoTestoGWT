@@ -93,7 +93,15 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			//aggiungi la risposta formattata html
 			responseTagTmp = "";
 			tagmeResp.setJsonNL(tagmeResp.getJson().replaceAll(",", ",\n"));
+			
+			//liste per entita' e spotPlace con rho sufficiente
 			List<String> titletag = new ArrayList<String>();
+			List<String> spotTag = new ArrayList<String>();
+			
+			//liste per entita' e spotPlace con rho non sufficiente
+			List<String> titleSkipped = new ArrayList<String>();
+			List<String> spotSkipped = new ArrayList<String>();
+			
 			//converti Json -> gson
 			Gson gson = new Gson();
 			JsonArray jarray = new JsonArray();
@@ -107,12 +115,24 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 					//JData.jdata.addProperty("title"+i, responseTagTmp);
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
 					titletag.add(responseTagTmp);	
+					
+					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).spot;
+					spotTag.add(responseTagTmp);
 					responseTagTmp = "";
 				}else{
 					Debug.printDbgLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + " rho troppo basso("+tagmeResp.getJsonData().annotations.get(i).rho+") e max="+tagmeResp.getRho());
+					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
+					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
+					titleSkipped.add(responseTagTmp);	
+					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).spot;
+					spotSkipped.add(responseTagTmp);
+					responseTagTmp = "";
 				}
 			}
 			tagmeResp.setTitleTag(titletag);
+			tagmeResp.setSpotTag(spotTag);
+			tagmeResp.setTitleSkipped(titleSkipped);
+			tagmeResp.setSpotSkipped(spotSkipped);
 			//JsonElement jelement = null;
 
 			//jarray.add(jelement);

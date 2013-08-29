@@ -1,6 +1,14 @@
 package com.sottotesto.client;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+import javax.swing.JApplet;
+
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
@@ -33,8 +41,10 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.tree.Tree;
+import com.sencha.gxt.widget.core.client.tree.TreeStyle;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.STResources;
+import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.TreeData;
 import com.sottotesto.shared.TreeDataProperties;
 
@@ -53,9 +63,10 @@ public class ResultController {
 	private BorderLayoutData west;
 	private BoxLayoutData vBoxData;
 	private HTML defaultCenterHTML;
-	private String HTMLloadIconString="<p style=\"padding:10px;color:#556677;font-size:11px;\"><img src='loading.gif'/></p>";
-	private String HTMLselectSomethingString="<p style=\"padding:10px;color:#556677;font-size:11px;\">Seleziona una vista dall'elenco a sinistra</p>";
-	private String HTMLerrorString="<p style=\"padding:10px;color:red;font-size:11px;\">E' avvenuto un errore, rieffettua la tua ricerca!</p>";
+	private String HTMLsearchSomethingString="<div class=\"result_searchSomethingString\">Effettua una ricerca!</div>";
+	private String HTMLloadIconString="<div class=\"result_loadingGifContainer\"><img class=\"result_loadingGif\" src='loading.gif'/></div>";
+	private String HTMLselectSomethingString="<div class=\"result_selectSomethingString\">Seleziona una vista dall'elenco a sinistra</div>";
+	private String HTMLerrorString="<div class=\"result_errorString\">E' avvenuto un errore, rieffettua la tua ricerca!</div>";
 	
 	//infovis data
 	private InfovisController infovisC;
@@ -74,6 +85,10 @@ public class ResultController {
 	private ButtonBar treeButtonBar;
 	private TextButton treeExpandButton, treeCollapseButton;
 	private StoreFilterField<TreeData> treeFilter;
+	
+	//search phrase data
+	String searchedPhrase;	
+	TagmeResponse tagmeResp;
 
 	public void init(){
 		Debug.printDbgLine("ResultController.java: init()");
@@ -101,7 +116,8 @@ public class ResultController {
 		centerPanel.setHeaderVisible(false);
 		centerPanel.setId("centerPanel");
 		defaultCenterHTML = new HTML();
-		defaultCenterHTML.setHTML("<p style=\"padding:10px;color:#556677;font-size:11px;\">Effettua Una ricerca!</p>");
+		defaultCenterHTML.setStyleName("result_htmlContainer");
+		defaultCenterHTML.setHTML(HTMLsearchSomethingString);
 		centerPanel.add(defaultCenterHTML);
 				
 
@@ -136,6 +152,7 @@ public class ResultController {
 		Debug.printDbgLine("ResultController.java: initTree()");
 		
 		treeContainer = new FlowLayoutContainer();
+		treeContainer.setId("treeContainer");
 		treeContainer.addStyleName("margin-10");
 		
 		//TREE EXPAND/COLLAPSE BUTTONS
@@ -174,6 +191,8 @@ public class ResultController {
 		*/
 		treeStore = ts;
 		tree = new Tree<TreeData, String>(treeStore, treeProperties.name());
+		tree.setId("tree");
+		tree.setStylePrimaryName("treePrimStyle");
 		
 		//TREE CLICK HANDLER		
 		tree.getSelectionModel().setSelectionMode(SelectionMode.SIMPLE);
@@ -185,21 +204,7 @@ public class ResultController {
 	            //Info.display("Tree Handler", mnu.getName());
 	        }
 	    });
-	    /*
-	     * cell = new SimpleSafeHtmlCell<String>(SimpleSafeHtmlRenderer.getInstance(), "click") {
-			@Override
-			public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event,
-					ValueUpdater<String> valueUpdater) {
-				super.onBrowserEvent(context, parent, value, event, valueUpdater);
-				if ("click".equals(event.getType())) {
-					//Info.display("Click", "You clicked \"" + value + "\"!");
-					handleTreeClick(value);
-				}
-			}
-		};
-		tree.setCell(cell);
-	     */
-		
+	    		
 		//TREE FILTERING
 		treeFilter = new StoreFilterField<TreeData>() {			 
 		      @Override
@@ -223,12 +228,12 @@ public class ResultController {
 			         {
 			            if ( model.getName().equals("ForceDirected Graph") ) return STResources.INSTANCE.iconHyperTree();
 			            if ( model.getName().equals("Hypertree Graph") ) return STResources.INSTANCE.iconHyperTree();
-			            if ( model.getName().equals("Map") ) return STResources.INSTANCE.iconMap();
+			            if ( model.getName().equals("Knowledge Map") ) return STResources.INSTANCE.iconMap();
 			            else return STResources.INSTANCE.iconTreeEntity();
 			            //else return null;
 			         }
 			      } );
-		
+				
 		//populate treecontainer
 		treeContainer.add(treeFilter);    
 		treeContainer.add(treeButtonBar);
@@ -237,8 +242,8 @@ public class ResultController {
 		lcwest.add(treeContainer);
 		
 		centerPanel.clear();	// clear centerpanel contents
-		centerPanel.add(new HTML(HTMLselectSomethingString));
-		
+		centerPanel.add(new HTML(HTMLselectSomethingString+"<br><br><span class=\"result_taggedElementsTitle\">Entita' rilevate nella frase:</span><br>"+createTaggedSearchString()));
+		centerPanel.getWidget().setHeight(String.valueOf(centerPanel.getOffsetHeight()+"px")); //html grande quando si puo'
 	}
 
 	
@@ -310,5 +315,65 @@ public class ResultController {
 	public ContentPanel getPanel(){
 		if (panel!=null) return panel;
 		else return null;
+	}
+	
+	//rc.setSearchedPhrase(textToServer); in sottotestogwt, line 364
+	public void setSearchedPhrase(String textEditContent){
+		if (!textEditContent.isEmpty()) searchedPhrase = textEditContent;
+		else searchedPhrase = "";
+	}
+	
+	//rc.setTagmeResp(tagmeResp); in sottotestogwt tagmeok, linea 439
+	public void setTagmeResp(TagmeResponse tagmeResponse){
+		tagmeResp = tagmeResponse;		
+	}
+	
+	private String createTaggedSearchString(){
+		Debug.printDbgLine("ResultController.java: createTaggedSearchString()");
+		
+		String result = "<span class=\"result_searchedPhrase\">"+searchedPhrase+"</span>";
+		String curTag="";
+		String curTitle="";
+		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result = "+result);
+		
+		//CHECK TAGGED ENTRIES
+		List<String> taggedEntries;
+		taggedEntries = new ArrayList<String>(tagmeResp.getSpotTag());		
+		Iterator<String> iterTags =  taggedEntries.iterator();		
+		List<String> taggedTitles;
+		taggedTitles = new ArrayList<String>(tagmeResp.getTitleTag());		
+		Iterator<String> iterTitle =  taggedTitles.iterator();				
+		while (iterTags.hasNext()){
+			curTag=iterTags.next();	
+			curTag=curTag.replaceAll("_", " ");
+			curTitle=iterTitle.next();
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
+			
+			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
+		}
+		
+		//CHECK TAGGED ENTRIES WITH LOW ROH
+		List<String> skippedEntries;
+		skippedEntries = new ArrayList<String>(tagmeResp.getSpotSkipped());		
+		Iterator<String> iterSkippedTags =  skippedEntries.iterator();		
+		List<String> skippedTitles;
+		skippedTitles = new ArrayList<String>(tagmeResp.getTitleSkipped());		
+		Iterator<String> iterSkippedTitle =  skippedTitles.iterator();				
+		while (iterSkippedTags.hasNext()){
+			curTag=iterSkippedTags.next();	
+			curTag=curTag.replaceAll("_", " ");
+			curTitle=iterSkippedTitle.next();
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
+			
+			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
+		}
+		
+		return result;
+	}
+	
+	public void addMapMarker(final LatLng position, String title, final String htmlInfo, int colorIndex){
+		if (mapC != null) mapC.createMarker(position, title, htmlInfo, colorIndex);
 	}
 }

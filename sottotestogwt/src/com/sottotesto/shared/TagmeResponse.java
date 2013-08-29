@@ -20,7 +20,9 @@ public class TagmeResponse implements java.io.Serializable{
 	private double maxrho;
 	private long time;
 	private List<String> titleTag;
-
+	private List<String> spotTag;
+	private List<String> titleSkipped;
+	private List<String> spotSkipped;
 
 	public TagmeResponse() {
 		code = 0;
@@ -60,4 +62,11 @@ public class TagmeResponse implements java.io.Serializable{
 	public long getTime(){return time;}	
 	public void setTitleTag(List<String> x) {titleTag = x;}
 	public List<String> getTitleTag(){return titleTag;}
+	public void setSpotTag(List<String> x) {spotTag = x;}
+	public List<String> getSpotTag(){return spotTag;}
+	
+	public void setTitleSkipped(List<String> x) {titleSkipped = x;}
+	public List<String> getTitleSkipped(){return titleSkipped;}
+	public void setSpotSkipped(List<String> x) {spotSkipped = x;}
+	public List<String> getSpotSkipped(){return spotSkipped;}
 }

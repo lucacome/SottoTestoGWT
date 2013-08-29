@@ -3,6 +3,9 @@ package com.sottotesto.client;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+
+import org.apache.commons.lang.math.RandomUtils;
 
 import java_cup.internal_error;
 
@@ -40,7 +43,7 @@ import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
-
+import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
@@ -81,8 +84,10 @@ public class Sottotestogwt implements EntryPoint {
 	private final TagmeServiceAsync tagmeService = GWT.create(TagmeService.class);	
 	private final DBPediaServiceAsync dbpediaService = GWT.create(DBPediaService.class);
 	private final EkpServiceAsync ekpService = GWT.create(EkpService.class);
+	private final DBPediaQueryAsync dbpqService = GWT.create(DBPediaQuery.class);
 	private int ekpRemainingCallNum = 0;
 	private List<String> ekpRemainingCallInputs = new ArrayList<String>();
+	
 	
 	//Service status panel items
 	ContentPanel serviceStatusPanel = null;
@@ -314,37 +319,20 @@ public class Sottotestogwt implements EntryPoint {
 				
 				titleContentPanel.setWidget(searchPanelHC);
 				
-				//TEST BUTTON: FOR TESTING... OF COURSE		
-				/*
+				//TEST BUTTON: FOR TESTING... OF COURSE				
 				Button testButton = new Button();
 				testButton.setText("Test");
 				testButton.addClickHandler(new ClickHandler() {			
 					@Override
 					public void onClick(ClickEvent event) {
-						Debug.printDbgLine("Sottotestogwt.java: testButtonClick()");
-						
-						SimplePanel mapPanel = new SimplePanel() ;
-						mapPanel.setSize("1000px", "500px");
-						MapOptions options  = MapOptions.create();
-						options.setCenter(LatLng.create(39.509, -98.434)); 
-				      options.setZoom(6);
-				      options.setMapTypeId(MapTypeId.SATELLITE);
-				      options.setDraggable(true);
-				      options.setMapTypeControl(true);
-				      options.setScaleControl(true);
-				      options.setScrollwheel(true);
-				      GoogleMap theMap = GoogleMap.create(mapPanel.getElement(), options) ;
-				      mapPanel.setVisible(true);
-						Marker marker = Marker.create();
-						marker.setPosition(LatLng.create(42.8333, 12.8333));
-						marker.setMap(theMap);
-					    RootPanel.get("testContainer").add( mapPanel ) ;
-						
+						Debug.printDbgLine("Sottotestogwt.java: testButtonClick()");						
+						Random random = new Random();						
+						rc.addMapMarker(LatLng.create(random.nextDouble()*10, random.nextDouble()*10), "AutoMarker", "<b>ENTITY</b><br>bla bla",3);						
 					}
 				});
 				RootPanel.get("testContainer").add(testButton);
-				*/
-				}
+				
+	}
 	
 
 	//send input from textarea to tagme
@@ -360,7 +348,8 @@ public class Sottotestogwt implements EntryPoint {
 		}
 			
 		sendButton.setEnabled(false);
-		serverResponseLabel.setText("");		
+		serverResponseLabel.setText("");	
+		rc.setSearchedPhrase(textToServer);
 		
 		//reinit service status panel items
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
@@ -435,7 +424,7 @@ public class Sottotestogwt implements EntryPoint {
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
 							tagmeShowDataBTN.setVisible(true); //allow to see the data		
-							
+							rc.setTagmeResp(tagmeResp);
 														
 							//chiamiamo DBPedia							
 							List<String> dbproperty = new ArrayList<String>();
@@ -532,16 +521,23 @@ public class Sottotestogwt implements EntryPoint {
 			ekpRespTmp = result;
 			
 			String jsonHT = "["+result.jdataHT+"]";
-			String jsonFD = "["+result.jdataFD+"]";			
+			String jsonFD = "["+result.jdataFD+"]";	
+			
+			callDBPediaQuery(ekpRespTmp);
+			
 			//rc.setJsonHT(tem);
 			//rc.setJsonFD(tem2);
 			//Debug.printDbgLine("MAIN="+tem);
+			
+			// create tree entry for Maps
+			tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWMAP));
+			treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
 			
 			// create tree entry for frocedirected graph
 			tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_FD));
 			tdEntriesList.get(tdEntriesList.size()-1).setJsonFD(jsonFD);
 			treeStore.add(tdForcedirected, tdEntriesList.get(tdEntriesList.size()-1));
-			
+	
 			// create tree entry for hypertree graph
 			tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
 			tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
@@ -556,6 +552,31 @@ public class Sottotestogwt implements EntryPoint {
 			else {rc.loadTree(treeStore); rc.getTree().expandAll();}
 		}});		
 	}
+	
+	private void callDBPediaQuery(EkpResponse resp){
+        Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
+
+        dbpqService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
+        public void onFailure(Throwable caught) {
+                //set the error
+
+        }
+
+        public void onSuccess(List<DBPQueryResp> result) {
+                //Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
+                Iterator<DBPQueryResp> iter = result.iterator();
+                Debug.printDbgLine("DBPQ Size="+result.size());
+
+                DBPQueryResp temp = new DBPQueryResp();
+
+                while (iter.hasNext()){
+            temp = iter.next();
+            Debug.printDbgLine("entity="+temp.getEntity()+", link="+temp.getLink()+", name="+temp.getName()+", gps="+temp.getLat()+", "+temp.getLng());
+                }
+        }});
+
+}
+
 	
 	private void InitServiceStatusPanel(){
 		Debug.printDbgLine("Sottotestogwt.java: initServiceStatusPanel()");
@@ -625,11 +646,15 @@ public class Sottotestogwt implements EntryPoint {
 		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
 		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph");
 		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Hypertree Graph");
-		tdMap = new TreeData(String.valueOf(treeDataIdProvider++),"Map"); tdMap.setClickAction(TreeData.CLICK_ACTIONS.SHOWMAP);
-		
+		tdMap = new TreeData(String.valueOf(treeDataIdProvider++),"Knowledge Map");
+	
+		treeStore.add(tdMap);
 		treeStore.add(tdForcedirected);
 		treeStore.add(tdHyperTree);
-		treeStore.add(tdMap);
+		
+		//add 'all entity' entry to tree
+		tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++), "Mappa completa", TreeData.CLICK_ACTIONS.SHOWMAP));
+		treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
 	}
 }
 
