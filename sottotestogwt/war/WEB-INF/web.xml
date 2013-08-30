@@ -44,6 +44,16 @@
     <url-pattern>/sottotestogwt/dbpq</url-pattern>
   </servlet-mapping>
   
+  
+    <servlet>
+    <servlet-name>ListServlet</servlet-name>
+    <servlet-class>com.sottotesto.server.ListServiceImpl</servlet-class>
+  </servlet>  
+  <servlet-mapping>
+    <servlet-name>ListServlet</servlet-name>
+    <url-pattern>/sottotestogwt/listservice</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Sottotestogwt.html</welcome-file>
