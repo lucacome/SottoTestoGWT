@@ -77,6 +77,14 @@ public class MapController {
 	}
 	
 	
+	public void loadSingleDBPQmarkerOnMap(DBPQueryResp dbqMarker){
+		String htmlInfo = "";
+		htmlInfo =  "Place: "+dbqMarker.getName()+
+				"<br>relation: "+dbqMarker.getLink()+
+				"<br>entity: "+dbqMarker.getEntity();
+		createMarker(LatLng.create(dbqMarker.getLat(), dbqMarker.getLng()), dbqMarker.getName()+"\n("+dbqMarker.getEntity()+")", htmlInfo, 0);
+	}
+	
 	public void loadMarkers(List<DBPQueryResp> mList){
 		
 		//test markers

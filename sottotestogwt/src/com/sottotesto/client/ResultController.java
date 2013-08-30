@@ -326,5 +326,7 @@ public class ResultController {
 		if (mapC != null) mapC.loadMarkers(mList);
 	}
 	
-	
+	public void addDBpediaMarkerSingleToMap(DBPQueryResp dbpqMarker ){
+		if (mapC != null) mapC.loadSingleDBPQmarkerOnMap(dbpqMarker);
+	}
 }
