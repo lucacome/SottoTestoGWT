@@ -78,25 +78,23 @@ public class Sottotestogwt implements EntryPoint {
 	HTML HtmlTagmeService;
 	HTML HtmlDBPediaService;
 	HTML HtmlEkpService;
+	String HTMLserviceStringTitle="<span title=\"Click to show\ndata/log\">";
 	String HTMLloadIconString="<img src='loading.gif'/>";
-	String HTMLtagmeServiceStringWaiting="Tagme Service: Waiting.";
-	String HTMLtagmeServiceStringCalling="Tagme Service: Calling ..."+HTMLloadIconString;
-	String HTMLtagmeServiceStringOK="Tagme Service: <span style='color:green;'>SUCCESS</span>";
-	String HTMLtagmeServiceStringFAIL="Tagme Service: <span style='color:red;'>FAILED</span>";
-	String HTMLtagmeServiceStringSkipped="Tagme Service: <span style='color:orange;'>Skipped</span>";
-	String HTMLdbpediaServiceStringWaiting="DBPedia Service: Waiting.";
-	String HTMLdbpediaServiceStringCalling="DBPedia Service: Calling ..."+HTMLloadIconString;
-	String HTMLdbpediaServiceStringOK="DBPedia Service: <span style='color:green;'>SUCCESS</span>";
-	String HTMLdbpediaServiceStringFAIL="DBPedia Service: <span style='color:red;'>FAILED</span>";
-	String HTMLdbpediaServiceStringSkipped="DBPedia Service: <span style='color:orange;'>Skipped</span>";
-	String HTMLekpServiceStringWaiting="Ekp Service: Waiting.";
-	String HTMLekpServiceStringCalling="Ekp Service: Calling ..."+HTMLloadIconString;
-	String HTMLekpServiceStringOK="Ekp Service: <span style='color:green;'>SUCCESS</span>";
-	String HTMLekpServiceStringFAIL="Ekp Service: <span style='color:red;'>FAILED</span>";
-	String HTMLekpServiceStringSkipped="Ekp Service: <span style='color:orange;'>Skipped</span>";
-	Button tagmeShowDataBTN;
-	Button dbpediaShowDataBTN;
-	Button ekpShowDataBTN;
+	String HTMLtagmeServiceStringWaiting=HTMLserviceStringTitle+"Tagme Service: Waiting."+"</span>";
+	String HTMLtagmeServiceStringCalling=HTMLserviceStringTitle+"Tagme Service: Calling ..."+"</span>"+HTMLloadIconString;
+	String HTMLtagmeServiceStringOK=HTMLserviceStringTitle+"Tagme Service: <span style='color:green;'>SUCCESS</span>"+"</span>";
+	String HTMLtagmeServiceStringFAIL=HTMLserviceStringTitle+"Tagme Service: <span style='color:red;'>FAILED</span>"+"</span>";
+	String HTMLtagmeServiceStringSkipped=HTMLserviceStringTitle+"Tagme Service: <span style='color:orange;'>Skipped</span>"+"</span>";
+	String HTMLdbpediaServiceStringWaiting=HTMLserviceStringTitle+"DBPedia Service: Waiting."+"</span>";
+	String HTMLdbpediaServiceStringCalling=HTMLserviceStringTitle+"DBPedia Service: Calling ..."+"</span>"+HTMLloadIconString;
+	String HTMLdbpediaServiceStringOK=HTMLserviceStringTitle+"DBPedia Service: <span style='color:green;'>SUCCESS</span>"+"</span>";
+	String HTMLdbpediaServiceStringFAIL=HTMLserviceStringTitle+"DBPedia Service: <span style='color:red;'>FAILED</span>"+"</span>";
+	String HTMLdbpediaServiceStringSkipped=HTMLserviceStringTitle+"DBPedia Service: <span style='color:orange;'>Skipped</span>"+"</span>";
+	String HTMLekpServiceStringWaiting=HTMLserviceStringTitle+"Ekp Service: Waiting."+"</span>";
+	String HTMLekpServiceStringCalling=HTMLserviceStringTitle+"Ekp Service: Calling ..."+"</span>"+HTMLloadIconString;
+	String HTMLekpServiceStringOK=HTMLserviceStringTitle+"Ekp Service: <span style='color:green;'>SUCCESS</span>"+"</span>";
+	String HTMLekpServiceStringFAIL=HTMLserviceStringTitle+"Ekp Service: <span style='color:red;'>FAILED</span>"+"</span>";
+	String HTMLekpServiceStringSkipped=HTMLserviceStringTitle+"Ekp Service: <span style='color:orange;'>Skipped</span>"+"</span>";
 	
 	 
 	//results items
@@ -210,7 +208,7 @@ public class Sottotestogwt implements EntryPoint {
 				searchPanelHC = new HorizontalLayoutContainer();
 				searchPanelHC.setId("searchHorContainer");
 				searchPanelHC.setWidth(panelsMaxWidth);
-				searchPanelHC.setBorders(true);
+				searchPanelHC.setBorders(false);
 				searchPanelHC.add(textAreaLabel, new HorizontalLayoutData(0.15, 1, new Margins(14)));
 				searchPanelHC.add(textAreaFP, new HorizontalLayoutData(0.70, 1, new Margins(4)));
 				searchPanelHC.add(sendButton, new HorizontalLayoutData(0.15, 1, new Margins(14)));			
@@ -290,9 +288,6 @@ public class Sottotestogwt implements EntryPoint {
 		//reinit service status panel items
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
 		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
-		dbpediaShowDataBTN.setVisible(false);
-		ekpShowDataBTN.setVisible(false);
-		tagmeShowDataBTN.setVisible(false);
 		
 		//reinit results panel items
 		rc.reInit();
@@ -312,13 +307,10 @@ public class Sottotestogwt implements EntryPoint {
 										   "<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 						
 						HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL); //show the fail
-						tagmeShowDataBTN.setVisible(true); //allow to see what gone wrong
 						
 						//skip all other services
 						HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
-						dbpediaShowDataBTN.setVisible(false);
 						HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
-						ekpShowDataBTN.setVisible(false);
 						rc.showError();
 					}
 
@@ -333,33 +325,26 @@ public class Sottotestogwt implements EntryPoint {
 							//Tagme ha avuto qualche problema!
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL); //show the fail
-							tagmeShowDataBTN.setVisible(true); //allow to see what gone wrong
 							
 							//skip all other services
 							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
-							dbpediaShowDataBTN.setVisible(false);
 							HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
-							ekpShowDataBTN.setVisible(false);
 							rc.showError();
 						}
 						else if (tagmeResp.getTitleTag().size()==0){
 							//Tagme OK, ma non ha taggato nulla!
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK+" (but 0!)");
-							tagmeShowDataBTN.setVisible(true);
 							
 							//skip all other services
 							HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
-							dbpediaShowDataBTN.setVisible(false);
 							HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
-							ekpShowDataBTN.setVisible(false);
 							rc.showError();
 						}
 						else {
 							//Tagme OK
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
-							tagmeShowDataBTN.setVisible(true); //allow to see the data	
 							showTaggedResult();
 							
 							//chiamiamo DBPedia							
@@ -407,7 +392,6 @@ public class Sottotestogwt implements EntryPoint {
 							   "<br><br><b>StackTrace: </b><br>"+Utility.getErrorHtmlString(caught));
 			
 			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL); //show the fail
-			dbpediaShowDataBTN.setVisible(true); //allow to see what gone wrong
 		}
 
 		public void onSuccess(DBPediaResponse result) {	
@@ -416,9 +400,7 @@ public class Sottotestogwt implements EntryPoint {
 			dbpediaResp = result;
 			
 			if (dbpediaResp.getCode()!=200) HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
-			else HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
-			
-			dbpediaShowDataBTN.setVisible(true);
+			else HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);			
 		}});
 		
 	}
@@ -444,7 +426,6 @@ public class Sottotestogwt implements EntryPoint {
 			
 			ekpResp.add(ekpRespTmp);
 			HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
-			ekpShowDataBTN.setVisible(true); //allow to see what gone wrong		
 			
 			if (ekpRemainingCallNum>0){callEkp();}
 		}
@@ -481,7 +462,6 @@ public class Sottotestogwt implements EntryPoint {
 			ekpResp.add(ekpRespTmp);
 			if (ekpRespTmp.getCode()==200) HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
 			else HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
-			ekpShowDataBTN.setVisible(true); //allow to see data
 			
 			if (ekpRemainingCallNum>0){callEkp();}
 			else {rc.loadTree(treeStore); rc.getTree().expandAll();}
@@ -491,12 +471,13 @@ public class Sottotestogwt implements EntryPoint {
 	private void callDBPediaQuery(EkpResponse resp){
         Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
 
+      
         dbpqService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
         public void onFailure(Throwable caught) {
                 //set the error
 
         }
-
+		
         public void onSuccess(List<DBPQueryResp> result) {
                 //Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
                 Iterator<DBPQueryResp> iter = result.iterator();
@@ -522,54 +503,46 @@ public class Sottotestogwt implements EntryPoint {
 		//main panel
 		serviceStatusPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
 		serviceStatusPanel.setHeadingText("Service Status");
-		serviceStatusPanel.setPixelSize(panelsMaxWidth, 100);
-		//serviceStatusPanel.setCollapsible(true);
+		serviceStatusPanel.setId("serviceStatusPanel");
+		serviceStatusPanel.setWidth(panelsMaxWidth);
+		serviceStatusPanel.setHeight(RootPanel.get("servicesContainer").getOffsetHeight()+"px");
 		serviceStatusPanelHC = new HorizontalLayoutContainer();
 		
 		//tagme service
 		HtmlTagmeService = new HTML();
 		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
-		tagmeShowDataBTN = new Button();
-		tagmeShowDataBTN.setText("View Data");
-		tagmeShowDataBTN.setVisible(false);
+		HtmlTagmeService.setStylePrimaryName("serviceLabel");
 		tagmeStatusVP = new VerticalPanel();
 		tagmeStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-		tagmeStatusVP.add(HtmlTagmeService);
-		tagmeStatusVP.add(tagmeShowDataBTN);		
+		tagmeStatusVP.add(HtmlTagmeService);	
 		tagmeStatusVP.setBorderWidth(0);
-		tagmeShowDataBTN.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showTagmeDataDB(tagmeResp);}});
+		HtmlTagmeService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showTagmeDataDB(tagmeResp);}});
 		
 		//dbpedia service
 		HtmlDBPediaService = new HTML();
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
-		dbpediaShowDataBTN = new Button();
-		dbpediaShowDataBTN.setText("View Data");
-		dbpediaShowDataBTN.setVisible(false);
+		HtmlDBPediaService.setStylePrimaryName("serviceLabel");
 		dbpediaStatusVP = new VerticalPanel();
 		dbpediaStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		dbpediaStatusVP.add(HtmlDBPediaService);
-		dbpediaStatusVP.add(dbpediaShowDataBTN);		
 		dbpediaStatusVP.setBorderWidth(0);
-		dbpediaShowDataBTN.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showDBPediaDataDB(dbpediaResp);}});
+		HtmlDBPediaService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showDBPediaDataDB(dbpediaResp);}});
 		
 		//ekp service
 		HtmlEkpService = new HTML();
 		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
-		ekpShowDataBTN = new Button();
-		ekpShowDataBTN.setText("View Data");
-		ekpShowDataBTN.setVisible(false);
+		HtmlEkpService.setStylePrimaryName("serviceLabel");
 		ekpStatusVP = new VerticalPanel();
 		ekpStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		ekpStatusVP.add(HtmlEkpService);
-		ekpStatusVP.add(ekpShowDataBTN);		
 		ekpStatusVP.setBorderWidth(0);
-		ekpShowDataBTN.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showEkpDataDB(ekpResp);}});
+		HtmlEkpService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showEkpDataDB(ekpResp);}});
 		
 		//add items to panel
-		serviceStatusPanelHC.add(tagmeStatusVP, new HorizontalLayoutData(0.33, 1, new Margins(4)));
-		serviceStatusPanelHC.add(dbpediaStatusVP, new HorizontalLayoutData(0.33, 1, new Margins(4)));
-		serviceStatusPanelHC.add(ekpStatusVP, new HorizontalLayoutData(0.33, 1, new Margins(4)));
-		serviceStatusPanelHC.setBorders(true);
+		serviceStatusPanelHC.add(HtmlTagmeService, new HorizontalLayoutData(0.33, 1, new Margins(4)));
+		serviceStatusPanelHC.add(HtmlEkpService, new HorizontalLayoutData(0.33, 1, new Margins(4)));
+		serviceStatusPanelHC.add(HtmlDBPediaService, new HorizontalLayoutData(0.33, 1, new Margins(4)));
+		serviceStatusPanelHC.setBorders(false);
 		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
 				
 	}	
@@ -614,7 +587,7 @@ public class Sottotestogwt implements EntryPoint {
 		searchPanelHC = new HorizontalLayoutContainer();
 		searchPanelHC.setId("searchHorContainer");
 		searchPanelHC.setWidth(panelsMaxWidth);
-		searchPanelHC.setBorders(true);
+		searchPanelHC.setBorders(false);
 		searchPanelHC.add(textAreaLabel, new HorizontalLayoutData(0.15, 1, new Margins(14)));
 		searchPanelHC.add(htmlPhrase, new HorizontalLayoutData(0.70, 1, new Margins(4)));
 		searchPanelHC.add(sendButton, new HorizontalLayoutData(0.15, 1, new Margins(14)));
@@ -699,9 +672,6 @@ public class Sottotestogwt implements EntryPoint {
 		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
 		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
-		dbpediaShowDataBTN.setVisible(false);
-		ekpShowDataBTN.setVisible(false);
-		tagmeShowDataBTN.setVisible(false);
 				
 		//reinit results panel items
 		RootPanel.get("resultsContainer").clear();

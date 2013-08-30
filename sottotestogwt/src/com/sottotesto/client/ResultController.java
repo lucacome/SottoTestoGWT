@@ -86,12 +86,20 @@ public class ResultController {
 		markerList = new ArrayList<DBPQueryResp>();
 		
 		panelMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100);
-		panelMaxHeight = (RootPanel.get().getOffsetHeight()) + (RootPanel.get().getOffsetHeight()*40/100);
+		int bottomMargin = 5;
+		panelMaxHeight = RootPanel.get().getOffsetHeight()-
+				RootPanel.get("title").getOffsetHeight()-
+				RootPanel.get("homeLoading").getOffsetHeight()-
+				RootPanel.get("searchContainer").getOffsetHeight()-
+				RootPanel.get("servicesContainer").getOffsetHeight()-
+				bottomMargin;
 		
 		if (panel != null) panel.clear();
 		panel = new ContentPanel();
-		panel.setHeadingText("Risultati");		
-		panel.setPixelSize(panelMaxWidth, panelMaxHeight);
+		panel.setHeadingText("Risultati");	
+		panel.setId("resultPanel");
+		panel.setWidth(panelMaxWidth);
+		panel.setHeight(panelMaxHeight+"px");
 		panel.setCollapsible(false);
 
 		if (border != null) border.clear();
