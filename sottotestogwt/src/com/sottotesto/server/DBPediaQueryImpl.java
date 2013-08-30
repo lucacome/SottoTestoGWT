@@ -60,10 +60,11 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
+			Debug.printDbgLine("ERRORE DBPEDIA!");
 		}
 
 		
-		Debug.printDbgLine("6");
+		//Debug.printDbgLine("6");
 		if (! gps.isEmpty()){
 			String arraygps[] = gps.split(" ");
 			resp.setGps(Double.parseDouble(arraygps[0]), Double.parseDouble(arraygps[1]));
