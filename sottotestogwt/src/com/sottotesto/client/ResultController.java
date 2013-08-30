@@ -7,6 +7,7 @@ import java.util.List;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -77,6 +78,8 @@ public class ResultController {
 	String searchedPhrase;	
 	TagmeResponse tagmeResp;
 
+
+	
 	public void init(){
 		Debug.printDbgLine("ResultController.java: init()");
 		
@@ -85,14 +88,17 @@ public class ResultController {
 		panelMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100);
 		panelMaxHeight = (RootPanel.get().getOffsetHeight()) + (RootPanel.get().getOffsetHeight()*40/100);
 		
+		if (panel != null) panel.clear();
 		panel = new ContentPanel();
 		panel.setHeadingText("Risultati");		
 		panel.setPixelSize(panelMaxWidth, panelMaxHeight);
 		panel.setCollapsible(false);
 
+		if (border != null) border.clear();
 		border = new BorderLayoutContainer();
 		panel.setWidget(border);
 
+		if (lcwest != null) lcwest.clear();
 		lcwest = new VBoxLayoutContainer();
 		lcwest.setVBoxLayoutAlign(VBoxLayoutAlign.STRETCH);
 
@@ -101,6 +107,7 @@ public class ResultController {
 
 		border.setWestWidget(lcwest, west);
 
+		if (centerPanel != null) centerPanel.clear();
 		centerPanel = new ContentPanel();
 		centerPanel.setHeaderVisible(false);
 		centerPanel.setId("centerPanel");
@@ -113,6 +120,7 @@ public class ResultController {
 
 		MarginData center = new MarginData(new Margins(5));
 
+		
 		border.setCenterWidget(centerPanel, center);
 
 		vBoxData = new BoxLayoutData(new Margins(5, 5, 5, 5));
