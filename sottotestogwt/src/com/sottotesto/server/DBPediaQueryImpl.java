@@ -60,7 +60,7 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			Debug.printDbgLine("ERRORE DBPEDIA!");
+			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
 		}
 
 		
