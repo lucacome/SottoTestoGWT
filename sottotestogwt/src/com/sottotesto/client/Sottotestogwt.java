@@ -114,6 +114,7 @@ public class Sottotestogwt implements EntryPoint {
 	private TagmeResponse tagmeResp; //response of TAGME service
 	private DBPediaResponse dbpediaResp; //response of DBPEDIA service
 	private List<EkpResponse> ekpResp; //response of EKP service
+	int gpsCallsMax, gpsCallsEnded;
 	
 	//resources
 	TextResource resourceHTMLmap;
@@ -469,16 +470,30 @@ public class Sottotestogwt implements EntryPoint {
 		}});		
 	}
 	
+	private void updateDBpediaServiceLabel(){
+		gpsCallsEnded++;
+		if (gpsCallsEnded >= gpsCallsMax){
+			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
+		}
+		else{
+			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling+" ("+gpsCallsEnded+"/"+gpsCallsMax+")");
+		}
+	}
+	
 	private void callDBPediaQuery(DBPQueryResp resp){
         Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
 
         dbpqService.sendToServer(resp, new AsyncCallback<DBPQueryResp>() {
         public void onFailure(Throwable caught) {
                 //set the error
-
+        	 updateDBpediaServiceLabel();
+        	 Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onFailure() - call n."+gpsCallsEnded+"/"+gpsCallsMax);
         }
 
         public void onSuccess(DBPQueryResp result) {
+        	updateDBpediaServiceLabel();
+       	 Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+gpsCallsEnded+"/"+gpsCallsMax);
+        	
           Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation());
           if (result.getLat() != 0.0 && result.getLng() != 0.0)
         	  rc.addDBpediaMarkerSingleToMap(result);  
@@ -488,16 +503,22 @@ public class Sottotestogwt implements EntryPoint {
 	private void callListService(EkpResponse resp){
         Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
 
+        gpsCallsMax=0;
+        gpsCallsEnded=0;
+        
         listService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
         public void onFailure(Throwable caught) {
                 //set the error
-
+        	Debug.printDbgLine("Sottotestogwt.java: callListService(): onFailure()");
         }
 
         public void onSuccess(List<DBPQueryResp> result) {
-                //Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
+        		Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess()");
+        		
+        		gpsCallsMax=result.size();
+        		
                 Iterator<DBPQueryResp> iter = result.iterator();
-                Debug.printDbgLine("DBPQ Size="+result.size());
+                Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess(): DBPQ Size="+result.size());
 
                 DBPQueryResp temp = new DBPQueryResp();
 
