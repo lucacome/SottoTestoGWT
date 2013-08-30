@@ -1,8 +1,13 @@
 package com.sottotesto.client;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jdt.internal.compiler.ast.SuperReference;
+import org.eclipse.jdt.internal.compiler.ast.ThisReference;
+
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -19,6 +24,7 @@ import com.google.maps.gwt.client.MapTypeId;
 import com.google.maps.gwt.client.Marker;
 import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MouseEvent;
+import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.Debug;
 
 public class MapController {
@@ -28,10 +34,12 @@ public class MapController {
 	MapOptions options;
 	GoogleMap theMap;
 	
-	//lista per i marker colorati da mettere sulla mappa
+	//lista links per i marker colorati da mettere sulla mappa
 	List<String> markerColoredLinks;
+	List<Marker> loadedMarkersOnMap; //lista dei marker gia' caricati nella mappa (obbligatoria per toglierli purtroppo)
 	
-	public Widget init(){
+	
+	public void init(){
 		Debug.printDbgLine("MapController.java: init()");
 		
 		//inizializza la lista di colori per i markers
@@ -45,6 +53,8 @@ public class MapController {
 		markerColoredLinks.add("http://maps.google.com/mapfiles/marker_white.png");
 		markerColoredLinks.add("http://maps.google.com/mapfiles/marker_black.png");
 		
+		loadedMarkersOnMap = new ArrayList<Marker>();
+		
 		//inizializza la mappa google
 		mapContainer = new SimplePanel() ;
 		options  = MapOptions.create();
@@ -55,29 +65,49 @@ public class MapController {
 		options.setMapTypeControl(true);
 		options.setScaleControl(true);
 		options.setScrollwheel(true);
-		theMap = GoogleMap.create(mapContainer.getElement(), options) ;
+		theMap = GoogleMap.create(mapContainer.getElement(), options);
 		mapContainer.setVisible(true);
-		
 		//load markers on map
-		loadMarkers(); 
+		//loadMarkers(); 
 		
 		//TEST GOOGLE GEOCODING
 		//String retjs = geocodeJS("via treves 3, bologna");
 		//Debug.printDbgLine("MapController.java: init(): geocode:" + retjs);
 		
-		return mapContainer;
 	}
 	
-	private void loadMarkers(){
+	
+	public void loadMarkers(List<DBPQueryResp> mList){
 		
 		//test markers
-		createMarker(LatLng.create(42.8333, 12.8333), "My \nMarker", "<b>ENTITY</b><br>bla bla",0);
-		createMarker(LatLng.create(52.8333, 22.8333), "My \nMarker\nthe revenge", "<b>ENTITY2</b><br>bla bla",1);
+		//createMarker(LatLng.create(42.8333, 12.8333), "My \nMarker", "<b>ENTITY</b><br>bla bla",0);
+		//createMarker(LatLng.create(52.8333, 22.8333), "My \nMarker\nthe revenge", "<b>ENTITY2</b><br>bla bla",1);
+		
+		Iterator<DBPQueryResp> mListIterator = mList.iterator();
+		DBPQueryResp curMark = new DBPQueryResp();
+		String htmlInfo = "";
+		String oldEntity = "";
+		int colorIndex = -1;
+		
+		while (mListIterator.hasNext()){
+			curMark = mListIterator.next();
+			
+			if (!curMark.getEntity().equals(oldEntity)){
+				oldEntity = curMark.getEntity();
+				colorIndex++;
+				if (colorIndex >= markerColoredLinks.size()) colorIndex=0;
+			}
+			
+			htmlInfo =  "Place: "+curMark.getName()+
+						"<br>relation: "+curMark.getLink()+
+						"<br>entity: "+curMark.getEntity();
+			createMarker(LatLng.create(curMark.getLat(), curMark.getLng()), curMark.getName()+"\n("+curMark.getEntity()+")", htmlInfo, colorIndex);
+		}
 
 	}
 	
 	//Crea un singolo marker con le opzioni date sulla mappa
-	public void createMarker(final LatLng position, String title, final String htmlInfo, int colorIndex){
+	private void createMarker(final LatLng position, String title, final String htmlInfo, int colorIndex){
 		Marker m = Marker.create();
 		m.setPosition(position);
 		m.setTitle(title);
@@ -87,6 +117,7 @@ public class MapController {
 		m.setIcon(MarkerImage.create(markerColoredLinks.get(colorIndex)));
 		m.setShadow(MarkerImage.create("http://maps.gstatic.com/mapfiles/shadow50.png"));
 		
+		loadedMarkersOnMap.add(m); //add marker to loaded list
 		
 		m.addClickListener(new Marker.ClickHandler() {			
 			@Override
@@ -112,7 +143,23 @@ public class MapController {
 		else return null;
 	}
 	
-	
+	public void clearMarkerFromMap(){
+		Debug.printDbgLine("ResultController.java: clearMarkerFromMap(): Clearing old markers from map...");	
+		Iterator<Marker> mListIterator = loadedMarkersOnMap.iterator();
+		Marker curMark = Marker.create();
+		SimplePanel nullContainerPanel = new SimplePanel();
+		GoogleMap gMapNull = GoogleMap.create(nullContainerPanel.getElement());
+		
+		while (mListIterator.hasNext()){
+			curMark = mListIterator.next();
+			curMark.setMap(gMapNull);
+			}
+		
+		Debug.printDbgLine("ResultController.java: clearMarkerFromMap(): Cleared "+loadedMarkersOnMap.size()+" markers");
+		loadedMarkersOnMap.clear();
+		
+		theMap.getOverlayMapTypes().setAt(0, null);
+	}
 	
 	//GOOGLE GEOCODING -- currently not used
 	private native String geocodeJS(String place)/*-{

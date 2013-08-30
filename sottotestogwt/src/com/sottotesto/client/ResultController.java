@@ -2,25 +2,15 @@ package com.sottotesto.client;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
-import javax.swing.JApplet;
-
-import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.text.shared.SimpleSafeHtmlRenderer;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.LatLng;
-import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.IconProvider;
@@ -41,7 +31,7 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.tree.Tree;
-import com.sencha.gxt.widget.core.client.tree.TreeStyle;
+import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.STResources;
 import com.sottotesto.shared.TagmeResponse;
@@ -70,15 +60,12 @@ public class ResultController {
 	
 	//infovis data
 	private InfovisController infovisC;
-	private String jsonFD; //json string for forcedirected graph
-	private String jsonHT;
-	
 	//map data
 	private MapController mapC;
+	List<DBPQueryResp> markerList; //Lista di marker ottenuti da dbpedia
 	
 	//tree data
 	private TreeDataProperties treeProperties;
-	private SimpleSafeHtmlCell<String> cell;
 	private TreeStore<TreeData> treeStore;
 	private Tree <TreeData, String> tree;
 	private FlowLayoutContainer treeContainer;
@@ -92,6 +79,8 @@ public class ResultController {
 
 	public void init(){
 		Debug.printDbgLine("ResultController.java: init()");
+		
+		markerList = new ArrayList<DBPQueryResp>();
 		
 		panelMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100);
 		panelMaxHeight = (RootPanel.get().getOffsetHeight()) + (RootPanel.get().getOffsetHeight()*40/100);
@@ -128,6 +117,10 @@ public class ResultController {
 
 		vBoxData = new BoxLayoutData(new Margins(5, 5, 5, 5));
 		vBoxData.setFlex(1);		
+		
+		
+		mapC = new MapController(); //initialize map controller	
+		mapC.init();
 		
 	}
 
@@ -242,7 +235,8 @@ public class ResultController {
 		lcwest.add(treeContainer);
 		
 		centerPanel.clear();	// clear centerpanel contents
-		centerPanel.add(new HTML(HTMLselectSomethingString+"<br><br><span class=\"result_taggedElementsTitle\">Entita' rilevate nella frase:</span><br>"+createTaggedSearchString()));
+		centerPanel.add(new HTML(HTMLselectSomethingString));
+		//Sottotestogwt.showTaggedResult(createTaggedSearchString());
 		centerPanel.getWidget().setHeight(String.valueOf(centerPanel.getOffsetHeight()+"px")); //html grande quando si puo'
 	}
 
@@ -272,16 +266,18 @@ public class ResultController {
 				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
-				mapC = new MapController(); //initialize map controller				
+				//if (mapC != null) mapC.clearMarkerFromMap();							
 				centerPanel.clear(); 				// clear centerpanel contents	
-				centerPanel.setWidget(mapC.init()); // add the graph in centerpanel
+				centerPanel.setWidget(mapC.getMapContainer()); // add the graph in centerpanel
 				mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
 				mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 				
 				//BUGFIX - the map doesn't show correctly for the second time, this is the fix
 				mapC.getMap().triggerResize();
 				mapC.getMap().setCenter(LatLng.create(35,-40)); 
-				//END BUGFIX
+				//END BUGFIX	
+				
+				//mapC.loadMarkers(markerList); //load new markers
 			}
 			else {
 				Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
@@ -295,13 +291,9 @@ public class ResultController {
 	
 	public void setJsonFD(String jdata){
 
-			jsonFD = jdata;
-
 	//Debug.printDbgLine("JSONDF="+jsonFD);	
 	}
 	public void setJsonHT(String jdata){
-
-			jsonHT = jdata;
 
 	//Debug.printDbgLine("JSONHT="+jsonHT);	
 	}
@@ -317,63 +309,14 @@ public class ResultController {
 		else return null;
 	}
 	
-	//rc.setSearchedPhrase(textToServer); in sottotestogwt, line 364
-	public void setSearchedPhrase(String textEditContent){
-		if (!textEditContent.isEmpty()) searchedPhrase = textEditContent;
-		else searchedPhrase = "";
+		
+	public void addMarkerToList(DBPQueryResp m){
+		markerList.add(m);
 	}
 	
-	//rc.setTagmeResp(tagmeResp); in sottotestogwt tagmeok, linea 439
-	public void setTagmeResp(TagmeResponse tagmeResponse){
-		tagmeResp = tagmeResponse;		
+	public void addDBpediaMarkeListToMap(List<DBPQueryResp> mList){
+		if (mapC != null) mapC.loadMarkers(mList);
 	}
 	
-	private String createTaggedSearchString(){
-		Debug.printDbgLine("ResultController.java: createTaggedSearchString()");
-		
-		String result = "<span class=\"result_searchedPhrase\">"+searchedPhrase+"</span>";
-		String curTag="";
-		String curTitle="";
-		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result = "+result);
-		
-		//CHECK TAGGED ENTRIES
-		List<String> taggedEntries;
-		taggedEntries = new ArrayList<String>(tagmeResp.getSpotTag());		
-		Iterator<String> iterTags =  taggedEntries.iterator();		
-		List<String> taggedTitles;
-		taggedTitles = new ArrayList<String>(tagmeResp.getTitleTag());		
-		Iterator<String> iterTitle =  taggedTitles.iterator();				
-		while (iterTags.hasNext()){
-			curTag=iterTags.next();	
-			curTag=curTag.replaceAll("_", " ");
-			curTitle=iterTitle.next();
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
-			
-			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
-		}
-		
-		//CHECK TAGGED ENTRIES WITH LOW ROH
-		List<String> skippedEntries;
-		skippedEntries = new ArrayList<String>(tagmeResp.getSpotSkipped());		
-		Iterator<String> iterSkippedTags =  skippedEntries.iterator();		
-		List<String> skippedTitles;
-		skippedTitles = new ArrayList<String>(tagmeResp.getTitleSkipped());		
-		Iterator<String> iterSkippedTitle =  skippedTitles.iterator();				
-		while (iterSkippedTags.hasNext()){
-			curTag=iterSkippedTags.next();	
-			curTag=curTag.replaceAll("_", " ");
-			curTitle=iterSkippedTitle.next();
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
-			
-			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
-		}
-		
-		return result;
-	}
 	
-	public void addMapMarker(final LatLng position, String title, final String htmlInfo, int colorIndex){
-		if (mapC != null) mapC.createMarker(position, title, htmlInfo, colorIndex);
-	}
 }

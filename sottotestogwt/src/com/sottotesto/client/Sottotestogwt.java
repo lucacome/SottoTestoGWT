@@ -3,11 +3,6 @@ package com.sottotesto.client;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
-
-import org.apache.commons.lang.math.RandomUtils;
-
-import java_cup.internal_error;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -16,26 +11,17 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.json.client.JSONException;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.TextResource;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.maps.gwt.client.GoogleMap;
-import com.google.maps.gwt.client.LatLng;
-import com.google.maps.gwt.client.MapOptions;
-import com.google.maps.gwt.client.MapTypeId;
-import com.google.maps.gwt.client.Marker;
-import com.sencha.gxt.core.client.Style.VerticalAlignment;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.ContentPanel;
@@ -48,7 +34,6 @@ import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.FieldVerifier;
-import com.sottotesto.shared.STResources;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.TreeData;
 import com.sottotesto.shared.TreeDataProperties;
@@ -118,6 +103,7 @@ public class Sottotestogwt implements EntryPoint {
 	Button dbpediaShowDataBTN;
 	Button ekpShowDataBTN;
 	
+	 
 	//results items
 	ResultController rc;
 	
@@ -319,19 +305,19 @@ public class Sottotestogwt implements EntryPoint {
 				
 				titleContentPanel.setWidget(searchPanelHC);
 				
-				//TEST BUTTON: FOR TESTING... OF COURSE				
+				//TEST BUTTON: FOR TESTING... OF COURSE		
+				/*
 				Button testButton = new Button();
 				testButton.setText("Test");
 				testButton.addClickHandler(new ClickHandler() {			
 					@Override
 					public void onClick(ClickEvent event) {
 						Debug.printDbgLine("Sottotestogwt.java: testButtonClick()");						
-						Random random = new Random();						
-						rc.addMapMarker(LatLng.create(random.nextDouble()*10, random.nextDouble()*10), "AutoMarker", "<b>ENTITY</b><br>bla bla",3);						
+						
 					}
 				});
 				RootPanel.get("testContainer").add(testButton);
-				
+				*/
 	}
 	
 
@@ -349,7 +335,6 @@ public class Sottotestogwt implements EntryPoint {
 			
 		sendButton.setEnabled(false);
 		serverResponseLabel.setText("");	
-		rc.setSearchedPhrase(textToServer);
 		
 		//reinit service status panel items
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
@@ -423,12 +408,11 @@ public class Sottotestogwt implements EntryPoint {
 							//Tagme OK
 							
 							HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
-							tagmeShowDataBTN.setVisible(true); //allow to see the data		
-							rc.setTagmeResp(tagmeResp);
-														
+							tagmeShowDataBTN.setVisible(true); //allow to see the data	
+							showTaggedResult();
+							
 							//chiamiamo DBPedia							
 							List<String> dbproperty = new ArrayList<String>();
-							List<String> dbproperty2 = new ArrayList<String>();
 							//dbproperty.add("birthDate");
 							//dbproperty.add("title");
 							//dbproperty.add("name");
@@ -570,9 +554,12 @@ public class Sottotestogwt implements EntryPoint {
                 DBPQueryResp temp = new DBPQueryResp();
 
                 while (iter.hasNext()){
-            temp = iter.next();
-            Debug.printDbgLine("entity="+temp.getEntity()+", link="+temp.getLink()+", name="+temp.getName()+", gps="+temp.getLat()+", "+temp.getLng());
+                	temp = iter.next();
+                	rc.addMarkerToList(temp);
+                	Debug.printDbgLine("entity="+temp.getEntity()+", link="+temp.getLink()+", name="+temp.getName()+", gps="+temp.getLat()+", "+temp.getLng());
                 }
+                
+                rc.addDBpediaMarkeListToMap(result);
         }});
 
 }
@@ -656,6 +643,80 @@ public class Sottotestogwt implements EntryPoint {
 		tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++), "Mappa completa", TreeData.CLICK_ACTIONS.SHOWMAP));
 		treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
 	}
+	
+	private void showTaggedResult(){
+		textAreaLabel.setText("Entita' rilevate:");
+		HTML htmlPhrase = new HTML();
+		htmlPhrase.setHTML(createTaggedSearchString());
+		
+		
+		sendButton = new Button("Nuova ricerca");		
+		sendButton.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.Location.reload();
+			}
+		});
+		
+		searchPanelHC.clear();
+		searchPanelHC = new HorizontalLayoutContainer();
+		searchPanelHC.setWidth(panelsMaxWidth);
+		searchPanelHC.setBorders(true);
+		searchPanelHC.add(textAreaLabel, new HorizontalLayoutData(0.15, 1, new Margins(14)));
+		searchPanelHC.add(htmlPhrase, new HorizontalLayoutData(0.70, 1, new Margins(4)));
+		searchPanelHC.add(sendButton, new HorizontalLayoutData(0.15, 1, new Margins(14)));
+		
+		titleContentPanel.clear();
+		titleContentPanel.setHeadingHtml("Analisi frase");
+		
+		titleContentPanel.setWidget(searchPanelHC);
+	}
+	
+	private String createTaggedSearchString(){
+		Debug.printDbgLine("ResultController.java: createTaggedSearchString()");
+		
+		String result = "<span class=\"result_searchedPhrase\">"+textArea.getText()+"</span>";
+		String curTag="";
+		String curTitle="";
+		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result = "+result);
+		
+		//CHECK TAGGED ENTRIES
+		List<String> taggedEntries;
+		taggedEntries = new ArrayList<String>(tagmeResp.getSpotTag());		
+		Iterator<String> iterTags =  taggedEntries.iterator();		
+		List<String> taggedTitles;
+		taggedTitles = new ArrayList<String>(tagmeResp.getTitleTag());		
+		Iterator<String> iterTitle =  taggedTitles.iterator();				
+		while (iterTags.hasNext()){
+			curTag=iterTags.next();	
+			curTag=curTag.replaceAll("_", " ");
+			curTitle=iterTitle.next();
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
+			
+			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
+		}
+		
+		//CHECK TAGGED ENTRIES WITH LOW ROH
+		List<String> skippedEntries;
+		skippedEntries = new ArrayList<String>(tagmeResp.getSpotSkipped());		
+		Iterator<String> iterSkippedTags =  skippedEntries.iterator();		
+		List<String> skippedTitles;
+		skippedTitles = new ArrayList<String>(tagmeResp.getTitleSkipped());		
+		Iterator<String> iterSkippedTitle =  skippedTitles.iterator();				
+		while (iterSkippedTags.hasNext()){
+			curTag=iterSkippedTags.next();	
+			curTag=curTag.replaceAll("_", " ");
+			curTitle=iterSkippedTitle.next();
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
+			
+			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
+		}
+		
+		return result;
+	}
+	
 }
 
 

@@ -116,16 +116,13 @@ span.name {
 	font-size:large; height:50px; line-height:50px; text-align:center; vertical-align:middle; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;	
 }
 .result_selectSomethingString{
-	padding:10px; font-size:large; text-align:center; vertical-align:top; position:absolute; left:0; right:0; margin:auto;
+	font-size:large; height:50px; line-height:50px; text-align:center; vertical-align:middle; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;
 }
 .result_errorString {
 	font-size:large; height:50px; line-height:50px; color:red; text-align:center; vertical-align:middle; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;
 }
-.result_taggedElementsTitle{
-	position: absolute; padding:20px; padding-top:80px; font-size:large;	text-align:left; vertical-align:top;
-}
 .result_searchedPhrase{
-	position:absolute;	padding:20px; padding-top:100px; font-size:large; text-align:left; vertical-align:top;
+	font-size:large; text-align:center;
 }
 .result_taggedWord{
 	font-weight:bold; color:green; text-decoration:underline; font-style:italic; background-color:yellow;
