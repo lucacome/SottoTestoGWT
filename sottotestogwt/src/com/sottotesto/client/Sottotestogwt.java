@@ -65,6 +65,7 @@ public class Sottotestogwt implements EntryPoint {
 	private final DBPediaServiceAsync dbpediaService = GWT.create(DBPediaService.class);
 	private final EkpServiceAsync ekpService = GWT.create(EkpService.class);
 	private final DBPediaQueryAsync dbpqService = GWT.create(DBPediaQuery.class);
+	private final ListServiceAsync listService = GWT.create(ListService.class);
 	private int ekpRemainingCallNum = 0;
 	private List<String> ekpRemainingCallInputs = new ArrayList<String>();
 	
@@ -439,7 +440,7 @@ public class Sottotestogwt implements EntryPoint {
 			String jsonHT = "["+result.jdataHT+"]";
 			String jsonFD = "["+result.jdataFD+"]";	
 			
-			//callDBPediaQuery(ekpRespTmp);
+			callListService(ekpRespTmp);
 			
 			//rc.setJsonHT(tem);
 			//rc.setJsonFD(tem2);
@@ -468,16 +469,31 @@ public class Sottotestogwt implements EntryPoint {
 		}});		
 	}
 	
-	private void callDBPediaQuery(EkpResponse resp){
+	private void callDBPediaQuery(DBPQueryResp resp){
         Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
 
-      
-        dbpqService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
+        dbpqService.sendToServer(resp, new AsyncCallback<DBPQueryResp>() {
         public void onFailure(Throwable caught) {
                 //set the error
 
         }
-		
+
+        public void onSuccess(DBPQueryResp result) {
+          Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation());
+          if (result.getLat() != 0.0 && result.getLng() != 0.0)
+        	  rc.addDBpediaMarkerSingleToMap(result);  
+        }});
+
+}
+	private void callListService(EkpResponse resp){
+        Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
+
+        listService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
+        public void onFailure(Throwable caught) {
+                //set the error
+
+        }
+
         public void onSuccess(List<DBPQueryResp> result) {
                 //Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
                 Iterator<DBPQueryResp> iter = result.iterator();
@@ -487,11 +503,9 @@ public class Sottotestogwt implements EntryPoint {
 
                 while (iter.hasNext()){
                 	temp = iter.next();
-                	rc.addMarkerToList(temp);
-                	Debug.printDbgLine("entity="+temp.getEntity()+", link="+temp.getLink()+", name="+temp.getName()+", gps="+temp.getLat()+", "+temp.getLng());
-                }
-                
-                rc.addDBpediaMarkeListToMap(result);
+                	callDBPediaQuery(temp);
+                	}
+
         }});
 
 }
