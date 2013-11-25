@@ -85,7 +85,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 			Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+responseQuery.getTime()+"ms]");
 		} catch (Exception e) {			
 			Debug.printDbgLine("DBPediaServiceImpl.java: Exception: "+e.getMessage());
-
+			e.printStackTrace();
 			//set error code
 			responseQuery.setCode(500);
 

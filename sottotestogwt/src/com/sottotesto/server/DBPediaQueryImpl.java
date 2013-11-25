@@ -25,6 +25,8 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 
 
 		ResultSet results = null;
+		ResultSet results2 = null;
+		Debug.printDbgLine("1");
 
 		String gps = "";
 		String spq = "PREFIX grs: <http://www.georss.org/georss/point>\n"+
@@ -34,35 +36,65 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 				"<"+resp.getLink()+"> grs: ?grs\n"+
 				"}\n"+
 				"";
-		
-		String spqabs = "PREFIX dbo: <http://dbpedia.org/ontology/>\n"+
+		Debug.printDbgLine("2");
+		String langdb = "\"en\"";
+		String spqabs = "PREFIX dbo: <http://dbpedia.org/ontology/> \n"+
 				"\n"+
 				"select ?abstract\n"+
-				"where {\n"+ 
-				"<"+resp.getLink()+"> dbo:abstract ?abstract .\n"+
-				"\n"+
-				"FILTER ( lang(?abstract) = \"en\" )\n"+
-				"}\n"+
-				"";
+				"where {\n"+
+				"<"+resp.getLink()+"> dbo:abstract ?abstract.\n"+
+				"FILTER (LANG(?abstract) = "+langdb+")\n"+
+				" }";
+
+		Debug.printDbgLine("3+"+langdb);
+//
+//		try {
+//			Query query = QueryFactory.create(spq); //s2 = the query above
+//			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query );
+//			results = qExe.execSelect();
+//
+//			if (results.hasNext()){
+//				QuerySolution sol = results.nextSolution();
+//				Literal l = sol.getLiteral("grs");
+//				gps = l.toString().replace("@en", "");
+//				
+//				
+//			}
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			//e.printStackTrace();
+//			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
+//		}
+		
 
 		try {
-			Query query = QueryFactory.create(spq); //s2 = the query above
-			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query );
-			results = qExe.execSelect();
+			Debug.printDbgLine("4");
+			Query query2 = QueryFactory.create(spqabs); //s2 = the query above
+			Debug.printDbgLine("5");
+			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
+			Debug.printDbgLine("6");
+			results2 = qExe.execSelect();
+			Debug.printDbgLine("7");
 
-			if (results.hasNext()){
-				QuerySolution sol = results.nextSolution();
-				Literal l = sol.getLiteral("grs");
-				gps = l.toString().replace("@en", "");
-				
-				
+			if (results2.hasNext()){
+				Debug.printDbgLine("8");
+				QuerySolution sol2 = results2.nextSolution();
+				Debug.printDbgLine("9");
+				Literal abs = sol2.getLiteral("abstract");
+				Debug.printDbgLine("10");
+				Debug.printDbgLine("NOW"+abs);
+
+
 			}
+			Debug.printDbgLine("11");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
+			Debug.printDbgLine("ERRORE2 DBPEDIA!   "+e.getCause());
 		}
 
+
+		
 		
 		//Debug.printDbgLine("6");
 		if (! gps.isEmpty()){
