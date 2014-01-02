@@ -2,8 +2,6 @@ package com.sottotesto.shared;
 
 import java.util.List;
 
-import com.google.gson.JsonObject;
-
 public class TagmeResponse implements java.io.Serializable{
 	/**
 	 * 
