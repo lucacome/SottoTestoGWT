@@ -87,6 +87,7 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 					abs = null;
 //				Debug.printDbgLine("10");
 //				Debug.printDbgLine("NOW"+abs);
+				//gittamelo
 
 
 			}
