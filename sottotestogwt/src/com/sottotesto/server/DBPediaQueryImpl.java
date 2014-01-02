@@ -36,53 +36,57 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 				"<"+resp.getLink()+"> grs: ?grs\n"+
 				"}\n"+
 				"";
-		Debug.printDbgLine("2");
-		String langdb = "\"en\"";
-		String spqabs = "PREFIX dbo: <http://dbpedia.org/ontology/> \n"+
-				"\n"+
+
+		String spqabs = "PREFIX dbo: <http://dbpedia.org/ontology/>\n"+
 				"select ?abstract\n"+
 				"where {\n"+
 				"<"+resp.getLink()+"> dbo:abstract ?abstract.\n"+
-				"FILTER (LANG(?abstract) = "+langdb+")\n"+
-				" }";
+//				"FILTER langMatches( lang(?abstract), 'en')"+
+				"}";
 
-		Debug.printDbgLine("3+"+langdb);
-//
-//		try {
-//			Query query = QueryFactory.create(spq); //s2 = the query above
-//			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query );
-//			results = qExe.execSelect();
-//
-//			if (results.hasNext()){
-//				QuerySolution sol = results.nextSolution();
-//				Literal l = sol.getLiteral("grs");
-//				gps = l.toString().replace("@en", "");
-//				
-//				
-//			}
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			//e.printStackTrace();
-//			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
-//		}
+		try {
+			Query query = QueryFactory.create(spq); //s2 = the query above
+			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query );
+			results = qExe.execSelect();
+
+			if (results.hasNext()){
+				QuerySolution sol = results.nextSolution();
+				Literal l = sol.getLiteral("grs");
+				gps = l.toString().replace("@en", "");
+				
+				
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
+		}
 		
 
 		try {
-			Debug.printDbgLine("4");
+//			Debug.printDbgLine("4");
 			Query query2 = QueryFactory.create(spqabs); //s2 = the query above
-			Debug.printDbgLine("5");
+//			Debug.printDbgLine("5");
 			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
-			Debug.printDbgLine("6");
+//			Debug.printDbgLine("6");
 			results2 = qExe.execSelect();
-			Debug.printDbgLine("7");
+//			Debug.printDbgLine("7");
+			Literal abs =  null;
+			
+			
 
-			if (results2.hasNext()){
-				Debug.printDbgLine("8");
+			for (; results2.hasNext() ;){
+//				Debug.printDbgLine("8");
 				QuerySolution sol2 = results2.nextSolution();
-				Debug.printDbgLine("9");
-				Literal abs = sol2.getLiteral("abstract");
-				Debug.printDbgLine("10");
-				Debug.printDbgLine("NOW"+abs);
+//				Debug.printDbgLine("9");
+				String langu = sol2.getLiteral("abstract").getLanguage();
+				if(langu.contains("en")){
+					abs = sol2.getLiteral("abstract");
+					resp.setAbstract(abs.toString());
+				}else
+					abs = null;
+//				Debug.printDbgLine("10");
+//				Debug.printDbgLine("NOW"+abs);
 
 
 			}

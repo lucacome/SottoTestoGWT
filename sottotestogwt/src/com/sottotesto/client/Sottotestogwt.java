@@ -494,7 +494,7 @@ public class Sottotestogwt implements EntryPoint {
         	updateDBpediaServiceLabel();
        	 Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+gpsCallsEnded+"/"+gpsCallsMax);
         	
-          Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation());
+          Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation()+", abstract="+result.getAbstract());
           if (result.getLat() != 0.0 && result.getLng() != 0.0)
         	  rc.addDBpediaMarkerSingleToMap(result);  
         }});

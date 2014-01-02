@@ -80,6 +80,7 @@ public class MapController {
 	public void loadSingleDBPQmarkerOnMap(DBPQueryResp dbqMarker){
 		String htmlInfo = "";
 		htmlInfo =  "Place: "+dbqMarker.getName()+
+				"<br>abstract: "+dbqMarker.getAbstract()+
 				"<br>relation: "+dbqMarker.getRelation()+
 				"<br>entity: "+dbqMarker.getEntity();
 		createMarker(LatLng.create(dbqMarker.getLat(), dbqMarker.getLng()), dbqMarker.getName()+"\n("+dbqMarker.getEntity()+")", htmlInfo, 0);
