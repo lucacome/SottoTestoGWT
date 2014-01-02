@@ -9,18 +9,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Scanner;
 
-import org.apache.http.ProtocolException;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.TagmeService;
 import com.sottotesto.shared.Debug;
@@ -30,6 +22,11 @@ import com.sottotesto.shared.Utility;
 
 public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeService {
 	;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -727904838259956930L;
 
 	public TagmeResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
@@ -104,7 +101,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			
 			//converti Json -> gson
 			Gson gson = new Gson();
-			JsonArray jarray = new JsonArray();
+			//JsonArray jarray = new JsonArray();
 			tagmeResp.setJsonData(gson.fromJson(tagmeResp.getJson(), TagmeData.class));
 			tagmeResp.setResNum(tagmeResp.getJsonData().annotations.size());
 			for (int i=0; i<=tagmeResp.getResNum()-1; i++){
