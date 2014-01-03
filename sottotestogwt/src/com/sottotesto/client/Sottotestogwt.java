@@ -140,6 +140,7 @@ public class Sottotestogwt implements EntryPoint {
 		
 		
 		//hide loading icon
+		RootPanel.get("title").setVisible(false);
 		RootPanel.get("homeLoading").setVisible(false);
 		
 		Debug.printDbgLine("Sottotestogwt.java: HomePage loaded in "+(System.currentTimeMillis()-homeTimeStart)+"ms, waiting input ...");
@@ -149,7 +150,7 @@ public class Sottotestogwt implements EntryPoint {
 	private void initItems(){
 		Debug.printDbgLine("Sottotestogwt.java: initItems()");
 
-		panelsMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*5/100);
+		panelsMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 		
 		//init services responses
 		tagmeResp = new TagmeResponse();
@@ -196,7 +197,7 @@ public class Sottotestogwt implements EntryPoint {
 				titleHTML.setHTML("<h1>Sottotesto Web App</h1>");
 				titleHTML.setHeight("10px");
 				titleContentPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
-				titleContentPanel.setHeadingHtml("Search Area");
+				titleContentPanel.setHeadingHtml("SOTTOTESTO WEBAPPLICATION");
 				titleContentPanel.setWidth(panelsMaxWidth);
 				titleContentPanel.setHeight(RootPanel.get("searchContainer").getOffsetHeight()+"px");
 				
@@ -628,7 +629,7 @@ public class Sottotestogwt implements EntryPoint {
 		searchPanelHC.add(sendButton, new HorizontalLayoutData(0.15, 1, new Margins(14)));
 		
 		titleContentPanel.clear();
-		titleContentPanel.setHeadingHtml("Analisi frase");
+		titleContentPanel.setHeadingHtml("SOTTOTESTO WEBAPPLICATION");
 		
 		titleContentPanel.setWidget(searchPanelHC);
 	}
