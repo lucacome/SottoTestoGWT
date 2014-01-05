@@ -552,7 +552,8 @@ public class Sottotestogwt implements EntryPoint {
 		tagmeStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		tagmeStatusVP.add(HtmlTagmeService);	
 		tagmeStatusVP.setBorderWidth(0);
-		HtmlTagmeService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showTagmeDataDB(tagmeResp);}});
+		HtmlTagmeService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
+			if(!HtmlTagmeService.getHTML().contains("Waiting")) Utility.showTagmeDataDB(tagmeResp);}});
 		
 		//dbpedia service
 		HtmlDBPediaService = new HTML();
@@ -562,7 +563,8 @@ public class Sottotestogwt implements EntryPoint {
 		dbpediaStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		dbpediaStatusVP.add(HtmlDBPediaService);
 		dbpediaStatusVP.setBorderWidth(0);
-		HtmlDBPediaService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showDBPediaDataDB(dbpediaResp);}});
+		HtmlDBPediaService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
+			if(!HtmlDBPediaService.getHTML().contains("Waiting")) Utility.showDBPediaDataDB(dbpediaResp);}});
 		
 		//ekp service
 		HtmlEkpService = new HTML();
@@ -572,7 +574,8 @@ public class Sottotestogwt implements EntryPoint {
 		ekpStatusVP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		ekpStatusVP.add(HtmlEkpService);
 		ekpStatusVP.setBorderWidth(0);
-		HtmlEkpService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){Utility.showEkpDataDB(ekpResp);}});
+		HtmlEkpService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
+			if(!HtmlEkpService.getHTML().contains("Waiting")) Utility.showEkpDataDB(ekpResp);}});
 		
 		//add items to panel
 		serviceStatusPanelHC.add(HtmlTagmeService, new HorizontalLayoutData(0.33, 1, new Margins(4)));

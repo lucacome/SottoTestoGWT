@@ -37,7 +37,11 @@ public class MapController {
 	//lista links per i marker colorati da mettere sulla mappa
 	List<String> markerColoredLinks;
 	List<Marker> loadedMarkersOnMap; //lista dei marker gia' caricati nella mappa (obbligatoria per toglierli purtroppo)
+	List<String> entities;			 //stringhe con tutte le entita sulla mappa (usato per i colori)
 	
+	//Altro
+	String curEntityMap;			//che mappa viene visualizzata al momento ("mappa completa, "entita 1", "entita 2" ecc)
+	String fullMap = "Mappa completa"; //come si chiama il nome di "mappa completa" (cosi se lo cambiamo basta modificare qui)
 	
 	public void init(){
 		Debug.printDbgLine("MapController.java: init()");
@@ -54,6 +58,8 @@ public class MapController {
 		markerColoredLinks.add("http://maps.google.com/mapfiles/marker_black.png");
 		
 		loadedMarkersOnMap = new ArrayList<Marker>();
+		entities = new ArrayList<String>();
+		curEntityMap = "";
 		
 		//inizializza la mappa google
 		mapContainer = new SimplePanel() ;
@@ -66,61 +72,75 @@ public class MapController {
 		options.setScaleControl(true);
 		options.setScrollwheel(true);
 		theMap = GoogleMap.create(mapContainer.getElement(), options);
-		mapContainer.setVisible(true);
-		//load markers on map
-		//loadMarkers(); 
-		
-		//TEST GOOGLE GEOCODING
-		//String retjs = geocodeJS("via treves 3, bologna");
-		//Debug.printDbgLine("MapController.java: init(): geocode:" + retjs);
-		
+		mapContainer.setVisible(true);		
 	}
 	
 	
 	public void loadSingleDBPQmarkerOnMap(DBPQueryResp dbqMarker){
-		String htmlInfo = "";
-		htmlInfo =  "Place: "+dbqMarker.getName()+
-				"<br>abstract: "+dbqMarker.getAbstract()+
-				"<br>relation: "+dbqMarker.getRelation()+
-				"<br>entity: "+dbqMarker.getEntity();
-		createMarker(LatLng.create(dbqMarker.getLat(), dbqMarker.getLng()), dbqMarker.getName()+"\n("+dbqMarker.getEntity()+")", htmlInfo, 0);
+		
+		String entityName = dbqMarker.getEntity().replace("[","").replace("]", ""); //clear entity name
+		
+		//resize abstract
+		String sAbstract = dbqMarker.getAbstract();
+		int maxAbstractLen = 500;
+		if (sAbstract.length()>=maxAbstractLen) sAbstract = sAbstract.substring(0, maxAbstractLen-1) + " [...]";
+		
+		//setup info showed on mapMarker mouse Click
+		String htmlInfo =  "<b>Place: </b>"+dbqMarker.getName()+
+				"<br><b>Abstract: </b>"+sAbstract+
+				"<br><b>Relation: </b>"+dbqMarker.getRelation()+
+				"<br><b>Entity: </b>"+entityName;
+		
+		//find right marker color ---------------------------------
+		int colorIndex=0;
+		if (entities.indexOf(entityName)>=0){ //se era gia in lista questa entità
+			colorIndex = entities.indexOf(entityName); //prendi il colore corrispondente
+		}
+		else{
+			entities.add(entityName);
+			colorIndex = entities.size()-1;
+		}
+		if (colorIndex >= markerColoredLinks.size()){ //if colorIndex > maxColorNumber
+			colorIndex = colorIndex % markerColoredLinks.size(); //pick an already used color
+		}
+		//---------------------------------------------------------
+		
+		//finally create marker with data
+		createMarker(LatLng.create(dbqMarker.getLat(), dbqMarker.getLng()), dbqMarker.getName()+"\n("+entityName+")", htmlInfo, colorIndex);
 	}
 	
-	public void loadMarkers(List<DBPQueryResp> mList){
+	public void loadMarkers(String entityName){
+		Debug.printDbgLine("ResultController.java: loadMarkers(): "+entityName);
 		
-		//test markers
-		//createMarker(LatLng.create(42.8333, 12.8333), "My \nMarker", "<b>ENTITY</b><br>bla bla",0);
-		//createMarker(LatLng.create(52.8333, 22.8333), "My \nMarker\nthe revenge", "<b>ENTITY2</b><br>bla bla",1);
+		curEntityMap=entityName; //update curren map showed
+		int loaded=0;
 		
-		Iterator<DBPQueryResp> mListIterator = mList.iterator();
-		DBPQueryResp curMark = new DBPQueryResp();
-		String htmlInfo = "";
-		String oldEntity = "";
-		int colorIndex = -1;
-		
-		while (mListIterator.hasNext()){
-			curMark = mListIterator.next();
+		//cycle all markers
+		for(Marker m : loadedMarkersOnMap){
 			
-			if (!curMark.getEntity().equals(oldEntity)){
-				oldEntity = curMark.getEntity();
-				colorIndex++;
-				if (colorIndex >= markerColoredLinks.size()) colorIndex=0;
+			if (entityName.equals(fullMap)){ //LOAD ALL MARKERS
+				m.setMap(theMap); loaded++;
 			}
-			
-			htmlInfo =  "Place: "+curMark.getName()+
-						"<br>relation: "+curMark.getRelation()+
-						"<br>entity: "+curMark.getEntity();
-			createMarker(LatLng.create(curMark.getLat(), curMark.getLng()), curMark.getName()+"\n("+curMark.getEntity()+")", htmlInfo, colorIndex);
-		}
-
+			else if(m.getTitle().contains(entityName)){ //LOAD MARKERS ONLY FOR SELECTED ENTITY
+				m.setMap(theMap); loaded++;
+			}
+		}		
+		Debug.printDbgLine("ResultController.java: loadMarkers(): "+loaded+" markers loaded");
 	}
 	
 	//Crea un singolo marker con le opzioni date sulla mappa
 	private void createMarker(final LatLng position, String title, final String htmlInfo, int colorIndex){
+		
+		//to hide markers
+		SimplePanel nullContainerPanel = new SimplePanel();
+		GoogleMap gMapNull = GoogleMap.create(nullContainerPanel.getElement());
+		
 		Marker m = Marker.create();
 		m.setPosition(position);
 		m.setTitle(title);
-		m.setMap(theMap);		
+		if (curEntityMap.equals(fullMap)) m.setMap(theMap); //if i've selected "full map" -> show right away
+		else if(m.getTitle().contains(curEntityMap)) m.setMap(theMap); //if i've selected "map for x" and this is an x marker -> show right away
+		else m.setMap(gMapNull); // if it's a marker for a different entity from the one visualized right now -> don't show
 		m.setAnimation(Animation.DROP);
 		m.setFlat(false); //false to show marker shadow? -- No, non va
 		m.setIcon(MarkerImage.create(markerColoredLinks.get(colorIndex)));
@@ -164,33 +184,8 @@ public class MapController {
 			curMark.setMap(gMapNull);
 			}
 		
-		Debug.printDbgLine("ResultController.java: clearMarkerFromMap(): Cleared "+loadedMarkersOnMap.size()+" markers");
-		loadedMarkersOnMap.clear();
-		
+		Debug.printDbgLine("ResultController.java: clearMarkerFromMap(): Cleared "+loadedMarkersOnMap.size()+" markers");		
 		theMap.getOverlayMapTypes().setAt(0, null);
 	}
 	
-	//GOOGLE GEOCODING -- currently not used
-	private native String geocodeJS(String place)/*-{
-		var geocoder;
-		var latlong;
-		geocoder = new $wnd.google.maps.Geocoder();
-
-		 geocoder.geocode( { 'address': place}, function(results, status) {
-    		if (status == $wnd.google.maps.GeocoderStatus.OK) {
-    			alert('ok, return: ' + results[0].geometry.location);
-    			//latlong = results[0].geometry.location.lat() + '-' + results[0].geometry.location.lng();
-    			latlong="prova2";
-    			alert('latlong: ' + latlong);
-    			return latlong;
-
-    		} else {
-      			alert('Geocode was not successful for the following reason: ' + status);
-      			latlong="shit";
-    		}
-  		});
-  		
-  		return latlong;
-	}-*/;
-
 }

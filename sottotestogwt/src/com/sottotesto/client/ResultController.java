@@ -288,12 +288,13 @@ public class ResultController {
 				mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
 				mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 				
-				//BUGFIX - the map doesn't show correctly for the second time, this is the fix
+				//BUGFIX - the map doesn't show correctly for the second time, this is the fix (by lollo... fuck stackoverflow!)
 				mapC.getMap().triggerResize();
 				mapC.getMap().setCenter(LatLng.create(35,-40)); 
 				//END BUGFIX	
 				
-				//mapC.loadMarkers(markerList); //load new markers
+				if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
+				mapC.loadMarkers(treeDataSelected.getName()); //load only right markers, depending on selected map
 			}
 			else {
 				Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
@@ -329,11 +330,6 @@ public class ResultController {
 	public void addMarkerToList(DBPQueryResp m){
 		markerList.add(m);
 	}
-	
-	public void addDBpediaMarkeListToMap(List<DBPQueryResp> mList){
-		if (mapC != null) mapC.loadMarkers(mList);
-	}
-	
 	public void addDBpediaMarkerSingleToMap(DBPQueryResp dbpqMarker ){
 		if (mapC != null) mapC.loadSingleDBPQmarkerOnMap(dbpqMarker);
 	}
