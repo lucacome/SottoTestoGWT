@@ -25,19 +25,19 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 
 
 		ResultSet results = null;
-//		ResultSet results2 = null;
-				Debug.printDbgLine("1");
+		ResultSet results2 = null;
+//				Debug.printDbgLine("1");
 
 		String gps = "";
 		String entlink = resp.getLink();
 		String spq = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+
-				"PREFIX grs: <http://www.georss.org/georss/point>  "+
-				"select ?grs ?abstract "+
-				"where { "+
-				"<"+entlink+"> rdfs:comment ?abstract . "+
-				"<"+entlink+"> grs: ?grs . "+
-				"} \n ";
-		Debug.printDbgLine("2");
+				"PREFIX grs: <http://www.georss.org/georss/point>\n"+
+				"select ?abstract ?grs\n"+
+				"where {\n"+
+				"<"+entlink+"> rdfs:comment ?abstract .\n"+
+				"<"+entlink+"> grs: ?grs .\n"+
+				"}";
+//		Debug.printDbgLine("2");
 		//		String spqabs = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"+
 		//				"select ?abstract\n"+
 		//				"where {\n"+
