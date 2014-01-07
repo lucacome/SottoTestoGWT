@@ -85,11 +85,18 @@ public class MapController {
 		int maxAbstractLen = 500;
 		if (sAbstract.length()>=maxAbstractLen) sAbstract = sAbstract.substring(0, maxAbstractLen-1) + " [...]";
 		
+		//obtain wikipedia link
+		String wikiLink="http://en.wikipedia.org/wiki/";
+		String dbLink=dbqMarker.getLink();
+		wikiLink=wikiLink+dbLink.subSequence(dbLink.lastIndexOf("/")+1, dbLink.length());
+		wikiLink="<a href="+wikiLink+" target=\"_blank\">"+wikiLink+"</a>";
+		
 		//setup info showed on mapMarker mouse Click
 		String htmlInfo =  "<b>Place: </b>"+dbqMarker.getName()+
 				"<br><b>Abstract: </b>"+sAbstract+
 				"<br><b>Relation: </b>"+dbqMarker.getRelation()+
-				"<br><b>Entity: </b>"+entityName;
+				"<br><b>Entity: </b>"+entityName+
+				"<br><b>Link: </b>"+wikiLink;
 		
 		//find right marker color ---------------------------------
 		int colorIndex=0;

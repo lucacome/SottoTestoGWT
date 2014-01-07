@@ -74,6 +74,7 @@ public class Utility {
 		container.add(dialogVPanel);		
 		dialogBox.setWidget(container);		
 		dialogBox.center(); //must be done for updating data for resizing
+		Debug.printDbgLine("Utility.java: showTagmeDataDB(): dialogHeight="+container.getOffsetHeight());
 		if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
 		if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
 		
@@ -115,8 +116,11 @@ public class Utility {
 		container.add(dialogVPanel);
 		dialogBox.setWidget(container);
 		dialogBox.center(); //must be done for updating data for resizing
-		if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
-		if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
+		Debug.printDbgLine("Utility.java: showDBPediaDataDB(): dialogHeight="+container.getOffsetHeight());
+		//if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
+		//if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
+		container.setHeight(getDbMaxHeight());
+		container.setWidth(getDbMaxWidth());
 		
 		dialogBox.center();		
 		dialogBox.show();
@@ -159,8 +163,11 @@ public class Utility {
 		container.add(folder);
 		dialogBox.setWidget(container);
 		dialogBox.center(); //must be done for updating data for resizing
-		if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
-		if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
+		Debug.printDbgLine("Utility.java: showEKPDataDB(): dialogHeight="+container.getOffsetHeight());
+		//if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
+		//if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
+		container.setHeight(getDbMaxHeight());
+		container.setWidth(getDbMaxWidth());
 		
 		dialogBox.center();		
 		dialogBox.show();	
@@ -253,7 +260,8 @@ public class Utility {
 	}
 	
 	public static int getDbMaxHeight(){
-		int dbMaxHeight = (RootPanel.get().getOffsetHeight()*80)/100;
+		int dbMaxHeight = (RootPanel.get("body").getOffsetHeight()*80)/100;
+		Debug.printDbgLine("Utility.java: getDbMaxHeight(): "+dbMaxHeight);
 		 return dbMaxHeight;
 	}
 	

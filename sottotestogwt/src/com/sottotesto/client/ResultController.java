@@ -7,7 +7,6 @@ import java.util.List;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -61,6 +60,7 @@ public class ResultController {
 	
 	//infovis data
 	private InfovisController infovisC;
+	
 	//map data
 	private MapController mapC;
 	List<DBPQueryResp> markerList; //Lista di marker ottenuti da dbpedia
@@ -122,22 +122,16 @@ public class ResultController {
 		defaultCenterHTML = new HTML();
 		defaultCenterHTML.setStyleName("result_htmlContainer");
 		defaultCenterHTML.setHTML(HTMLsearchSomethingString);
-		centerPanel.add(defaultCenterHTML);
-				
+		centerPanel.add(defaultCenterHTML);			
 
 
-		MarginData center = new MarginData(new Margins(5));
-
-		
+		MarginData center = new MarginData(new Margins(5));		
 		border.setCenterWidget(centerPanel, center);
-
 		vBoxData = new BoxLayoutData(new Margins(5, 5, 5, 5));
-		vBoxData.setFlex(1);		
-		
+		vBoxData.setFlex(1);			
 		
 		mapC = new MapController(); //initialize map controller	
-		mapC.init();
-		
+		mapC.init();		
 	}
 
 	public void reInit(){
@@ -185,19 +179,6 @@ public class ResultController {
 		
 		//TREE DATA LOADER
 		treeProperties = GWT.create(TreeDataProperties.class); // Generate the key provider and value provider for the Data class
-		/*
-		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
-		TreeData r1 = new TreeData("1","ForceDirected Graph"); r1.setClickAction(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD); r1.setJsonFD(jsonFD);
-		treeStore.add(r1);
-		treeStore.add(r1, new TreeData("3","Tag1"));
-		treeStore.add(r1, new TreeData("4","Tag1"));
-		TreeData r2 = new TreeData("2","Hypertree Graph"); r2.setClickAction(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT); r2.setJsonHT(jsonHT);
-		treeStore.add(r2);
-		TreeData r3 = new TreeData("5","Maps");
-		treeStore.add(r3);
-		treeStore.add(r3, new TreeData("6","Tag3"));
-		treeStore.add(r3, new TreeData("7","Tag4"));	
-		*/
 		treeStore = ts;
 		tree = new Tree<TreeData, String>(treeStore, treeProperties.name());
 		tree.setId("tree");
@@ -206,7 +187,6 @@ public class ResultController {
 		//TREE CLICK HANDLER		
 		tree.getSelectionModel().setSelectionMode(SelectionMode.SIMPLE);
 	    tree.getSelectionModel().addSelectionHandler(new SelectionHandler<TreeData>() {
-
 	        public void onSelection(SelectionEvent<TreeData> event) {
 	        	TreeData treeDataSelected = event.getSelectedItem();
 	        	handleTreeClick(treeDataSelected);
@@ -284,19 +264,6 @@ public class ResultController {
 				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
-				//if (mapC != null) mapC.clearMarkerFromMap();							
-				/*centerPanel.clear(); 				// clear centerpanel contents	
-				centerPanel.setWidget(mapC.getMapContainer()); // add the graph in centerpanel
-				mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
-				mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-				
-				//BUGFIX - the map doesn't show correctly for the second time, this is the fix (by lollo... fuck stackoverflow!)
-				mapC.getMap().triggerResize();
-				mapC.getMap().setCenter(LatLng.create(35,-40)); 
-				//END BUGFIX	
-				
-				if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
-				mapC.loadMarkers(treeDataSelected.getName()); //load only right markers, depending on selected map*/
 				showMap(treeDataSelected.getName());
 			}
 			else {
