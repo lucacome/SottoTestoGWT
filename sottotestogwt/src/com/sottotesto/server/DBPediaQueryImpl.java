@@ -25,79 +25,101 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 
 
 		ResultSet results = null;
-		ResultSet results2 = null;
-//		Debug.printDbgLine("1");
+//		ResultSet results2 = null;
+				Debug.printDbgLine("1");
 
 		String gps = "";
-		String spq = "PREFIX grs: <http://www.georss.org/georss/point>\n"+
-				"\n"+
-				"select ?grs\n"+
-				"where {\n"+ 
-				"<"+resp.getLink()+"> grs: ?grs\n"+
-				"}\n"+
-				"";
-
-		String spqabs = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"+
-				"select ?abstract\n"+
-				"where {\n"+
-				"<"+resp.getLink()+"> rdfs:comment ?abstract.\n"+
-//				"FILTER langMatches( lang(?abstract), 'en')"+
-				"}";
+		String entlink = resp.getLink();
+		String spq = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+
+				"PREFIX grs: <http://www.georss.org/georss/point>  "+
+				"select ?grs ?abstract "+
+				"where { "+
+				"<"+entlink+"> rdfs:comment ?abstract . "+
+				"<"+entlink+"> grs: ?grs . "+
+				"} \n ";
+		Debug.printDbgLine("2");
+		//		String spqabs = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"+
+		//				"select ?abstract\n"+
+		//				"where {\n"+
+		//				"<"+resp.getLink()+"> rdfs:comment ?abstract.\n"+
+		////				"FILTER langMatches( lang(?abstract), 'en')"+
+		//				"}";
 
 		try {
 			Query query = QueryFactory.create(spq); //s2 = the query above
 			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query );
 			results = qExe.execSelect();
-
-			if (results.hasNext()){
+			Literal abs =  null;
+//			Debug.printDbgLine("3");
+			for (; results.hasNext() ;){
 				QuerySolution sol = results.nextSolution();
+//				Debug.printDbgLine("4");
 				Literal l = sol.getLiteral("grs");
-				gps = l.toString().replace("@en", "");
-				
-				
+//				Debug.printDbgLine("GRS= "+l);
+//				Debug.printDbgLine("5");
+				String langu = sol.getLiteral("abstract").getLanguage();
+				if(langu.contains("en")){				
+//					Debug.printDbgLine("6");	
+					
+					gps = l.toString().replace("@en", "");
+//					Debug.printDbgLine("7");
+					if (!gps.isEmpty()){
+//						Debug.printDbgLine("8");
+						abs = sol.getLiteral("abstract");
+						resp.setAbstract(abs.getString());
+						
+
+						String arraygps[] = gps.split(" ");
+						resp.setGps(Double.parseDouble(arraygps[0]), Double.parseDouble(arraygps[1]));
+					}else
+						abs=null;
+					//Debug.printDbgLine("ABS= "+abs);
+				}else
+					abs = null;
+
+
+
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
 		}
-		
-		if (!gps.isEmpty()){
-		try {
-//			Debug.printDbgLine("4");
-			Query query2 = QueryFactory.create(spqabs); //s2 = the query above
-//			Debug.printDbgLine("5");
-			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
-//			Debug.printDbgLine("6");
-			results2 = qExe.execSelect();
-//			Debug.printDbgLine("7");
-			Literal abs =  null;
 
-			for (; results2.hasNext() ;){
-//				Debug.printDbgLine("8");
-				QuerySolution sol2 = results2.nextSolution();
-//				Debug.printDbgLine("9");
-				String langu = sol2.getLiteral("abstract").getLanguage();
-				if(langu.contains("en")){
-					abs = sol2.getLiteral("abstract");
-					resp.setAbstract(abs.getString());
-					//Debug.printDbgLine("ABS= "+abs);
-				}else
-					abs = null;
 
-			}
-//			Debug.printDbgLine("11");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			Debug.printDbgLine("ERRORE2 DBPEDIA!   "+e.getCause());
-		}
-		
+		//		try {
+		////			Debug.printDbgLine("4");
+		//			Query query2 = QueryFactory.create(spqabs); //s2 = the query above
+		////			Debug.printDbgLine("5");
+		//			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
+		////			Debug.printDbgLine("6");
+		//			results2 = qExe.execSelect();
+		////			Debug.printDbgLine("7");
+		//			Literal abs =  null;
+		//
+		//			for (; results2.hasNext() ;){
+		////				Debug.printDbgLine("8");
+		//				QuerySolution sol2 = results2.nextSolution();
+		////				Debug.printDbgLine("9");
+		//				String langu = sol2.getLiteral("abstract").getLanguage();
+		//				if(langu.contains("en")){
+		//					abs = sol2.getLiteral("abstract");
+		//					resp.setAbstract(abs.getString());
+		//					//Debug.printDbgLine("ABS= "+abs);
+		//				}else
+		//					abs = null;
+		//
+		//			}
+		////			Debug.printDbgLine("11");
+		//		} catch (Exception e) {
+		//			// TODO Auto-generated catch block
+		//			//e.printStackTrace();
+		//			Debug.printDbgLine("ERRORE2 DBPEDIA!   "+e.getCause());
+		//		}
+		//		
 
-			String arraygps[] = gps.split(" ");
-			resp.setGps(Double.parseDouble(arraygps[0]), Double.parseDouble(arraygps[1]));
-		}
-		
+
+
 		return resp;
 	}
 
