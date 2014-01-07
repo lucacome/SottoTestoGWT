@@ -250,10 +250,12 @@ public class ResultController {
 		
 		lcwest.add(treeContainer);
 		
+		/* NO MORE SINCE WE DIRECTLY SHOW THE MAP
 		centerPanel.clear();	// clear centerpanel contents
 		centerPanel.add(new HTML(HTMLselectSomethingString));
-		//Sottotestogwt.showTaggedResult(createTaggedSearchString());
 		centerPanel.getWidget().setHeight(String.valueOf(centerPanel.getOffsetHeight()+"px")); //html grande quando si puo'
+		*/
+		showMap("Mappa completa");
 	}
 
 	
@@ -283,7 +285,7 @@ public class ResultController {
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
 				//if (mapC != null) mapC.clearMarkerFromMap();							
-				centerPanel.clear(); 				// clear centerpanel contents	
+				/*centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(mapC.getMapContainer()); // add the graph in centerpanel
 				mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
 				mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
@@ -294,7 +296,8 @@ public class ResultController {
 				//END BUGFIX	
 				
 				if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
-				mapC.loadMarkers(treeDataSelected.getName()); //load only right markers, depending on selected map
+				mapC.loadMarkers(treeDataSelected.getName()); //load only right markers, depending on selected map*/
+				showMap(treeDataSelected.getName());
 			}
 			else {
 				Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
@@ -305,6 +308,21 @@ public class ResultController {
 		}		
 	}
 
+	public void showMap(String mapName){
+		centerPanel.clear(); 				// clear centerpanel contents	
+		centerPanel.setWidget(mapC.getMapContainer()); // add the graph in centerpanel
+		mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
+		mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+		
+		//BUGFIX - the map doesn't show correctly for the second time, this is the fix (by lollo... fuck stackoverflow!)
+		mapC.getMap().triggerResize();
+		mapC.getMap().setCenter(LatLng.create(35,-40)); 
+		//END BUGFIX	
+		
+		if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
+		mapC.loadMarkers(mapName); //load only right markers, depending on selected map
+	}
+	
 	
 	public void setJsonFD(String jdata){
 
