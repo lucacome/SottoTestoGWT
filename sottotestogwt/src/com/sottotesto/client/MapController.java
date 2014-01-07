@@ -94,7 +94,7 @@ public class MapController {
 		
 		//setup info showed on mapMarker mouse Click
 		String htmlInfo =  "<b>Place: </b>"+dbqMarker.getName()+
-				"<br><b>Abstract: </b>"+sAbstract+
+				"<br><b>Description: </b>"+sAbstract+
 				"<br><b>Relation: </b>"+dbqMarker.getRelation()+
 				"<br><b>Entity: </b>"+entityName+
 				"<br><b>Link: </b>"+wikiLink;
@@ -119,6 +119,8 @@ public class MapController {
 	
 	public void loadMarkers(String entityName){
 		Debug.printDbgLine("ResultController.java: loadMarkers(): "+entityName);
+		
+		 if (info != null) info.close();
 		
 		curEntityMap=entityName; //update curren map showed
 		int loaded=0;
