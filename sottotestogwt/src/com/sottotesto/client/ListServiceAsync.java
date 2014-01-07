@@ -9,5 +9,5 @@ import com.sottotesto.shared.EkpResponse;
 public interface ListServiceAsync {
 	void sendToServer(EkpResponse resp, AsyncCallback<List<DBPQueryResp>> callback)
 			throws IllegalArgumentException;
-	
+
 }

@@ -5,7 +5,7 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
 public interface TreeDataProperties extends PropertyAccess<TreeData>{
-	
+
 	// Note that this implies that the string value available in the id property will be unique
 	ModelKeyProvider<TreeData> id();
 
@@ -15,8 +15,8 @@ public interface TreeDataProperties extends PropertyAccess<TreeData>{
 	/*
 	  @Path("firstName")
 	  LabelProvider<Person> simpleLabel(); 
-	*/
-	
+	 */
+
 	// None of these are used in this example, and could be removed, but could be helpful in other cases
 	ValueProvider<TreeData, String> name();
 	ValueProvider<TreeData, String> clickAction(); 

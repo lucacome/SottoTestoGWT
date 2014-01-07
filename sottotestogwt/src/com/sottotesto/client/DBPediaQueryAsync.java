@@ -9,5 +9,5 @@ import com.sottotesto.shared.DBPQueryResp;
 public interface DBPediaQueryAsync {
 	void sendToServer(DBPQueryResp resp, AsyncCallback<DBPQueryResp> callback)
 			throws IllegalArgumentException;
-	
+
 }

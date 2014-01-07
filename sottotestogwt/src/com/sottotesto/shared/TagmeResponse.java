@@ -62,7 +62,7 @@ public class TagmeResponse implements java.io.Serializable{
 	public List<String> getTitleTag(){return titleTag;}
 	public void setSpotTag(List<String> x) {spotTag = x;}
 	public List<String> getSpotTag(){return spotTag;}
-	
+
 	public void setTitleSkipped(List<String> x) {titleSkipped = x;}
 	public List<String> getTitleSkipped(){return titleSkipped;}
 	public void setSpotSkipped(List<String> x) {spotSkipped = x;}

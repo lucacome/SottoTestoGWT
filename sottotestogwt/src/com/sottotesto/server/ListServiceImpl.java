@@ -9,10 +9,14 @@ import com.google.gson.JsonParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.ListService;
 import com.sottotesto.shared.DBPQueryResp;
-import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 
 public class ListServiceImpl extends RemoteServiceServlet implements ListService	{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6701602502729720643L;
 
 	@Override
 	public List<DBPQueryResp> sendToServer(EkpResponse resp)

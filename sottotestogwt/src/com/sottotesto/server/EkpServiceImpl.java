@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +30,6 @@ import com.sottotesto.client.EkpService;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.Utility;
-import java.net.URLEncoder;
 
 
 
@@ -56,7 +56,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		RDFReader arp = null;
 		arp = m.getReader();
 		String jresp = null;
-		
+
 		try {
 			input = URLEncoder.encode(input, "UTF-8");
 		} catch (UnsupportedEncodingException e1) {
@@ -128,12 +128,12 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					//Debug.printDbgLine(s.getObject().toString());
 					oth = m.getResource(s.getObject().toString());
 					StmtIterator a = null;
-					
+
 					for (a = oth.listProperties(); a.hasNext(); ){
 						Statement z = a.next();
 						if (z.getPredicate().getLocalName().contains("label") && z.getObject().toString().contains("@en"))
 							linklabel.put(s.getObject().toString(), z.getObject().toString().replace("@en", ""));
-							//Debug.printDbgLine("PIPPO="+z.getPredicate().getLocalName()+"\nPLUTO="+z.getObject().toString().replace("@en", ""));
+						//Debug.printDbgLine("PIPPO="+z.getPredicate().getLocalName()+"\nPLUTO="+z.getObject().toString().replace("@en", ""));
 					}	
 				}
 
@@ -145,7 +145,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						jsonHT.name = linkmap.asMap().get(key).toString().replace("@en", "");
 						jsonFD.name = jsonHT.name;
 					}else{
-						
+
 						Map<String, String> mapNodeHT = new HashMap<String,String>();
 
 						mapNodeHT.put("nodeTo", key.toString());
@@ -224,7 +224,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				tag.put(input, jsonHT.getLink());
 				//		jdata.setTag(tag);
 
-			//	Gson ekpj = new GsonBuilder().disableHtmlEscaping().create();
+				//	Gson ekpj = new GsonBuilder().disableHtmlEscaping().create();
 				Gson aa = new GsonBuilder().disableHtmlEscaping().create();
 				Gson tempfd2 = new GsonBuilder().disableHtmlEscaping().create();
 

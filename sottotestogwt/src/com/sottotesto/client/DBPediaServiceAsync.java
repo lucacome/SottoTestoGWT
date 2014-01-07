@@ -12,5 +12,5 @@ import com.sottotesto.shared.TagmeResponse;
 public interface DBPediaServiceAsync {
 	void sendToServer(TagmeResponse tagmResp, List<String> dbprop, AsyncCallback<DBPediaResponse> callback)
 			throws IllegalArgumentException;
-	
+
 }

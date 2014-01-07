@@ -3,8 +3,6 @@ package com.sottotesto.server;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -24,16 +22,11 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static org.apache.log4j.Logger log= Logger.getLogger(DBPediaServiceImpl.class);
+	//private static org.apache.log4j.Logger log= Logger.getLogger(DBPediaServiceImpl.class);
 
 	public DBPediaResponse sendToServer(TagmeResponse tagmResp, List<String> dbprop) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
 
-//				select*
-//				where { 
-//				  <http://dbpedia.org/resource/Diego_Maradona> ?p ?o
-//				filter regex(?p, dbpprop:)
-//				}
 
 		DBPediaResponse responseQuery;
 		ResultSet results = null;
@@ -63,14 +56,14 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 							//"FILTER (LANG(?"+dbprop.get(j)+") = \"en\") .\n"+
 							" }\n" +	            
 							"";
-					  Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
+					Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 					Query query2 = QueryFactory.create(s2); //s2 = the query above
 					QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
 					results = qExe.execSelect();
 					//TODO fix xmlresult
 					resultQueryXML += ResultSetFormatter.asXMLString(results);
 					resultQueryText += ResultSetFormatter.asText(results);
-					
+
 				}
 				//TODO output in json
 
