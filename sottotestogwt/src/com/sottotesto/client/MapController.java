@@ -33,6 +33,7 @@ public class MapController {
 	SimplePanel mapContainer;
 	MapOptions options;
 	GoogleMap theMap;
+	InfoWindow info;
 	
 	//lista links per i marker colorati da mettere sulla mappa
 	List<String> markerColoredLinks;
@@ -158,7 +159,8 @@ public class MapController {
 		m.addClickListener(new Marker.ClickHandler() {			
 			@Override
 			public void handle(MouseEvent event) {
-				InfoWindow info = InfoWindow.create();				
+				 if (info != null) info.close();
+				 info = InfoWindow.create();				
 				 final HTMLPanel html = new HTMLPanel((htmlInfo));
 		            info.setContent(html.getElement());
 		            info.setPosition(position);
