@@ -67,7 +67,6 @@ public class Sottotestogwt implements EntryPoint {
 	private final EkpServiceAsync ekpService = GWT.create(EkpService.class);
 	private final DBPediaQueryAsync dbpqService = GWT.create(DBPediaQuery.class);
 	private final ListServiceAsync listService = GWT.create(ListService.class);
-	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
 	
 	private int ekpRemainingCallNum = 0;
 	private List<String> ekpRemainingCallInputs = new ArrayList<String>();
@@ -477,7 +476,7 @@ public class Sottotestogwt implements EntryPoint {
 				else {
 					rc.loadTree(treeStore); 
 					rc.getTree().expandAll();
-					callGraphService(listFD);
+					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
 				}
 			}});		
 	}
@@ -543,22 +542,6 @@ public class Sottotestogwt implements EntryPoint {
 
 	}
 	
-	private void callGraphService(List<String> listFD){
-		
-		GraphService.sendToServer(listFD, new AsyncCallback<String>() {
-			public void onFailure(Throwable caught) {
-				//set the error
-				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onFailure()");
-			}
-
-			public void onSuccess(String result) {
-				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onSuccess()");
-				Debug.printDbgLine(result);
-			}
-			});
-		
-	}
-
 
 	private void InitServiceStatusPanel(){
 		Debug.printDbgLine("Sottotestogwt.java: initServiceStatusPanel()");
@@ -621,7 +604,11 @@ public class Sottotestogwt implements EntryPoint {
 		treeDataIdProvider = 0; //tree entries id counter
 		treeProperties = GWT.create(TreeDataProperties.class); // Generate the key provider and value provider for the Data class
 		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
-		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph");
+		
+		//temporaneo per luca:
+		//tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph");
+		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph", TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD);
+		
 		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Hypertree Graph");
 		tdMap = new TreeData(String.valueOf(treeDataIdProvider++),"Knowledge Map");
 

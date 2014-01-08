@@ -5,6 +5,7 @@ public class TreeData {
 	public static final class CLICK_ACTIONS {
 		public static final String NOTHING = "nothing";
 		public static final String SHOWGRAPH_FD = "showGraphFD";
+		public static final String SHOWJOINEDGRAPH_FD = "showJoinedGraphFD";
 		public static final String SHOWGRAPH_HT = "showGraphHT";	
 		public static final String SHOWMAP = "showMap";
 	}

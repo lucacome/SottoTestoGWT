@@ -8,6 +8,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.LatLng;
@@ -60,6 +61,8 @@ public class ResultController {
 
 	//infovis data
 	private InfovisController infovisC;
+	private List<String> listFD;
+	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
 
 	//map data
 	private MapController mapC;
@@ -255,6 +258,9 @@ public class ResultController {
 				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 				infovisC.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
 			}
+			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD)) {
+				callGraphService(listFD);				
+			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
@@ -291,6 +297,30 @@ public class ResultController {
 	}
 
 
+private void callGraphService(List<String> listFD){
+		
+		GraphService.sendToServer(listFD, new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				//set the error
+				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onFailure()");
+			}
+
+			public void onSuccess(String result) {
+				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onSuccess()");
+				Debug.printDbgLine(result);
+				
+				// show the graph with the result json
+				infovisC = new InfovisController();	// initialize new infovis controller
+				centerPanel.clear(); 				// clear centerpanel contents	
+				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
+				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
+				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");				
+				infovisC.showGraph(result, InfovisController.GRAPH_TYPE.FORCEDIRECTED);				
+			}
+			});
+		
+	}
+	
 	public void setJsonFD(String jdata){
 
 		//Debug.printDbgLine("JSONDF="+jsonFD);	
@@ -317,5 +347,10 @@ public class ResultController {
 	}
 	public void addDBpediaMarkerSingleToMap(DBPQueryResp dbpqMarker ){
 		if (mapC != null) mapC.loadSingleDBPQmarkerOnMap(dbpqMarker);
+	}
+	
+	public void setListFD(List<String> listFDnew){
+		listFD = new ArrayList<String>();
+		listFD = listFDnew;
 	}
 }
