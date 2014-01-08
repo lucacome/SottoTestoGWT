@@ -29,6 +29,7 @@ import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
+import com.sottotesto.server.JData;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
@@ -49,6 +50,7 @@ public class Sottotestogwt implements EntryPoint {
 	//title panel items
 	private String textAreaDefText; //default text written on textarea
 	private String textSendButton;  //default tet written on send button
+//	private String finalFDstring;
 	private Button sendButton;     //button to call tagme
 	private TextArea textArea;     //textarea for user input
 	private Label textAreaLabel;   //label for text area
@@ -57,7 +59,7 @@ public class Sottotestogwt implements EntryPoint {
 	private HTML titleHTML;
 	private HorizontalLayoutContainer searchPanelHC;
 	private FlowPanel textAreaFP;
-
+	private List<String> listFD = new ArrayList<String>();
 
 	// Create remote service proxyes to talk to the server-side services
 	private final TagmeServiceAsync tagmeService = GWT.create(TagmeService.class);	
@@ -65,6 +67,8 @@ public class Sottotestogwt implements EntryPoint {
 	private final EkpServiceAsync ekpService = GWT.create(EkpService.class);
 	private final DBPediaQueryAsync dbpqService = GWT.create(DBPediaQuery.class);
 	private final ListServiceAsync listService = GWT.create(ListService.class);
+	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
+	
 	private int ekpRemainingCallNum = 0;
 	private List<String> ekpRemainingCallInputs = new ArrayList<String>();
 
@@ -376,6 +380,7 @@ public class Sottotestogwt implements EntryPoint {
 
 					ekpResp = new ArrayList<EkpResponse>();
 					callEkp();
+					Debug.printDbgLine("SONO QUI");
 				}						
 			}
 		});
@@ -442,11 +447,12 @@ public class Sottotestogwt implements EntryPoint {
 				String jsonFD = "["+result.jdataFD+"]";	
 
 				callListService(ekpRespTmp);
-
+				listFD.add(jsonFD);
+				
 				//rc.setJsonHT(tem);
 				//rc.setJsonFD(tem2);
 				//Debug.printDbgLine("MAIN="+tem);
-
+				
 				// create tree entry for Maps
 				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWMAP));
 				treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
@@ -465,8 +471,14 @@ public class Sottotestogwt implements EntryPoint {
 				if (ekpRespTmp.getCode()==200) HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
 				else HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 
-				if (ekpRemainingCallNum>0){callEkp();}
-				else {rc.loadTree(treeStore); rc.getTree().expandAll();}
+				if (ekpRemainingCallNum>0){
+					callEkp();
+				}
+				else {
+					rc.loadTree(treeStore); 
+					rc.getTree().expandAll();
+					callGraphService(listFD);
+				}
 			}});		
 	}
 
@@ -529,6 +541,22 @@ public class Sottotestogwt implements EntryPoint {
 
 			}});
 
+	}
+	
+	private void callGraphService(List<String> listFD){
+		
+		GraphService.sendToServer(listFD, new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				//set the error
+				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onFailure()");
+			}
+
+			public void onSuccess(String result) {
+				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onSuccess()");
+				Debug.printDbgLine(result);
+			}
+			});
+		
 	}
 
 
