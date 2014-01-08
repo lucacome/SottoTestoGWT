@@ -7,5 +7,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("graphservice")
 public interface GraphService extends RemoteService {
-	String sendToServer(List<String> fdfinal) throws IllegalArgumentException;
+	String sendToServer(List<String> fdfinal, List<String> selectedDbpLinks) throws IllegalArgumentException;
 }

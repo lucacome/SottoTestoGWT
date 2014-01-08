@@ -352,6 +352,8 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
 					showTaggedResult();
 
+					rc.setTagmeResp(tagmeResp);
+					
 					//chiamiamo DBPedia							
 					List<String> dbproperty = new ArrayList<String>();
 					//dbproperty.add("birthDate");

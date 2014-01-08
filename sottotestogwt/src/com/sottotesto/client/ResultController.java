@@ -79,7 +79,8 @@ public class ResultController {
 
 	//search phrase data
 	String searchedPhrase;	
-	TagmeResponse tagmeResp;
+	
+	private TagmeResponse tagmeResp;
 
 
 
@@ -246,11 +247,9 @@ public class ResultController {
 		Debug.printDbgLine("ResultController.java: handleTreeClick("+treeDataSelected.getName()+")");
 
 		if (!treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.NOTHING)){
-
-			//show loading gif
-			showLoading();
-
+	
 			if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD)) {
+				showLoading();
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
@@ -258,10 +257,11 @@ public class ResultController {
 				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 				infovisC.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
 			}
-			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD)) {
-				callGraphService(listFD);				
+			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD)) {				
+				GraphEntityChooser.showDialog(tagmeResp.getTitleTag(), this); //mostra il dialog per scegliere le entita' da confrontare
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
+				showLoading();
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
@@ -270,6 +270,7 @@ public class ResultController {
 				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
+				showLoading();
 				showMap(treeDataSelected.getName());
 			}
 			else {
@@ -297,9 +298,23 @@ public class ResultController {
 	}
 
 
-private void callGraphService(List<String> listFD){
+//questa viene chiamata da GraphEntityChooser quando l'utente seleziona piu entita per un confronto
+public void prepareToCallGraphService(List<String> selectedEntities){
+	if (selectedEntities.size()<2){
+		Info.display("WARNING", "Hai selezionato troppe poche entita' per fare un confronto!");
+	}
+	else{
+		List<String> selectedDBPlinks = new ArrayList<String>();
+		for (String s : selectedEntities){
+			selectedDBPlinks.add("http://dbpedia.org/resource/"+s);
+		}
+		Debug.printDbgLine("Sottotestogwt.java: prepareToCallGraphService(): calling graphService...");
+		callGraphService(listFD, selectedDBPlinks);
+	}
+}	
+private void callGraphService(List<String> listFD, List<String> selectedDbpLinks){
 		
-		GraphService.sendToServer(listFD, new AsyncCallback<String>() {
+		GraphService.sendToServer(listFD, selectedDbpLinks, new AsyncCallback<String>() {
 			public void onFailure(Throwable caught) {
 				//set the error
 				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onFailure()");
@@ -352,5 +367,10 @@ private void callGraphService(List<String> listFD){
 	public void setListFD(List<String> listFDnew){
 		listFD = new ArrayList<String>();
 		listFD = listFDnew;
+	}
+	
+	public void setTagmeResp(TagmeResponse tgmRsp){
+		tagmeResp = new TagmeResponse();
+		tagmeResp = tgmRsp;
 	}
 }
