@@ -88,6 +88,7 @@ public class ResultController {
 		Debug.printDbgLine("ResultController.java: init()");
 
 		markerList = new ArrayList<DBPQueryResp>();
+		listFD = new ArrayList<String>();
 
 		panelMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 		int bottomMargin = 5;
