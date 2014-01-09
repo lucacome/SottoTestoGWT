@@ -38,6 +38,7 @@ import com.sottotesto.shared.STResources;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.TreeData;
 import com.sottotesto.shared.TreeDataProperties;
+import com.sottotesto.shared.Utility;
 
 
 /* USAGE:
@@ -55,7 +56,7 @@ public class ResultController {
 	private BoxLayoutData vBoxData;
 	private HTML defaultCenterHTML;
 	private String HTMLsearchSomethingString="<div class=\"result_searchSomethingString\">Effettua una ricerca!</div>";
-	private String HTMLloadIconString="<div class=\"result_loadingGifContainer\"><img class=\"result_loadingGif\" src='loading.gif'/></div>";
+	//private String HTMLloadIconString="<div class=\"result_loadingGifContainer\"><img class=\"result_loadingGif\" src='loading.gif'/></div>";
 	private String HTMLerrorString="<div class=\"result_errorString\">E' avvenuto un errore, rieffettua la tua ricerca!</div>";
 
 	//infovis data
@@ -138,7 +139,7 @@ public class ResultController {
 
 	public void reInit(){
 		lcwest.clear(); //remove tree
-		showLoading(); //show loading gif
+		showLoading(true); //show loading gif
 	}
 
 	public void showError(){
@@ -147,9 +148,13 @@ public class ResultController {
 		centerPanel.add(new HTML(HTMLerrorString));
 	}
 
-	public void showLoading(){
-		centerPanel.clear();	// clear centerpanel contents
-		centerPanel.add(new HTML(HTMLloadIconString));
+	public void showLoading(boolean visible){
+		//centerPanel.clear();	// clear centerpanel contents
+		//centerPanel.add(new HTML(HTMLloadIconString));
+		
+		if(visible)	Utility.showLoadingBar();
+		else Utility.hideLoadingBar();
+		
 	}
 
 	public void loadTree(TreeStore<TreeData> ts){
@@ -242,28 +247,30 @@ public class ResultController {
 		if (!treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.NOTHING)){
 	
 			if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD)) {
-				showLoading();
+				showLoading(true);
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
 				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 				infovisC.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
+				showLoading(false);
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD)) {				
 				GraphEntityChooser.showDialog(tagmeResp.getTitleTag(), this); //mostra il dialog per scegliere le entita' da confrontare
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
-				showLoading();
+				showLoading(true);
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
 				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
+				showLoading(false);
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
-				showLoading();
+				showLoading(true);
 				showMap(treeDataSelected.getName());
 			}
 			else {
@@ -285,9 +292,10 @@ public class ResultController {
 		mapC.getMap().triggerResize();
 		mapC.getMap().setCenter(LatLng.create(35,-40)); 
 		//END BUGFIX	
-
+		
 		if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
-		mapC.loadMarkers(mapName); //load only right markers, depending on selected map
+		showLoading(false); //hide loading
+		mapC.loadMarkers(mapName); //load only right markers, depending on selected map		
 	}
 
 
@@ -297,6 +305,7 @@ public void prepareToCallGraphService(List<String> selectedEntities){
 		Info.display("WARNING", "Hai selezionato troppe poche entita' per fare un confronto!");
 	}
 	else{
+		showLoading(true);
 		List<String> selectedDBPlinks = new ArrayList<String>();
 		for (String s : selectedEntities){
 			selectedDBPlinks.add("http://dbpedia.org/resource/"+s);
@@ -311,6 +320,7 @@ private void callGraphService(List<String> listFD, List<String> selectedDbpLinks
 			public void onFailure(Throwable caught) {
 				//set the error
 				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onFailure()");
+				showLoading(false);
 			}
 
 			public void onSuccess(String result) {
@@ -323,7 +333,8 @@ private void callGraphService(List<String> listFD, List<String> selectedDbpLinks
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
 				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");				
-				infovisC.showGraph(result, InfovisController.GRAPH_TYPE.FORCEDIRECTED);				
+				infovisC.showGraph(result, InfovisController.GRAPH_TYPE.FORCEDIRECTED);		
+				showLoading(false); //hide loading
 			}
 			});
 		

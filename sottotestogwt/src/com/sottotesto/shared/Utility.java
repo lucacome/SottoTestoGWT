@@ -3,11 +3,23 @@ package com.sottotesto.shared;
 import java.io.UnsupportedEncodingException;
 
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TabPanel;
+import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
 
 public class Utility {
 
-	public static TabPanel tabPaneldbpDB;
+	static AutoProgressMessageBox loadingBox;
+	
+	public static void showLoadingBar(){
+		loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
+		loadingBox.setProgressText("... Working ...");
+		loadingBox.setShadow(true);
+		loadingBox.auto();
+		loadingBox.show();
+	}
+	public static void hideLoadingBar(){
+		if (loadingBox != null) loadingBox.hide();
+	}
+	
 
 	public static long calcTimeTookMs(long StartTimeMs){
 		return (System.currentTimeMillis()-StartTimeMs);

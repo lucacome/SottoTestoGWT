@@ -320,6 +320,7 @@ public class Sottotestogwt implements EntryPoint {
 				HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 				HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 				rc.showError();
+				rc.showLoading(false);
 			}
 
 			public void onSuccess(TagmeResponse result) {
@@ -341,6 +342,7 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 					HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 					rc.showError();
+					rc.showLoading(false);
 				}
 				else if (tagmeResp.getTitleTag().size()==0){
 					//Tagme OK, ma non ha taggato nulla!
@@ -351,6 +353,7 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 					HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 					rc.showError();
+					rc.showLoading(false);
 				}
 				else {
 					//Tagme OK
@@ -735,7 +738,7 @@ public class Sottotestogwt implements EntryPoint {
 
 		//show Loading Icon
 		RootPanel.get("homeLoading").setVisible(true);
-
+		rc.showLoading(true);
 
 
 		//brutal way: reload page (really long wait)
@@ -768,6 +771,7 @@ public class Sottotestogwt implements EntryPoint {
 
 		//show Loading Icon
 		RootPanel.get("homeLoading").setVisible(false);
+		rc.showLoading(false);
 	}
 
 }
