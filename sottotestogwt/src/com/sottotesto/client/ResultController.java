@@ -56,7 +56,6 @@ public class ResultController {
 	private HTML defaultCenterHTML;
 	private String HTMLsearchSomethingString="<div class=\"result_searchSomethingString\">Effettua una ricerca!</div>";
 	private String HTMLloadIconString="<div class=\"result_loadingGifContainer\"><img class=\"result_loadingGif\" src='loading.gif'/></div>";
-	private String HTMLselectSomethingString="<div class=\"result_selectSomethingString\">Seleziona una vista dall'elenco a sinistra</div>";
 	private String HTMLerrorString="<div class=\"result_errorString\">E' avvenuto un errore, rieffettua la tua ricerca!</div>";
 
 	//infovis data
@@ -93,8 +92,6 @@ public class ResultController {
 		panelMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 		int bottomMargin = 5;
 		panelMaxHeight = RootPanel.get().getOffsetHeight()-
-				//RootPanel.get("title").getOffsetHeight()-
-				//RootPanel.get("homeLoading").getOffsetHeight()-
 				RootPanel.get("searchContainer").getOffsetHeight()-
 				RootPanel.get("servicesContainer").getOffsetHeight()-
 				bottomMargin;
@@ -235,11 +232,6 @@ public class ResultController {
 
 		lcwest.add(treeContainer);
 
-		/* NO MORE SINCE WE DIRECTLY SHOW THE MAP
-		centerPanel.clear();	// clear centerpanel contents
-		centerPanel.add(new HTML(HTMLselectSomethingString));
-		centerPanel.getWidget().setHeight(String.valueOf(centerPanel.getOffsetHeight()+"px")); //html grande quando si puo'
-		 */
 		showMap("Mappa completa");
 	}
 

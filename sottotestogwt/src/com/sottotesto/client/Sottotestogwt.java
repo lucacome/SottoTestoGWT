@@ -1,7 +1,5 @@
 package com.sottotesto.client;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +29,6 @@ import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
-import com.sottotesto.server.JData;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
@@ -75,6 +72,7 @@ public class Sottotestogwt implements EntryPoint {
 
 
 	//Service status panel items
+	ServicePanelLogger spLogger;
 	ContentPanel serviceStatusPanel = null;
 	HorizontalLayoutContainer serviceStatusPanelHC;
 	VerticalPanel tagmeStatusVP;
@@ -154,7 +152,6 @@ public class Sottotestogwt implements EntryPoint {
 	//initialize items and load them on page
 	private void initItems(){
 		Debug.printDbgLine("Sottotestogwt.java: initItems()");
-
 		panelsMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 
 		//init services responses
@@ -315,6 +312,9 @@ public class Sottotestogwt implements EntryPoint {
 						"<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 
 				HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL); //show the fail
+				
+				//update log
+				spLogger.addTAGMElog(tagmeResp);
 
 				//skip all other services
 				HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
@@ -327,7 +327,10 @@ public class Sottotestogwt implements EntryPoint {
 
 				sendButton.setEnabled(true); //allow user for a new search
 
-				tagmeResp = result; //save the result				
+				tagmeResp = result; //save the result	
+				
+				//update log
+				spLogger.addTAGMElog(tagmeResp);
 
 				if (!(tagmeResp.getCode()==200)){
 					//Tagme ha avuto qualche problema!
@@ -410,6 +413,8 @@ public class Sottotestogwt implements EntryPoint {
 
 				dbpediaResp = result;
 
+				spLogger.addDBPlog(result);
+				
 				if (dbpediaResp.getCode()!=200) HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
 				else HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);			
 			}});
@@ -429,6 +434,9 @@ public class Sottotestogwt implements EntryPoint {
 		Debug.printDbgLine("Sottotestogwt.java: Ekp input="+input);
 		ekpService.sendToServer(input, new AsyncCallback<EkpResponse>() {
 			public void onFailure(Throwable caught) {
+				
+				
+				
 				//set the error
 				EkpResponse ekpRespTmp = new EkpResponse();
 				ekpRespTmp.setCode(-1);
@@ -438,6 +446,9 @@ public class Sottotestogwt implements EntryPoint {
 				ekpResp.add(ekpRespTmp);
 				HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 
+				//update log
+				spLogger.addEKPlog(ekpRespTmp);
+				
 				if (ekpRemainingCallNum>0){callEkp();}
 			}
 
@@ -451,6 +462,9 @@ public class Sottotestogwt implements EntryPoint {
 				
 				EkpResponse ekpRespTmp = new EkpResponse();
 				ekpRespTmp = result;
+				
+				//update log
+				spLogger.addEKPlog(ekpRespTmp);
 
 				String jsonHT = "["+result.jdataHT+"]";
 				String jsonFD = "["+result.jdataFD+"]";	
@@ -511,9 +525,11 @@ public class Sottotestogwt implements EntryPoint {
 
 			public void onSuccess(DBPQueryResp result) {
 				dbpqCallsDone++; //update main counter
-				updateDBpediaServiceLabel(resp); //show the status		
-								
-				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+resp.getCallNum()+"/"+resp.getMaxCalls()+" - "+result.getEntity()+" - "+result.getName()+" -> "+result.getLat()+","+result.getLng());
+				updateDBpediaServiceLabel(result); //show the status		
+				
+				spLogger.updateDBPQlog(result);
+				
+				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+result.getCallNum()+"/"+result.getMaxCalls()+" - "+result.getEntity()+" - "+result.getName()+" -> "+result.getLat()+","+result.getLng());
 
 				//Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation()+", abstract="+result.getAbstract());
 				if (result.getLat() != 0.0 && result.getLng() != 0.0)
@@ -539,6 +555,8 @@ public class Sottotestogwt implements EntryPoint {
 			public void onSuccess(List<DBPQueryResp> result) {
 				//update main counter
 				dbpqCallsToDo+=result.size();
+				
+				spLogger.addDBPlog(result.get(0)); //add new tab to dbpedia service log
 				
 				Iterator<DBPQueryResp> iter = result.iterator();
 				Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess(): calling DBPQ "+result.size()+" times for "+result.get(0).getEntity());
@@ -568,7 +586,8 @@ public class Sottotestogwt implements EntryPoint {
 		serviceStatusPanel.setWidth(panelsMaxWidth);
 		serviceStatusPanel.setHeight(RootPanel.get("servicesContainer").getOffsetHeight()+"px");
 		serviceStatusPanelHC = new HorizontalLayoutContainer();
-
+		spLogger = new ServicePanelLogger();
+		
 		//tagme service
 		HtmlTagmeService = new HTML();
 		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
@@ -578,7 +597,7 @@ public class Sottotestogwt implements EntryPoint {
 		tagmeStatusVP.add(HtmlTagmeService);	
 		tagmeStatusVP.setBorderWidth(0);
 		HtmlTagmeService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlTagmeService.getHTML().contains("Waiting")) Utility.showTagmeDataDB(tagmeResp);}});
+			if(!HtmlTagmeService.getHTML().contains("Waiting")) spLogger.showTagmeDataDB();}});
 
 		//dbpedia service
 		HtmlDBPediaService = new HTML();
@@ -589,7 +608,7 @@ public class Sottotestogwt implements EntryPoint {
 		dbpediaStatusVP.add(HtmlDBPediaService);
 		dbpediaStatusVP.setBorderWidth(0);
 		HtmlDBPediaService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlDBPediaService.getHTML().contains("Waiting")) Utility.showDBPediaDataDB(dbpediaResp);}});
+			if(!HtmlDBPediaService.getHTML().contains("Waiting")) spLogger.showDBPediaDataDB();}});
 
 		//ekp service
 		HtmlEkpService = new HTML();
@@ -600,7 +619,7 @@ public class Sottotestogwt implements EntryPoint {
 		ekpStatusVP.add(HtmlEkpService);
 		ekpStatusVP.setBorderWidth(0);
 		HtmlEkpService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlEkpService.getHTML().contains("Waiting")) Utility.showEkpDataDB(ekpResp);}});
+			if(!HtmlEkpService.getHTML().contains("Waiting")) spLogger.showEkpDataDB();}});
 
 		//add items to panel
 		serviceStatusPanelHC.add(HtmlTagmeService, new HorizontalLayoutData(0.33, 1, new Margins(4)));
@@ -737,9 +756,10 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("searchContainer").add(titleContentPanel);
 
 		//reinit service status panel items
-		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
-		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
-		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
+		//HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
+		//HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
+		//HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
+		InitServiceStatusPanel();
 
 		//reinit results panel items
 		RootPanel.get("resultsContainer").clear();

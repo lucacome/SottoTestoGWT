@@ -1,26 +1,13 @@
 package com.sottotesto.shared;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.List;
 
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.dom.client.Node;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Event.NativePreviewEvent;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
-import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 
 public class Utility {
 
-
+	public static TabPanel tabPaneldbpDB;
 
 	public static long calcTimeTookMs(long StartTimeMs){
 		return (System.currentTimeMillis()-StartTimeMs);
@@ -35,200 +22,9 @@ public class Utility {
 		return cleanString;
 	}
 	
-	public static void showTagmeDataDB(TagmeResponse tagmeResp){
-		Debug.printDbgLine("Utility.java: showTagmeDataDB()");
+	
 
-		final ExtendedDialogBox dialogBox = new ExtendedDialogBox();
-		dialogBox.setText("Tagme Data");
-		dialogBox.setAnimationEnabled(false);
-		dialogBox.getElement().setId("tagmeDataDB");
-
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(tagmeResp.getTime())+"ms"));
-		dialogVPanel.add(new HTML("<br><b>Code:</b> "+String.valueOf(tagmeResp.getCode())));
-		dialogVPanel.add(new HTML("<br><b>Message:</b> "+tagmeResp.getMessage()));
-		dialogVPanel.add(new HTML("<br><b>ContentType:</b> "+tagmeResp.getContentType()));
-
-		if (tagmeResp.getCode() != 200)
-			dialogVPanel.add(new HTML("<br><b>Error:</b> "+tagmeResp.getError()));
-		else{ // got 200			
-			dialogVPanel.add(new HTML("<br><b>Number of Total Json Resource:</b> "+tagmeResp.getResNum()));
-			if (tagmeResp.getResNum()>0)
-			{
-				dialogVPanel.add(new HTML("<br><b>Number of Relevant Tags found:</b> "+tagmeResp.getTitleTag().size()));
-
-				if (!tagmeResp.getTitleTag().isEmpty())
-				{
-					String taggedTotal="";
-					Iterator<String> tagged = tagmeResp.getTitleTag().iterator();
-					while (tagged.hasNext()){
-						taggedTotal+=tagged.next()+"<br>";
-					}
-					dialogVPanel.add(new HTML("<br><b>Elements tagged:</b><br> "+taggedTotal));
-					dialogVPanel.add(new HTML("<br><b>Json data:</b><br> "+tagmeResp.getJson().replaceAll(",",",<br>")));
-				}
-
-			}
-
-
-		}
-
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-
-		FlowLayoutContainer container = new FlowLayoutContainer();
-		container.setScrollMode(ScrollMode.AUTO);		
-		container.add(dialogVPanel);		
-		dialogBox.setWidget(container);		
-		dialogBox.center(); //must be done for updating data for resizing
-		Debug.printDbgLine("Utility.java: showTagmeDataDB(): dialogHeight="+container.getOffsetHeight());
-		if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
-		if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
-
-		dialogBox.center();
-		dialogBox.show();
-
-
-
-
-
-	}
-
-	public static void showDBPediaDataDB(DBPediaResponse dbpediaResp){
-		Debug.printDbgLine("Utility.java: showDBPediaDataDB()");
-
-		final ExtendedDialogBox dialogBox = new ExtendedDialogBox();
-		dialogBox.setText("DBPedia Data");
-		dialogBox.setAnimationEnabled(false);
-		dialogBox.getElement().setId("dbPediaDataDB");
-
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms"));
-		dialogVPanel.add(new HTML("<br><b>Code:</b> "+String.valueOf(dbpediaResp.getCode())));
-
-
-		if (dbpediaResp.getCode()==200){
-			dialogVPanel.add(new HTML("<br><b>Result Query:</b><br>"+dbpediaResp.getQueryResultXML()));
-		}
-		else{
-			dialogVPanel.add(new HTML("<br><b>Error:</b><br>"+dbpediaResp.getError()));			
-		}
-
-
-
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-		FlowLayoutContainer container = new FlowLayoutContainer();
-		container.setScrollMode(ScrollMode.AUTO);
-		container.add(dialogVPanel);
-		dialogBox.setWidget(container);
-		dialogBox.center(); //must be done for updating data for resizing
-		Debug.printDbgLine("Utility.java: showDBPediaDataDB(): dialogHeight="+container.getOffsetHeight());
-		//if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
-		//if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
-		container.setHeight(getDbMaxHeight());
-		container.setWidth(getDbMaxWidth());
-
-		dialogBox.center();		
-		dialogBox.show();
-	}
-
-	public static void showEkpDataDB(List<EkpResponse> ekpResp){
-		Debug.printDbgLine("Utility.java: showEkpDataDB()");
-
-		final ExtendedDialogBox dialogBox = new ExtendedDialogBox();
-		dialogBox.setText("Ekp Data");
-		dialogBox.setAnimationEnabled(false);
-		dialogBox.getElement().setId("ekpDataDB");
-
-
-		TabPanel folder = new TabPanel();		 
-		int tabNum = ekpResp.size();
-
-		for (int i=0; i<tabNum; i++){
-			VerticalPanel dialogVPanel = new VerticalPanel();
-			dialogVPanel.addStyleName("dialogVPanel");
-			dialogVPanel.add(new HTML("<b>Response time:</b> "+String.valueOf(ekpResp.get(i).getTime())+"ms"));
-			dialogVPanel.add(new HTML("<br><b>Code:</b> "+String.valueOf(ekpResp.get(i).getCode())));
-			dialogVPanel.add(new HTML("<br><b>Message:</b> "+ekpResp.get(i).getMessage()));
-			dialogVPanel.add(new HTML("<br><b>ContentType:</b> "+ekpResp.get(i).getContentType()));
-
-			if (ekpResp.get(i).getCode() != 200)
-				dialogVPanel.add(new HTML("<br><b>Error:</b> "+ekpResp.get(i).getError()));
-			else{
-				dialogVPanel.add(new HTML("<br><b>Response:</b> "));
-				HTML rdfHtml = new HTML(); rdfHtml.setText(ekpResp.get(i).jdataHT);
-				dialogVPanel.add(rdfHtml);
-			}
-			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-			folder.add(dialogVPanel, ekpResp.get(i).getTag());
-		}
-
-		folder.selectTab(0);
-		FlowLayoutContainer container = new FlowLayoutContainer();
-		container.setScrollMode(ScrollMode.AUTO);
-		container.add(folder);
-		dialogBox.setWidget(container);
-		dialogBox.center(); //must be done for updating data for resizing
-		Debug.printDbgLine("Utility.java: showEKPDataDB(): dialogHeight="+container.getOffsetHeight());
-		//if (container.getOffsetHeight()>getDbMaxHeight()) container.setHeight(getDbMaxHeight());
-		//if (container.getOffsetWidth()>getDbMaxWidth()) container.setWidth(getDbMaxWidth());
-		container.setHeight(getDbMaxHeight());
-		container.setWidth(getDbMaxWidth());
-
-		dialogBox.center();		
-		dialogBox.show();	
-	}
-
-
-	private static class ExtendedDialogBox extends DialogBox {
-
-		private Node closeEventTarget = null;
-
-		public ExtendedDialogBox() {
-			// get the "dialogTopRight" class td
-			Element dialogTopRight = getCellElement(0, 2);
-
-			// close button image html
-			dialogTopRight.setInnerHTML(
-					"<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\">" + 
-							"<img src=\"closeicon.gif\" height=\"20px\"/>" + 
-					"</div>");
-
-			// set the event target
-			closeEventTarget = dialogTopRight.getChild(0).getChild(0);
-		}
-
-		@Override
-		protected void onPreviewNativeEvent(NativePreviewEvent event) {
-			super.onPreviewNativeEvent(event);
-
-			NativeEvent nativeEvent = event.getNativeEvent();
-
-			if (!event.isCanceled() 
-					&& (event.getTypeInt() == Event.ONCLICK)
-					&& isCloseEvent(nativeEvent))
-			{
-				this.hide();
-				this.removeFromParent();
-			}
-
-			switch (event.getTypeInt()) {
-			case Event.ONKEYDOWN:
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ESCAPE ||
-				event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					hide();
-					removeFromParent();
-				}
-				break;
-			}
-		}
-
-		// see if the click target is the close button
-		private boolean isCloseEvent(NativeEvent event) {
-			return event.getEventTarget().equals(closeEventTarget); //compares equality of the underlying DOM elements
-		} 
-	}
+	
 
 	public static String getErrorHtmlString (Throwable throwable) {
 		String ret="";
