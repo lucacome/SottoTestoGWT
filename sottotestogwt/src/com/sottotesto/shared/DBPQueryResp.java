@@ -14,6 +14,10 @@ public class DBPQueryResp implements java.io.Serializable {
 	private String abstr;
 	private double lat;
 	private double lng;
+	
+	//for updating service interface
+	private int call;
+	private int callMax;
 
 
 
@@ -24,6 +28,8 @@ public class DBPQueryResp implements java.io.Serializable {
 		relation = "";
 		lat = 0.0;
 		lng = 0.0;
+		call=0;
+		callMax=0;
 
 	}
 	public void setEntity(String e){entity = e;}
@@ -32,6 +38,8 @@ public class DBPQueryResp implements java.io.Serializable {
 	public void setName(String n){name = n;}
 	public void setRelation(String r){relation = r;}
 	public void setGps(double lt, double lg){lat = lt; lng = lg;}
+	public void setCallNum(int callNum){call=callNum;}
+	public void setMaxCall(int maxCalls){callMax=maxCalls;}
 	public String getEntity(){return entity;}
 	public String getAbstract(){return abstr;}
 	public String getLink(){return link;}
@@ -39,6 +47,8 @@ public class DBPQueryResp implements java.io.Serializable {
 	public String getRelation(){return relation;}
 	public double getLat(){return lat;}
 	public double getLng(){return lng;}
+	public int getCallNum(){return call;}
+	public int getMaxCalls(){return callMax;}
 
 
 }
