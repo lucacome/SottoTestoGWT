@@ -1,5 +1,7 @@
 package com.sottotesto.client;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -442,6 +444,11 @@ public class Sottotestogwt implements EntryPoint {
 			public void onSuccess(EkpResponse result) {			
 				Debug.printDbgLine("Sottotestogwt.java: Ekp output="+result.getMessage());
 
+				//clean non-utf8 characters
+				result.jdataHT = Utility.toUTF8(result.jdataHT);
+				result.jdataFD = Utility.toUTF8(result.jdataFD);
+				
+				
 				EkpResponse ekpRespTmp = new EkpResponse();
 				ekpRespTmp = result;
 
@@ -504,7 +511,8 @@ public class Sottotestogwt implements EntryPoint {
 
 			public void onSuccess(DBPQueryResp result) {
 				dbpqCallsDone++; //update main counter
-				updateDBpediaServiceLabel(resp); //show the status				
+				updateDBpediaServiceLabel(resp); //show the status		
+								
 				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+resp.getCallNum()+"/"+resp.getMaxCalls()+" - "+result.getEntity()+" - "+result.getName()+" -> "+result.getLat()+","+result.getLng());
 
 				//Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation()+", abstract="+result.getAbstract());

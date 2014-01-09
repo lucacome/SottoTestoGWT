@@ -1,5 +1,6 @@
 package com.sottotesto.shared;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +26,15 @@ public class Utility {
 		return (System.currentTimeMillis()-StartTimeMs);
 	}
 
+	public static String toUTF8(String dirtyString){
+		String cleanString = "";
+		
+		try {
+			cleanString = new String(dirtyString.getBytes(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {/*do nothing*/}		
+		return cleanString;
+	}
+	
 	public static void showTagmeDataDB(TagmeResponse tagmeResp){
 		Debug.printDbgLine("Utility.java: showTagmeDataDB()");
 
