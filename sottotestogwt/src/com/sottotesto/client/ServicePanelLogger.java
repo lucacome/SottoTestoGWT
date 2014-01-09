@@ -55,7 +55,7 @@ public class ServicePanelLogger {
 		tagmeFlowContainer.setWidth(Utility.getDbMaxWidth());
 		
 		tagmeDialogBox = new ExtendedDialogBox();
-		tagmeDialogBox.setText("EKP Data");
+		tagmeDialogBox.setText("TAGME Data");
 		tagmeDialogBox.setAnimationEnabled(false);
 		tagmeDialogBox.getElement().setId("tagmeDataDB");
 		tagmeDialogBox.setWidget(tagmeFlowContainer);
