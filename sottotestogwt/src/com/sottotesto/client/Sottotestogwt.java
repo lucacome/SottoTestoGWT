@@ -116,8 +116,9 @@ public class Sottotestogwt implements EntryPoint {
 	private TagmeResponse tagmeResp; //response of TAGME service
 	private DBPediaResponse dbpediaResp; //response of DBPEDIA service
 	private List<EkpResponse> ekpResp; //response of EKP service
-	int gpsCallsMax, gpsCallsEnded;
-
+	private int dbpqCallsDone;
+	private int dbpqCallsToDo;
+	
 	//resources
 	TextResource resourceHTMLmap;
 	DataResource resourceHTMLdata;
@@ -447,7 +448,7 @@ public class Sottotestogwt implements EntryPoint {
 				String jsonHT = "["+result.jdataHT+"]";
 				String jsonFD = "["+result.jdataFD+"]";	
 
-				callListService(ekpRespTmp);
+				//callListService(ekpRespTmp);
 				listFD.add(jsonFD);
 				
 				//rc.setJsonHT(tem);
@@ -476,49 +477,51 @@ public class Sottotestogwt implements EntryPoint {
 					callEkp();
 				}
 				else {
-					rc.loadTree(treeStore); 
+					rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
 					rc.getTree().expandAll();
 					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
+					callListService(ekpResp); //lancia il servizio di "cerca markers"
 				}
 			}});		
 	}
 
-	private void updateDBpediaServiceLabel(){
-		gpsCallsEnded++;
-		if (gpsCallsEnded >= gpsCallsMax){
+	private void updateDBpediaServiceLabel(DBPQueryResp resp){
+		if (dbpqCallsDone >= dbpqCallsToDo){
 			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
 		}
 		else{
-			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling+" ("+gpsCallsEnded+"/"+gpsCallsMax+")");
+			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling+" ("+resp.getCallNum()+"/"+resp.getMaxCalls()+")");
 		}
 	}
 
-	private void callDBPediaQuery(DBPQueryResp resp){
-		Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
-
+	private void callDBPediaQuery(final DBPQueryResp resp){
 		dbpqService.sendToServer(resp, new AsyncCallback<DBPQueryResp>() {
 			public void onFailure(Throwable caught) {
-				//set the error
-				updateDBpediaServiceLabel();
-				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onFailure() - call n."+gpsCallsEnded+"/"+gpsCallsMax);
+				dbpqCallsDone++; //update main counter				
+				updateDBpediaServiceLabel(resp); //show the status
+				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): ONFAILURE() - call n."+resp.getCallNum()+"/"+resp.getMaxCalls());
 			}
 
 			public void onSuccess(DBPQueryResp result) {
-				updateDBpediaServiceLabel();
-				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+gpsCallsEnded+"/"+gpsCallsMax);
+				dbpqCallsDone++; //update main counter
+				updateDBpediaServiceLabel(resp); //show the status				
+				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+resp.getCallNum()+"/"+resp.getMaxCalls()+" - "+result.getEntity()+" - "+result.getName()+" -> "+result.getLat()+","+result.getLng());
 
-				Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation()+", abstract="+result.getAbstract());
+				//Debug.printDbgLine("entity="+result.getEntity()+", link="+result.getLink()+", name="+result.getName()+", gps="+result.getLat()+", "+result.getLng()+", relation="+result.getRelation()+", relatio="+result.getRelation()+", abstract="+result.getAbstract());
 				if (result.getLat() != 0.0 && result.getLng() != 0.0)
 					rc.addDBpediaMarkerSingleToMap(result);  
 			}});
 
 	}
-	private void callListService(EkpResponse resp){
+	private void callListService(List<EkpResponse> respList){
 		Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
 
-		gpsCallsMax=0;
-		gpsCallsEnded=0;
-
+		//initialize main counter
+		dbpqCallsDone=0;
+		dbpqCallsToDo=0;
+		
+		for (EkpResponse resp : respList)
+		if(resp.getCode()==200)	
 		listService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
 			public void onFailure(Throwable caught) {
 				//set the error
@@ -526,17 +529,19 @@ public class Sottotestogwt implements EntryPoint {
 			}
 
 			public void onSuccess(List<DBPQueryResp> result) {
-				Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess()");
-
-				gpsCallsMax=result.size();
-
+				//update main counter
+				dbpqCallsToDo+=result.size();
+				
 				Iterator<DBPQueryResp> iter = result.iterator();
-				Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess(): DBPQ Size="+result.size());
+				Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess(): calling DBPQ "+result.size()+" times for "+result.get(0).getEntity());
 
 				DBPQueryResp temp = new DBPQueryResp();
-
+				int callNumber=1;
 				while (iter.hasNext()){
 					temp = iter.next();
+					temp.setCallNum(callNumber);
+					callNumber++;
+					temp.setMaxCall(result.size());
 					callDBPediaQuery(temp);
 				}
 
