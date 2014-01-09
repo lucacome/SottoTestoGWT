@@ -759,9 +759,9 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("searchContainer").add(titleContentPanel);
 
 		//reinit service status panel items
-		//HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
-		//HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
-		//HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
+		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
+		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
+		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
 		InitServiceStatusPanel();
 
 		//reinit results panel items
