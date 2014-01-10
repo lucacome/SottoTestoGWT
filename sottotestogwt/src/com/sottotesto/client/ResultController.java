@@ -63,6 +63,7 @@ public class ResultController {
 	private InfovisController infovisC;
 	private List<String> listFD;
 	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
+	private final GHTServiceAsync GHTService = GWT.create(GHTService.class);
 
 	//map data
 	private MapController mapC;
@@ -347,7 +348,7 @@ private void callGraphService(List<String> listFD, List<String> selectedDbpLinks
 	//questa viene chiamata da GraphLinkChooser quando l'utente seleziona piu entita per un confronto
 	public void prepareToCallGHTService(String jsonHT, List<String> selectedLinks){
 		if (selectedLinks.size()==0){
-			Info.display("WARNING", "Non hai selezionato entità da visualizzare!");
+			Info.display("WARNING", "Non hai selezionato entitï¿½ da visualizzare!");
 		}
 		else{
 			showLoading(true);
