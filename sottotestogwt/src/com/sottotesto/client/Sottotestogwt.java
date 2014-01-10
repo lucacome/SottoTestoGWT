@@ -740,6 +740,7 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("homeLoading").setVisible(true);
 		rc.showLoading(true);
 
+		listFD = new ArrayList<String>();
 
 		//brutal way: reload page (really long wait)
 		//Window.Location.reload();
