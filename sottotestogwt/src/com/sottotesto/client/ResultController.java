@@ -68,6 +68,7 @@ public class ResultController {
 	//map data
 	private MapController mapC;
 	List<DBPQueryResp> markerList; //Lista di marker ottenuti da dbpedia
+	private boolean firstMapLoad;
 
 	//tree data
 	private TreeDataProperties treeProperties;
@@ -135,7 +136,8 @@ public class ResultController {
 		vBoxData.setFlex(1);			
 
 		mapC = new MapController(); //initialize map controller	
-		mapC.init();		
+		mapC.init();	
+		firstMapLoad=true;
 	}
 
 	public void reInit(){
@@ -262,16 +264,6 @@ public class ResultController {
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
 				GraphLinksChooser.showDialog(treeDataSelected.getJsonHT(), this);
-				/*
-				showLoading(true);
-				infovisC = new InfovisController();	// initialize new infovis controller
-				centerPanel.clear(); 				// clear centerpanel contents	
-				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
-				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
-				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);
-				showLoading(false);
-				*/
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
 				showLoading(true);
@@ -294,12 +286,16 @@ public class ResultController {
 
 		//BUGFIX - the map doesn't show correctly for the second time, this is the fix (by lollo... fuck stackoverflow!)
 		mapC.getMap().triggerResize();
-		mapC.getMap().setCenter(LatLng.create(35,-40)); 
+		if(firstMapLoad){
+			mapC.getMap().setCenter(LatLng.create(35,-40));
+			firstMapLoad=false;
+		}
 		//END BUGFIX	
 		
 		if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
 		showLoading(false); //hide loading
-		mapC.loadMarkers(mapName); //load only right markers, depending on selected map		
+		//mapC.loadMarkers(mapName); //load only right markers, depending on selected map
+		mapC.loadMarkersDelayed(mapName, 0);
 	}
 
 

@@ -2,6 +2,7 @@ package com.sottotesto.shared;
 
 import java.io.UnsupportedEncodingException;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
 
@@ -33,7 +34,6 @@ public class Utility {
 		} catch (UnsupportedEncodingException e) {/*do nothing*/}		
 		return cleanString;
 	}
-	
 	
 
 	

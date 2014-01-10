@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,7 +30,7 @@ public class MapController {
 
 	//lista links per i marker colorati da mettere sulla mappa
 	List<String> markerColoredLinks;
-	List<Marker> loadedMarkersOnMap; //lista dei marker gia' caricati nella mappa (obbligatoria per toglierli purtroppo)
+	List<Marker> allMarkers; //lista dei marker gia' caricati nella mappa (obbligatoria per toglierli purtroppo)
 	List<String> entities;			 //stringhe con tutte le entita sulla mappa (usato per i colori)
 
 	//Altro
@@ -50,7 +51,7 @@ public class MapController {
 		markerColoredLinks.add("http://maps.google.com/mapfiles/marker_white.png");
 		markerColoredLinks.add("http://maps.google.com/mapfiles/marker_black.png");
 
-		loadedMarkersOnMap = new ArrayList<Marker>();
+		allMarkers = new ArrayList<Marker>();
 		entities = new ArrayList<String>();
 		curEntityMap = "";
 
@@ -118,16 +119,47 @@ public class MapController {
 		int loaded=0;
 
 		//cycle all markers
-		for(Marker m : loadedMarkersOnMap){
+		for(Marker m : allMarkers){
 
 			if (entityName.equals(fullMap)){ //LOAD ALL MARKERS
+				m.setAnimation(Animation.DROP);
 				m.setMap(theMap); loaded++;
 			}
 			else if(m.getTitle().contains(entityName)){ //LOAD MARKERS ONLY FOR SELECTED ENTITY
+				m.setAnimation(Animation.DROP);
 				m.setMap(theMap); loaded++;
 			}
 		}		
 		Debug.printDbgLine("ResultController.java: loadMarkers(): "+loaded+" markers loaded");
+	}
+	public void loadMarkersDelayed(final String entityName, final int index){
+
+		if (info != null) info.close();
+
+		curEntityMap=entityName; //update curren map showed
+
+		Timer nextCallTimer = new Timer() { 
+		    public void run() { 
+		        loadMarkersDelayed(entityName, index+1); 
+		    } 
+		}; 
+
+		//cycle all markers recursively and delayed
+		if (index<allMarkers.size()){
+			if (entityName.equals(fullMap)){ //LOAD ALL MARKERS
+				allMarkers.get(index).setAnimation(Animation.DROP);
+				allMarkers.get(index).setMap(theMap);
+				nextCallTimer.schedule(50);
+			}
+			else if(allMarkers.get(index).getTitle().contains(entityName)){ //LOAD MARKERS ONLY FOR SELECTED ENTITY
+				allMarkers.get(index).setAnimation(Animation.DROP);
+				allMarkers.get(index).setMap(theMap);
+				nextCallTimer.schedule(50);
+			}
+			else{ //skip marker
+				nextCallTimer.schedule(0);
+			}
+		}		
 	}
 
 	//Crea un singolo marker con le opzioni date sulla mappa
@@ -147,8 +179,7 @@ public class MapController {
 		m.setFlat(false); //false to show marker shadow? -- No, non va
 		m.setIcon(MarkerImage.create(markerColoredLinks.get(colorIndex)));
 		m.setShadow(MarkerImage.create("http://maps.gstatic.com/mapfiles/shadow50.png"));
-
-		loadedMarkersOnMap.add(m); //add marker to loaded list
+		allMarkers.add(m); //add marker to loaded list
 
 		m.addClickListener(new Marker.ClickHandler() {			
 			@Override
@@ -177,7 +208,7 @@ public class MapController {
 
 	public void clearMarkerFromMap(){
 		Debug.printDbgLine("ResultController.java: clearMarkerFromMap(): Clearing old markers from map...");	
-		Iterator<Marker> mListIterator = loadedMarkersOnMap.iterator();
+		Iterator<Marker> mListIterator = allMarkers.iterator();
 		Marker curMark = Marker.create();
 		SimplePanel nullContainerPanel = new SimplePanel();
 		GoogleMap gMapNull = GoogleMap.create(nullContainerPanel.getElement());
@@ -187,7 +218,7 @@ public class MapController {
 			curMark.setMap(gMapNull);
 		}
 
-		Debug.printDbgLine("ResultController.java: clearMarkerFromMap(): Cleared "+loadedMarkersOnMap.size()+" markers");		
+		Debug.printDbgLine("ResultController.java: clearMarkerFromMap(): Cleared "+allMarkers.size()+" markers");		
 		theMap.getOverlayMapTypes().setAt(0, null);
 	}
 
