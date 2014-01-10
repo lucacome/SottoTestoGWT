@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface GHTServiceAsync {
-	void sendToServer(List<String> fdfinal, List<String> selectedDbpLinks, AsyncCallback<String> callback)
+	void sendToServer(String jsonHT, List<String> selectedLinks, AsyncCallback<String> callback)
 			throws IllegalArgumentException;
 
 }

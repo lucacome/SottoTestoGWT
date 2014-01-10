@@ -7,5 +7,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("ghtservice")
 public interface GHTService extends RemoteService {
-	String sendToServer(List<String> fdfinal, List<String> selectedDbpLinks) throws IllegalArgumentException;
+	String sendToServer(String jsonHT, List<String> selectedLinks) throws IllegalArgumentException;
 }

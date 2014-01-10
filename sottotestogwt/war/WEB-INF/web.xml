@@ -62,6 +62,15 @@
     <url-pattern>/sottotestogwt/graphservice</url-pattern>
   </servlet-mapping>
   
+        <servlet>
+    <servlet-name>GHTServlet</servlet-name>
+    <servlet-class>com.sottotesto.server.GHTServiceImpl</servlet-class>
+  </servlet>  
+  <servlet-mapping>
+    <servlet-name>GraphServlet</servlet-name>
+    <url-pattern>/sottotestogwt/ghtservice</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Sottotestogwt.html</welcome-file>
