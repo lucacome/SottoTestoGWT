@@ -9,9 +9,11 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -56,6 +58,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		RDFReader arp = null;
 		arp = m.getReader();
 		String jresp = null;
+		List<String> linkList = new ArrayList<String>();
 
 		try {
 			input = URLEncoder.encode(input, "UTF-8");
@@ -123,6 +126,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				for (i = link.listProperties(); i.hasNext(); ) {
 					Statement s = i.next();					
 					//Debug.printDbgLine( "link has property " + s.getPredicate().getLocalName().replace("linksTo", "") + " with value " + s.getObject() );
+					
 					linkmap.put(s.getPredicate().getLocalName(), s.getObject().toString());
 					Resource oth = null;
 					//Debug.printDbgLine(s.getObject().toString());
@@ -145,7 +149,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						jsonHT.name = linkmap.asMap().get(key).toString().replace("@en", "");
 						jsonFD.name = jsonHT.name;
 					}else{
-
+						linkList.add(key.toString());
 						Map<String, String> mapNodeHT = new HashMap<String,String>();
 
 						mapNodeHT.put("nodeTo", key.toString());
@@ -255,8 +259,8 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				Debug.printDbgLine("EkpServiceImpl: json response="+jresp);
 				result.jdataHT=jresp;
 				result.jdataFD=tempf;
-
-
+				result.linkList=linkList;
+				Debug.printDbgLine(linkList.toString());
 
 
 			}

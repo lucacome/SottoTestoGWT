@@ -1,5 +1,8 @@
 package com.sottotesto.shared;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 
@@ -19,6 +22,7 @@ public class EkpResponse implements java.io.Serializable{
 	private long time;
 	public String jdataHT;
 	public String jdataFD;
+	public List<String> linkList;
 
 	public EkpResponse() {
 		code = 0;
@@ -30,6 +34,7 @@ public class EkpResponse implements java.io.Serializable{
 		type = "";
 		jdataHT = "";
 		jdataFD = "";
+		linkList = new ArrayList<String>();
 	}
 
 
