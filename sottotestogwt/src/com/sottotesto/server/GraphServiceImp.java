@@ -43,9 +43,9 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 			Debug.printDbgLine(temp);
 			Gson pa = new Gson();
 			JsonParser parser = new JsonParser();
-			Debug.printDbgLine("G0.1");
+//			Debug.printDbgLine("G0.1");
 			JsonArray array = parser.parse(temp).getAsJsonArray();
-			Debug.printDbgLine("G0.2");
+//			Debug.printDbgLine("G0.2");
 			JData jd = pa.fromJson(array.get(0), JData.class);
 			
 	
@@ -73,14 +73,14 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 			}
 
 			//response = response + temp +",";
-			Debug.printDbgLine("G0.20");
+//			Debug.printDbgLine("G0.20");
 
 		}
 		Iterator<JData> jiter = jdatalist.listIterator();
 		Iterator<JData> jiter2 = jdatalist.listIterator();
-		Debug.printDbgLine("G1");
+//		Debug.printDbgLine("G1");
 		data1 = jiter.next();
-		Debug.printDbgLine("G2");
+//		Debug.printDbgLine("G2");
 		data2 = jiter.next();
 
 			
@@ -104,10 +104,10 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 				while (iteradj.hasNext()){
 					Map<String,String> tempa = iteradj.next();
 					if (data2.adjacencies.contains(tempa)){
-						Debug.printDbgLine("TEMPA="+tempa);
+//						Debug.printDbgLine("TEMPA="+tempa);
 						finale.adjacencies.add(tempa);
-						Debug.printDbgLine("DATA2= "+data2.id);
-						Debug.printDbgLine("DATA2= "+tempa.get("nodeTo"));
+//						Debug.printDbgLine("DATA2= "+data2.id);
+//						Debug.printDbgLine("DATA2= "+tempa.get("nodeTo"));
 					}
 
 				}
@@ -115,7 +115,7 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 				finale = new JData();
 			}
 
-		
+		String link = "";
 		while (jiter2.hasNext()){
 			data2 = jiter2.next();
 			iteradj = data1.adjacencies.iterator();
@@ -126,6 +126,28 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 				finale.name = data2.name;
 				finale.data = data2.data;
 				finale.adjacencies = data1.adjacencies;
+				 Iterator<Map<String, String>> iteradj2 = finale.adjacencies.iterator();
+				 Iterator<JData> linkiter = jlink.iterator();
+				if (link.isEmpty())
+					while (iteradj2.hasNext()){
+						
+						String linkTo = iteradj2.next().get("nodeTo");
+//						Debug.printDbgLine("GG= "+linkTo);
+						while (linkiter.hasNext()){
+							JData templ = new JData();
+							templ = linkiter.next();
+							String linkA = templ.id;
+//							Debug.printDbgLine("GGA= "+linkA);
+							if ( linkTo.equals(linkA)){
+								Debug.printDbgLine("dio= "+linkA);
+								if (link.isEmpty())
+									link = aa.toJson(templ);
+								else
+									link = link + "," + aa.toJson(templ);
+								break;
+							}
+						}
+					}
 				if (response.isEmpty())
 					response += aa.toJson(finale);
 				else
@@ -177,7 +199,7 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 //			}
 //		}
 
-		Debug.printDbgLine("G9");
+//		Debug.printDbgLine("G9");
 //		Gson aa = new GsonBuilder().disableHtmlEscaping().create();
 
 //		data1.id = "Nuova";
@@ -185,9 +207,9 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 //
 //		response = aa.toJson(data1);
 
-		response = "["+ response + "]";
+		response = "["+ response + "," + link + "]";
 		//response = jdatalist.get(1).id;
-		Debug.printDbgLine("PIPPO_GRAPH= "+response);
+	//	Debug.printDbgLine("PIPPO_GRAPH= "+response);
 
 
 		// TODO Auto-generated method stub
