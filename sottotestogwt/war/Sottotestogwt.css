@@ -202,3 +202,32 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 	font-size:large; height:50px; line-height:50px; color:red; text-align:center; vertical-align:middle; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;
 }
 /*-----------------------------------------------------------------------*/
+
+
+/*-----------------------------------------------------------------------*/
+/* GRAFI */
+/*
+struttura:
+contenitore nomenodo+X : <div id="<dbpdLink>" class="node">
+	-> testo nodo : <span class="name">
+	-> X di chiusura: <span class="close">
+*/
+
+#graphContainer{ /*contiene tutti i grafi*/
+	background-color: black;
+}
+
+#graphContainer .node .name{ /*testo sotto i nodi*/
+}
+
+#graphContainer .node .close{ /*X di testo di eliminazione nodo*/
+	font-size: 80%;
+	color: red;
+}
+
+/*-----------------------------------------------------------------------*/
+
+
+
+
+
