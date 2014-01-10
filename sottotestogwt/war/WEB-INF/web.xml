@@ -67,7 +67,7 @@
     <servlet-class>com.sottotesto.server.GHTServiceImpl</servlet-class>
   </servlet>  
   <servlet-mapping>
-    <servlet-name>GraphServlet</servlet-name>
+    <servlet-name>GHTServlet</servlet-name>
     <url-pattern>/sottotestogwt/ghtservice</url-pattern>
   </servlet-mapping>
   
