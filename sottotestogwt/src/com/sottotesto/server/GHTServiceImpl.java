@@ -1,7 +1,10 @@
 package com.sottotesto.server;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,6 +32,15 @@ public class GHTServiceImpl extends RemoteServiceServlet implements GHTService	{
 		JsonArray array = parser.parse(jsonHT).getAsJsonArray();
 
 		JData jd = pa.fromJson(array.get(0), JData.class);
+		
+		jd.adjacencies.clear();
+		for (String s : selectedLink){
+			Map<String, String> data = new HashMap<String, String>();
+			data.put("nodeTo", s);
+			jd.adjacencies.add(data);
+		}
+
+		
 		response += aa.toJson(jd)+ ",";
 
 		for ( int i=1; i<array.size(); i++){
