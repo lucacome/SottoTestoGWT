@@ -484,10 +484,12 @@ public class Sottotestogwt implements EntryPoint {
 				treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
 
 				// create tree entry for frocedirected graph
+				/*
 				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_FD));
 				tdEntriesList.get(tdEntriesList.size()-1).setJsonFD(jsonFD);
 				treeStore.add(tdForcedirected, tdEntriesList.get(tdEntriesList.size()-1));
-
+				*/
+				
 				// create tree entry for hypertree graph
 				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
 				tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
@@ -644,9 +646,9 @@ public class Sottotestogwt implements EntryPoint {
 		
 		//temporaneo per luca:
 		//tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph");
-		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph", TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD);
+		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"Confronta entita'", TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD);
 		
-		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Hypertree Graph");
+		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Esplora entita'");
 		tdMap = new TreeData(String.valueOf(treeDataIdProvider++),"Knowledge Map");
 
 		treeStore.add(tdMap);

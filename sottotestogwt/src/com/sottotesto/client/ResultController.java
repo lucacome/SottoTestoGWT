@@ -62,8 +62,6 @@ public class ResultController {
 	//infovis data
 	private InfovisController infovisC;
 	private List<String> listFD;
-	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
-	private final GHTServiceAsync GHTService = GWT.create(GHTService.class);
 
 	//map data
 	private MapController mapC;
@@ -225,8 +223,8 @@ public class ResultController {
 			@Override
 			public ImageResource getIcon( TreeData model )
 			{
-				if ( model.getName().equals("ForceDirected Graph") ) return STResources.INSTANCE.iconHyperTree();
-				if ( model.getName().equals("Hypertree Graph") ) return STResources.INSTANCE.iconHyperTree();
+				if ( model.getName().equals("Confronta entita'") ) return STResources.INSTANCE.iconHyperTree();
+				if ( model.getName().equals("Esplora entita'") ) return STResources.INSTANCE.iconHyperTree();
 				if ( model.getName().equals("Knowledge Map") ) return STResources.INSTANCE.iconMap();
 				else return STResources.INSTANCE.iconTreeEntity();
 				//else return null;
@@ -259,11 +257,29 @@ public class ResultController {
 				infovisC.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
 				showLoading(false);
 			}
-			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD)) {				
-				GraphEntityChooser.showDialog(tagmeResp.getTitleTag(), this); //mostra il dialog per scegliere le entita' da confrontare
+			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD)) {		
+				showLoading(true);
+				infovisC = new InfovisController();	// initialize new infovis controller
+				centerPanel.clear(); 				// clear centerpanel contents	
+				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
+				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
+				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");	
+				infovisC.setListFD(listFD);
+				infovisC.setCheckBoxes(tagmeResp.getTitleTag());
+				infovisC.showFullConfrontationGraph();
+				showLoading(false); //hide loading
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
-				GraphLinksChooser.showDialog(treeDataSelected.getJsonHT(), this);
+				showLoading(true);
+				infovisC = new InfovisController();	// initialize new infovis controller
+				centerPanel.clear(); 				// clear centerpanel contents	
+				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
+				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
+				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
+				infovisC.setCheckBoxes(treeDataSelected.getJsonHT());
+				infovisC.setListFD(listFD);
+				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);		
+				showLoading(false); //hide loading
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
 				showLoading(true);
@@ -299,87 +315,7 @@ public class ResultController {
 	}
 
 
-//questa viene chiamata da GraphEntityChooser quando l'utente seleziona piu entita per un confronto
-public void prepareToCallGraphService(List<String> selectedEntities){
-	if (selectedEntities.size()<2){
-		Info.display("WARNING", "Hai selezionato troppe poche entita' per fare un confronto!");
-	}
-	else{
-		showLoading(true);
-		List<String> selectedDBPlinks = new ArrayList<String>();
-		for (String s : selectedEntities){
-			selectedDBPlinks.add("http://dbpedia.org/resource/"+s);
-		}
-		Debug.printDbgLine("Sottotestogwt.java: prepareToCallGraphService(): calling graphService...");
-		callGraphService(listFD, selectedDBPlinks);
-	}
-}	
-private void callGraphService(List<String> listFD, List<String> selectedDbpLinks){
-		
-		GraphService.sendToServer(listFD, selectedDbpLinks, new AsyncCallback<String>() {
-			public void onFailure(Throwable caught) {
-				//set the error
-				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onFailure()");
-				showLoading(false);
-			}
 
-			public void onSuccess(String result) {
-				Debug.printDbgLine("Sottotestogwt.java: callGraphService(): onSuccess()");
-				Debug.printDbgLine(result);
-				
-				// show the graph with the result json
-				infovisC = new InfovisController();	// initialize new infovis controller
-				centerPanel.clear(); 				// clear centerpanel contents	
-				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
-				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
-				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");				
-				infovisC.showGraph(result, InfovisController.GRAPH_TYPE.FORCEDIRECTED);		
-				showLoading(false); //hide loading
-			}
-			});
-		
-	}
-	
-
-	//questa viene chiamata da GraphLinkChooser quando l'utente seleziona piu entita per un confronto
-	public void prepareToCallGHTService(String jsonHT, List<String> selectedLinks){
-		if (selectedLinks.size()==0){
-			Info.display("WARNING", "Non hai selezionato entit� da visualizzare!");
-		}
-		else{
-			showLoading(true);
-			List<String> selectedlinksToXXX = new ArrayList<String>();
-			for (String s : selectedLinks){
-				selectedlinksToXXX.add("linksTo"+s);
-			}
-			Debug.printDbgLine("Sottotestogwt.java: prepareToCallGraphService(): calling graphService...");
-			callGHTService(jsonHT, selectedlinksToXXX);
-		}
-	}
-	private void callGHTService(String jsonHT, List<String> selectedLinks){			
-		GHTService.sendToServer(jsonHT, selectedLinks, new AsyncCallback<String>() {
-			public void onFailure(Throwable caught) {
-				//set the error
-				Debug.printDbgLine("Sottotestogwt.java: callGHTService(): onFailure()");
-				showLoading(false);
-			}
-
-			public void onSuccess(String result) {
-				Debug.printDbgLine("Sottotestogwt.java: callGHTService(): onSuccess()");
-				Debug.printDbgLine(result);
-				
-				// show the graph with the result json
-				infovisC = new InfovisController();	// initialize new infovis controller
-				centerPanel.clear(); 				// clear centerpanel contents	
-				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
-				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
-				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-				infovisC.showGraph(result, InfovisController.GRAPH_TYPE.HYPERTREE);
-				showLoading(false); //hide loading
-			}
-			});
-		
-	}
 
 	public void setJsonFD(String jdata){
 

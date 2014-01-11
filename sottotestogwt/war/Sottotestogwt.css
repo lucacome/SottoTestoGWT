@@ -58,6 +58,12 @@ border: 0px !important;
 
 #inner-details {
   font-size:12px;
+  color: white;
+}
+
+#inner-details .relation{
+	font-size: 10px;
+	color: gray;
 }
 
 span.close {
@@ -219,10 +225,25 @@ contenitore nomenodo+X : <div id="<dbpdLink>" class="node">
 	-> X di chiusura: <span class="close">
 */
 
-#graphContainer{ /*contiene tutti i grafi*/
+#infovisContainer{ /* contiene checkbox, grafo e pannello a dx */
 	background-color: black;
 }
 
+#graphContainer{ /*contiene tutti i grafi*/
+	border: 0px !important;
+}
+
+#graphCheckBox{
+	cursor: pointer !important;
+}
+#checkBoxFlowContainer{ /* contiene i checkbox sopra al grafo */
+	color: white;
+}
+#checkBoxLabel{
+	color:yellow;
+	position: relative;
+	top: 1px;
+}
 #graphContainer .node .name{ /*testo sotto i nodi*/
 }
 

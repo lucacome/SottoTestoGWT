@@ -11,7 +11,7 @@ public class Utility {
 	static AutoProgressMessageBox loadingBox;
 	
 	public static void showLoadingBar(){
-		loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
+		if(loadingBox == null) loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
 		loadingBox.setProgressText("... Working ...");
 		loadingBox.setShadow(true);
 		loadingBox.auto();
