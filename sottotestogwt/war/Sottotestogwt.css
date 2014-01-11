@@ -6,9 +6,6 @@ h4 {
     color:#23A4FF;
 }
 
-a {
-    color:#23A4FF;
-}
 
 #inner-details {
     font-size:0.8em;
@@ -216,6 +213,7 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 /*-----------------------------------------------------------------------*/
 
 
+
 /*-----------------------------------------------------------------------*/
 /* GRAFI */
 /*
@@ -236,6 +234,9 @@ contenitore nomenodo+X : <div id="<dbpdLink>" class="node">
 #graphCheckBox{
 	cursor: pointer !important;
 }
+#graphCheckBox label{
+	cursor: pointer !important;
+}
 #checkBoxFlowContainer{ /* contiene i checkbox sopra al grafo */
 	color: white;
 }
@@ -244,9 +245,19 @@ contenitore nomenodo+X : <div id="<dbpdLink>" class="node">
 	position: relative;
 	top: 1px;
 }
+#inner-details a.graphWikiLink:link, a.graphWikiLink:visited { /* 'connections' entires */
+	color: white !important;
+	text-decoration: none !important;
+}
+#inner-details a.graphNodeTitle:link, a.graphNodeTitle:visited{ /* title of selected node in details */
+	color: lime !important;
+	text-decoration: none !important;
+}
+#inner-details .graphConnectionsText{ /* text 'Connections:' */
+	color: #0066cc;
+}
 #graphContainer .node .name{ /*testo sotto i nodi*/
 }
-
 #graphContainer .node .close{ /*X di testo di eliminazione nodo*/
 	font-size: 80%;
 	color: red;
