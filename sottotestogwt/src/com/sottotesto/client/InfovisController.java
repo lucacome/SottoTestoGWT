@@ -2,7 +2,9 @@ package com.sottotesto.client;
 
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.core.client.util.Margins;
+import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
@@ -17,7 +19,8 @@ public class InfovisController {
 
 	//infovis container
 	private HorizontalLayoutContainer infovisContainer;
-	private VerticalLayoutContainer logDetailsContainer;
+	private VerticalLayoutContainer logDetailsContainerVL;
+	private FlowLayoutContainer logDetFlowCont;
 	private VerticalLayoutContainer graphContainer;
 	private HTML infovisGraphHtml;
 	private HTML infovisDetailsHtml;
@@ -41,16 +44,20 @@ public class InfovisController {
 		infovisLogHtml = new HTML();
 		infovisLogHtml.setHTML("<div id=\"log\"></div>");
 
-		logDetailsContainer = new VerticalLayoutContainer();
-		logDetailsContainer.setBorders(true);
-		logDetailsContainer.add(infovisLogHtml);
-		logDetailsContainer.add(infovisDetailsHtml);
-		logDetailsContainer.setId("logDetailsContainer");
+		logDetailsContainerVL = new VerticalLayoutContainer();
+		logDetailsContainerVL.setBorders(true);
+		logDetailsContainerVL.add(infovisLogHtml);
+		logDetailsContainerVL.add(infovisDetailsHtml);
+		logDetailsContainerVL.setId("logDetailsContainer");
+		
+		logDetFlowCont = new FlowLayoutContainer();
+		logDetFlowCont.setScrollMode(ScrollMode.AUTO);		
+		logDetFlowCont.add(logDetailsContainerVL);
 
 		infovisContainer = new HorizontalLayoutContainer();
 		infovisContainer.setBorders(true);
 		infovisContainer.add(graphContainer, new HorizontalLayoutData(0.85, 1, new Margins(4)));
-		infovisContainer.add(logDetailsContainer, new HorizontalLayoutData(0.15, 1, new Margins(4)));
+		infovisContainer.add(logDetFlowCont, new HorizontalLayoutData(0.15, 1, new Margins(4)));
 		infovisContainer.setId("infovisContainer");
 
 		return infovisContainer;
@@ -72,7 +79,7 @@ public class InfovisController {
 		Debug.printDbgLine("InfovisController.java: updateDivSize(): graph width="+graphWidthString);
 		Debug.printDbgLine("InfovisController.java: updateDivSize(): graph height="+graphHeightString);
 		infovisGraphHtml.setHTML("<div id=\"infovis\" style=\"width:"+graphWidthString+"px; height:"+graphHeightString+"px;\"></div>");
-		infovisDetailsHtml.setHTML("<div id=\"inner-details\" style=\"width:"+logDetailsContainer.getOffsetWidth()+"; height:"+logDetailsContainer.getOffsetHeight()+"px; borders:1px;\"></div>");
+		infovisDetailsHtml.setHTML("<div id=\"inner-details\" style=\"width:"+logDetailsContainerVL.getOffsetWidth()+"; height:"+logDetailsContainerVL.getOffsetHeight()+"px; borders:1px;\"></div>");
 	}
 
 	public void showGraph(String json, String type){

@@ -13,17 +13,22 @@ a {
 #inner-details {
     font-size:0.8em;
     list-style:none;
-    margin:7px;
+    margin:0px;
+    borders: 0px;
 }
 
-#log {
-    position:absolute;
-    top:10px;
+#log { /* log dello stato del grafo */
+    top:0px;
     font-size:1.0em;
     font-weight:bold;
-    color:#23A4FF;
+    color:red;
+    left:0px !important;
 }
 
+
+#logDetailsContainer {
+border: 0px !important;
+}
 
 #infovis {
     position:relative;
