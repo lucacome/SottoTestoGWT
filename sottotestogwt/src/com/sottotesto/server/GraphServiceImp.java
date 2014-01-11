@@ -134,8 +134,10 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 			}
 
 
-
-			response = "["+ response + "," + link + "]";
+			if (response.isEmpty())
+				response = "[ {\"id\":\"vuoto\", \"name\":\"Nessun nodo in comune\"} ]";
+			else
+				response = "["+ response + "," + link + "]";
 		}
 		else if (selectedEn.size() == 1){
 			link = "";
@@ -151,8 +153,8 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 			}
 			response = "["+ response + "," + link + "]";
 		}else
-			response = "[ {\"id\":\"vuoto\", \"name\":\"seleziona qualcosa\"} ]";
-		
+			response = "[ {\"id\":\"vuoto\", \"name\":\"Seleziona qualcosa\"} ]";
+
 		// TODO Auto-generated method stub
 		return response;
 	}
