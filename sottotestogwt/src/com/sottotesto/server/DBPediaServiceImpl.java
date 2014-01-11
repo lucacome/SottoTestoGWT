@@ -56,7 +56,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 							//"FILTER (LANG(?"+dbprop.get(j)+") = \"en\") .\n"+
 							" }\n" +	            
 							"";
-					Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
+//					Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 					Query query2 = QueryFactory.create(s2); //s2 = the query above
 					QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
 					results = qExe.execSelect();
@@ -68,12 +68,8 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 				//TODO output in json
 
 			}
-			Debug.printDbgLine("6");
 			responseQuery.setQueryResultXML(resultQueryXML);
-			Debug.printDbgLine("7");
 			responseQuery.setQueryResultText(resultQueryText);
-			Debug.printDbgLine("8");
-
 
 			Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+responseQuery.getTime()+"ms]");
 		} catch (Exception e) {			

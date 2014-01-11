@@ -27,8 +27,10 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 		Debug.printDbgLine("Selezionati= "+selectedEn);
 		Iterator<String> iterfd = fdfinal.listIterator();
 		String response = "";
+		String link = "";
 		List<JData> jdatalist = new ArrayList<JData>();
 		List<JData> jlink = new ArrayList<JData>();
+		Iterator<JData> linkiter = jlink.iterator();
 		JData data1 = new JData();
 		JData data2 = new JData();
 		JData finale = new JData();
@@ -36,17 +38,15 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 
 		Debug.printDbgLine("Size="+selectedEn.size());
 
+		//ciclo la lista di json
 
 		while (iterfd.hasNext()){
 			String temp = iterfd.next();
-			Debug.printDbgLine(temp);
+			//Debug.printDbgLine(temp);
 			Gson pa = new Gson();
 			JsonParser parser = new JsonParser();
-
 			JsonArray array = parser.parse(temp).getAsJsonArray();
-
 			JData jd = pa.fromJson(array.get(0), JData.class);
-
 
 			for (String item : selectedEn){
 				if(jd.id.equals(item)){
@@ -57,98 +57,102 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 						jlink.add(jdl);
 					}
 				}
-				else
-				{
-					Debug.printDbgLine("NON AGGIUNTO");
-				}
-
 			}
-
-
 		}
+
 		Iterator<JData> jiter = jdatalist.listIterator();
-		Iterator<JData> jiter2 = jdatalist.listIterator();
-		data1 = jiter.next();
-		data2 = jiter.next();
+		if (selectedEn.size() > 1){
 
-
-		Iterator<Map<String, String>> iteradj = data1.adjacencies.iterator();
-
-		while (iteradj.hasNext()){
-			Map<String,String> tempa = iteradj.next();
-			if (data2.adjacencies.contains(tempa)){
-				finale.adjacencies.add(tempa);
-
-			}
-
-		}
-		data1 = finale;
-		finale = new JData();
-
-		while (jiter.hasNext()){
+			Iterator<JData> jiter2 = jdatalist.listIterator();
+			data1 = jiter.next();
 			data2 = jiter.next();
 
-			iteradj = data1.adjacencies.iterator();
+
+			Iterator<Map<String, String>> iteradj = data1.adjacencies.iterator();
+
 			while (iteradj.hasNext()){
 				Map<String,String> tempa = iteradj.next();
-				if (data2.adjacencies.contains(tempa)){
-					//						Debug.printDbgLine("TEMPA="+tempa);
+				if (data2.adjacencies.contains(tempa))
 					finale.adjacencies.add(tempa);
-					//						Debug.printDbgLine("DATA2= "+data2.id);
-					//						Debug.printDbgLine("DATA2= "+tempa.get("nodeTo"));
-				}
-
 			}
+
 			data1 = finale;
 			finale = new JData();
-		}
 
-		String link = "";
-		while (jiter2.hasNext()){
-			data2 = jiter2.next();
-			iteradj = data1.adjacencies.iterator();
-			while (iteradj.hasNext()){
-				Map<String,String> tempa2 = iteradj.next();
-				if (data2.adjacencies.contains(tempa2)){
-					finale.id = data2.id;
-					finale.name = data2.name;
-					finale.data = data2.data;
-					finale.adjacencies = data1.adjacencies;
-					Iterator<Map<String, String>> iteradj2 = finale.adjacencies.iterator();
-					Iterator<JData> linkiter = jlink.iterator();
-					if (link.isEmpty())
-						while (iteradj2.hasNext()){
+			while (jiter.hasNext()){
+				data2 = jiter.next();
 
-							String linkTo = iteradj2.next().get("nodeTo");
-							//						Debug.printDbgLine("GG= "+linkTo);
-							while (linkiter.hasNext()){
-								JData templ = new JData();
-								templ = linkiter.next();
-								String linkA = templ.id;
-								//							Debug.printDbgLine("GGA= "+linkA);
-								if ( linkTo.equals(linkA)){
-									//								Debug.printDbgLine("dio= "+linkA);
-									if (link.isEmpty())
-										link = aa.toJson(templ);
-									else
-										link = link + "," + aa.toJson(templ);
-									break;
+				iteradj = data1.adjacencies.iterator();
+				while (iteradj.hasNext()){
+					Map<String,String> tempa = iteradj.next();
+					if (data2.adjacencies.contains(tempa))
+						finale.adjacencies.add(tempa);
+				}
+
+				data1 = finale;
+				finale = new JData();
+			}
+
+			link = "";
+			while (jiter2.hasNext()){
+				data2 = jiter2.next();
+				iteradj = data1.adjacencies.iterator();
+				while (iteradj.hasNext()){
+					Map<String,String> tempa2 = iteradj.next();
+					if (data2.adjacencies.contains(tempa2)){
+						finale.id = data2.id;
+						finale.name = data2.name;
+						finale.data = data2.data;
+						finale.adjacencies = data1.adjacencies;
+						Iterator<Map<String, String>> iteradj2 = finale.adjacencies.iterator();
+						linkiter = jlink.iterator();
+						if (link.isEmpty())
+							while (iteradj2.hasNext()){
+								String linkTo = iteradj2.next().get("nodeTo");
+
+								while (linkiter.hasNext()){
+									JData templ = new JData();
+									templ = linkiter.next();
+									String linkA = templ.id;
+
+									if ( linkTo.equals(linkA)){
+										if (link.isEmpty())
+											link = aa.toJson(templ);
+										else
+											link = link + "," + aa.toJson(templ);
+										break;
+									}
 								}
 							}
-						}
-					if (response.isEmpty())
-						response += aa.toJson(finale);
-					else
-						response = response+ "," + aa.toJson(finale);
-					break;
+						if (response.isEmpty())
+							response += aa.toJson(finale);
+						else
+							response = response+ "," + aa.toJson(finale);
+						break;
+					}
 				}
 			}
+
+
+
+			response = "["+ response + "," + link + "]";
 		}
-
-
-
-		response = "["+ response + "," + link + "]";
-
+		else if (selectedEn.size() == 1){
+			link = "";
+			response = aa.toJson(jiter.next());
+			linkiter = jlink.iterator();
+			while (linkiter.hasNext()){
+				JData templ = new JData();
+				templ = linkiter.next();
+				if (link.isEmpty())
+					link = aa.toJson(templ);
+				else
+					link = link + "," + aa.toJson(templ);
+			}
+			response = "["+ response + "," + link + "]";
+		}else
+			response = "";
+		
 		// TODO Auto-generated method stub
 		return response;
 	}
