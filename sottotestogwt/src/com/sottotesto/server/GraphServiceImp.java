@@ -151,7 +151,7 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 			}
 			response = "["+ response + "," + link + "]";
 		}else
-			response = "";
+			response = "[ {\"id\":\"vuoto\", \"name\":\"seleziona qualcosa\"} ]";
 		
 		// TODO Auto-generated method stub
 		return response;
