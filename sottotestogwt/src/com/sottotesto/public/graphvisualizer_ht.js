@@ -52,6 +52,7 @@ function init_ht(jdata){
           lineWidth: 2,
           color: "#088"
       },
+      
       onBeforeCompute: function(node){
           Log.write("centering");
       },
@@ -98,13 +99,36 @@ function init_ht(jdata){
           //This is done by collecting the information (stored in the data property) 
           //for all the nodes adjacent to the centered node.
           var node = ht.graph.getClosestNodeToOrigin("current");
-          var html = "<h4>" + node.name + "</h4><b>Connections:</b>";
+          
+          /* aggiunto da lollo per avere link wikipedia */
+          var nodeName = node.name;
+          nodeName = nodeName.replace("[", "");
+          nodeName = nodeName.replace("]", "");
+          
+          var nodeLink = nodeName;
+          nodeLink = nodeLink.replace(" ", "_");
+          nodeLink = "<a href=\"http://en.wikipedia.org/wiki/"+nodeLink+"\" target=\"_blank\" class=\"graphNodeTitle\">"+nodeName+"</a>"
+          
+          var html = "<h4>" + nodeLink + "</h4><b><span class=\"graphConnectionsText\">Connections:</span></b>";
           html += "<ul>";
           node.eachAdjacency(function(adj){
               var child = adj.nodeTo;
               if (child.data) {
                   var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-                  html += "<li>" + child.name + " " + "<div class=\"relation\">(relation: " + rel + ")</div></li>";
+                  
+                  /* aggiunto da lollo per avere link wikipedia */
+                  var linkName = child.name;
+                  linkName = linkName.replace("[", "");
+                  linkName = linkName.replace("]", "");
+                  
+                  var link = linkName;
+                  link = link.replace(" ", "_");                  
+                  link = "<a href=\"http://en.wikipedia.org/wiki/"+link+"\" target=\"_blank\" class=\"graphWikiLink\">"+linkName+"</a>"
+                  
+                  // sego relation che e' inutile
+                  relationOK= " " + "<div class=\"relation\">(relation: " + rel + ")</div></li>";
+                  relationEmpty="";
+                  html += "<li>" + link + relationEmpty;
               }
           });
           html += "</ul>";

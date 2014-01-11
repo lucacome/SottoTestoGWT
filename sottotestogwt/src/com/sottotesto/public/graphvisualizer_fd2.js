@@ -42,7 +42,7 @@ function init_fd(jdata){
       //Enable panning events only if we're dragging the empty
       //canvas (and not a node).
       panning: 'avoid nodes',
-      zooming: 20 //zoom speed. higher is more sensible
+      zooming: 70 //zoom speed. higher is more sensible
     },
     // Change node and edge styles such as
     // color and width.
@@ -84,7 +84,7 @@ function init_fd(jdata){
     //Number of iterations for the FD algorithm
     iterations: 200,
     //Edge length
-    levelDistance: 130,
+    levelDistance: 350,
     // This method is only triggered
     // on label creation and only for DOM labels (not native canvas ones).
     onCreateLabel: function(domElement, node){
@@ -150,13 +150,38 @@ function init_fd(jdata){
         });
         // Build the right column relations list.
         // This is done by traversing the clicked node connections.
-        var html = "<h4>" + node.name + "</h4><b> connections:</b><ul><li>",
+        
+        /* aggiunto da lollo per avere link wikipedia */
+        var nodeName = node.name;
+        nodeName = nodeName.replace("[", "");
+        nodeName = nodeName.replace("]", "");
+        
+        var nodeLink = nodeName;
+        nodeLink = nodeLink.replace(" ", "_");
+        nodeLink = "<a href=\"http://en.wikipedia.org/wiki/"+nodeLink+"\" target=\"_blank\" class=\"graphNodeTitle\">"+nodeName+"</a>"
+        
+        var html = "<h4>" + nodeLink + "</h4><span class=\"graphConnectionsText\">Connections:</span><ul>",
             list = [];
         node.eachAdjacency(function(adj){
           if(adj.getData('alpha')) list.push(adj.nodeTo.name);
         });
+        
+        /* ciclo fatto da lollo in sostituzione del list.join */
+        for (var i = 0; i < list.length; i++) {        	
+        	var name = list[i];
+        	name = name.replace("[", "");
+        	name = name.replace("]", "");
+            
+        	var link = name;
+            link = link.replace(" ", "_");
+            link = "<a href=\"http://en.wikipedia.org/wiki/"+link+"\" target=\"_blank\" class=\"graphWikiLink\">"+name+"</a>"
+        	
+        	html +="<li>"+link+"</li>"
+        }
+        
         //append connections information
-        $jit.id('inner-details').innerHTML = html + list.join("</li><li>") + "</li></ul>";
+        //$jit.id('inner-details').innerHTML = html + list.join("</li><li>") + "</ul>";
+        $jit.id('inner-details').innerHTML = html + "</ul>";
       };
     },
     // Change node styles when DOM labels are placed
