@@ -23,6 +23,7 @@ a {
     font-weight:bold;
     color:red;
     left:0px !important;
+    display: none !important; /* disable log since it shows only first time */ 
 }
 
 

@@ -42,7 +42,7 @@ public class InfovisController {
 		infovisDetailsHtml.setWordWrap(true);
 
 		infovisLogHtml = new HTML();
-		infovisLogHtml.setHTML("<div id=\"log\"></div>");
+		infovisLogHtml.setHTML("<div id=\"log\"></div>"); //disable log since it shows only first time
 
 		logDetailsContainerVL = new VerticalLayoutContainer();
 		logDetailsContainerVL.setBorders(true);
