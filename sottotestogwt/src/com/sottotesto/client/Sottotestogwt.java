@@ -3,11 +3,10 @@ package com.sottotesto.client;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -17,7 +16,6 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.TextResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,8 +30,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.core.client.Style.HorizontalAlignment;
 import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.TreeStore;
@@ -753,15 +749,13 @@ public class Sottotestogwt implements EntryPoint {
 				HTML curHtml = new HTML();
 				curHtml.setHTML(curSubString+"&nbsp;");
 				curHtml.setTitle(curTitle);				
-				
-				final String mouseOverEntity = curTitle;
-				
+								
 				//aggiungi eventi mouse all'html taggato
 				curHtml.addMouseOverHandler(new MouseOverHandler() {				
 					@Override
-					public void onMouseOver(MouseOverEvent event) {
-						Debug.printDbgLine("htmlOver title: "+mouseOverEntity); //TODO: PERCHE' CAZZO E' VUOTO??
-						showTaggedPopup(mouseOverEntity);				
+					public void onMouseOver(MouseOverEvent event) {		
+						Element e = Element.as(event.getNativeEvent().getEventTarget());
+						showTaggedPopup(e.getTitle()); //title corrisponde all'entita'
 					}
 				});
 				//aggiungi eventi mouse all'html taggato
@@ -797,12 +791,11 @@ public class Sottotestogwt implements EntryPoint {
 	
 
 	private void showTaggedPopup(String entity){
-		Debug.printDbgLine("ResultController.java: showTaggedPopup(): "+entity);
 		taggedEntityPopup.clear();
 		HTML pupupHtml = new HTML();
 		
 		// DOVREI FAR VEDERE ROBA DI DBPEDIA....
-		pupupHtml.setHTML("<b>"+entity+"</b><br><br>Bellaaaaaaaaaaaaaa prova prova cazzo");
+		pupupHtml.setHTML("<b>"+entity+"</b><br>"+dbpediaResp.getQueryResultXML());
 		
 		taggedEntityPopup.setWidget(pupupHtml);
 		taggedEntityPopup.setPopupPosition(0, RootPanel.get("servicesContainer").getAbsoluteTop());
