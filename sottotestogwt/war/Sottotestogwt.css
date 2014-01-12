@@ -146,6 +146,9 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 .result_searchedPhrase{
 	height:50px; text-align:center; vertical-align:middle; position:absolute; top:0; bottom:0; left:0; right:0; margin:auto;
 }
+#taggedPhraseFC{
+	height:50px; text-align:center; vertical-align:middle; position:absolute; top:11px !important; bottom:0; left:0; right:0; margin:auto;
+}
 .result_taggedWord{
 	font-weight:bold; color:green; text-decoration:underline; font-style:italic; background-color:yellow;
 }

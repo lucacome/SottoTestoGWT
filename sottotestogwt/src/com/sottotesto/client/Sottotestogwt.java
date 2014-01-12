@@ -3,6 +3,8 @@ package com.sottotesto.client;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -11,22 +13,34 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.TextResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.Style.HorizontalAlignment;
+import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
+import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
 import com.sottotesto.shared.DBPQueryResp;
@@ -49,7 +63,6 @@ public class Sottotestogwt implements EntryPoint {
 	//title panel items
 	private String textAreaDefText; //default text written on textarea
 	private String textSendButton;  //default tet written on send button
-//	private String finalFDstring;
 	private Button sendButton;     //button to call tagme
 	private TextArea textArea;     //textarea for user input
 	private Label textAreaLabel;   //label for text area
@@ -59,7 +72,8 @@ public class Sottotestogwt implements EntryPoint {
 	private HorizontalLayoutContainer searchPanelHC;
 	private FlowPanel textAreaFP;
 	private List<String> listFD = new ArrayList<String>();
-
+	private DecoratedPopupPanel taggedEntityPopup;
+	
 	// Create remote service proxyes to talk to the server-side services
 	private final TagmeServiceAsync tagmeService = GWT.create(TagmeService.class);	
 	private final DBPediaServiceAsync dbpediaService = GWT.create(DBPediaService.class);
@@ -177,6 +191,9 @@ public class Sottotestogwt implements EntryPoint {
 	private void initSearchPanel(){
 		//init input section items
 
+		taggedEntityPopup = new DecoratedPopupPanel();
+		taggedEntityPopup.ensureDebugId("cwBasicPopup-simplePopup");
+		
 		if (titleContentPanel != null) titleContentPanel.clear();
 
 		textAreaLabel = new Label();
@@ -660,12 +677,25 @@ public class Sottotestogwt implements EntryPoint {
 		treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
 	}
 
+	
 	private void showTaggedResult(){
+		
+		HorizontalPanel taggedPhraseHP = new HorizontalPanel();
+		taggedPhraseHP.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		FlowLayoutContainer taggedPhraseFC = new FlowLayoutContainer();
+		taggedPhraseFC.setScrollMode(ScrollMode.AUTO);
+		taggedPhraseFC.setId("taggedPhraseFC");
+		taggedPhraseFC.add(taggedPhraseHP);
+		//addTaggedHtmls(taggedPhraseHP);
+		
 		textAreaLabel.setText("Entita' rilevate:");
+		/*
 		HTML htmlPhrase = new HTML();
 		htmlPhrase.setHTML(createTaggedSearchString());
 		htmlPhrase.setStylePrimaryName("taggedPhraseHTMLcontainer");
-
+		*/
+		addTaggedHtmls(createTaggedSearchString(),taggedPhraseHP);
+		
 		sendButton = new Button("Nuova ricerca");		
 		sendButton.addStyleName("newSearchButton");
 		sendButton.addClickHandler(new ClickHandler() {			
@@ -681,7 +711,7 @@ public class Sottotestogwt implements EntryPoint {
 		searchPanelHC.setWidth(panelsMaxWidth);
 		searchPanelHC.setBorders(false);
 		searchPanelHC.add(textAreaLabel, new HorizontalLayoutData(0.15, 1, new Margins(14)));
-		searchPanelHC.add(htmlPhrase, new HorizontalLayoutData(0.70, 1, new Margins(4)));
+		searchPanelHC.add(taggedPhraseFC, new HorizontalLayoutData(0.70, 1, new Margins(4)));
 		searchPanelHC.add(sendButton, new HorizontalLayoutData(0.15, 1, new Margins(14)));
 
 		titleContentPanel.clear();
@@ -689,11 +719,104 @@ public class Sottotestogwt implements EntryPoint {
 
 		titleContentPanel.setWidget(searchPanelHC);
 	}
+	
+	private void addTaggedHtmls(String taggedSearchString, HorizontalPanel hp){
+		Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls2()");
+		hp.clear();
+		
+		//CYCLE ALL STRING
+		while(taggedSearchString.length()>0){
+			if(taggedSearchString.substring(0,1).equals(" ")){ /* if we have a space*/
+				taggedSearchString = taggedSearchString.substring(1, taggedSearchString.length());
+			}
+			else if(taggedSearchString.substring(0,1).equals("<")){ /* if we have a span*/
+				//CREATE HTML ELEMENT CONTAINING SPAN
+				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): taggedSearchString: "+taggedSearchString);
+				
+				int spanEndIndex = taggedSearchString.indexOf("</span>")+7;
+				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): spanEndIndex: "+spanEndIndex);
+				String curSubString = taggedSearchString.substring(0, spanEndIndex); //<span ... </span>
+				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): curSubString: "+curSubString);
+				taggedSearchString = taggedSearchString.substring(spanEndIndex); //[</span>] ..... [end]
+				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): taggedSearchString trimmed: "+taggedSearchString);
+				
+				
+				
+				String curTagText = "";
+				String curTitle = "";
+				curTagText=curSubString.substring(curSubString.indexOf('>'), curSubString.length());
+				curTagText=curTagText.substring(0, curTagText.indexOf('<'));
+				if(tagmeResp.getSpotTag().contains(curTagText)) curTitle=tagmeResp.getTitleTag().get(tagmeResp.getSpotTag().indexOf(curTagText));
+				else if(tagmeResp.getSpotSkipped().contains(curTagText)) curTitle=tagmeResp.getTitleTag().get(tagmeResp.getSpotSkipped().indexOf(curTagText));
+				
+				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): curTagText: "+curTagText);
+				HTML curHtml = new HTML();
+				curHtml.setHTML(curSubString+"&nbsp;");
+				curHtml.setTitle(curTitle);				
+				
+				final String mouseOverEntity = curTitle;
+				
+				//aggiungi eventi mouse all'html taggato
+				curHtml.addMouseOverHandler(new MouseOverHandler() {				
+					@Override
+					public void onMouseOver(MouseOverEvent event) {
+						Debug.printDbgLine("htmlOver title: "+mouseOverEntity); //TODO: PERCHE' CAZZO E' VUOTO??
+						showTaggedPopup(mouseOverEntity);				
+					}
+				});
+				//aggiungi eventi mouse all'html taggato
+				curHtml.addMouseOutHandler(new MouseOutHandler() {				
+					@Override
+					public void onMouseOut(MouseOutEvent event) {
+						hideTaggedPopup();				
+					}
+				});
+				
+				hp.add(curHtml);
+			}
+			else { // we have a simple char
+				if(taggedSearchString.contains("<")){ // we'll have another span
+					int spanBeginIndex = taggedSearchString.indexOf('<');
+					String curString = taggedSearchString.substring(0, spanBeginIndex);
+					curString.replaceAll(" ", "&nbsp;");
+					HTML curHtml = new HTML(curString+"&nbsp;");
+					hp.add(curHtml);
+					taggedSearchString = taggedSearchString.substring(spanBeginIndex, taggedSearchString.length());
+				}
+				else{ //no mor span -> single html until endo of line
+					taggedSearchString.replaceAll(" ", "&nbsp;");
+					HTML curHtml = new HTML(taggedSearchString+"&nbsp;");
+					hp.add(curHtml);
+					
+					taggedSearchString="";
+				}
+			}
+		}
+	}
+	
+	
 
+	private void showTaggedPopup(String entity){
+		Debug.printDbgLine("ResultController.java: showTaggedPopup(): "+entity);
+		taggedEntityPopup.clear();
+		HTML pupupHtml = new HTML();
+		
+		// DOVREI FAR VEDERE ROBA DI DBPEDIA....
+		pupupHtml.setHTML("<b>"+entity+"</b><br><br>Bellaaaaaaaaaaaaaa prova prova cazzo");
+		
+		taggedEntityPopup.setWidget(pupupHtml);
+		taggedEntityPopup.setPopupPosition(0, RootPanel.get("servicesContainer").getAbsoluteTop());
+		taggedEntityPopup.show();
+	}
+	private void hideTaggedPopup(){
+		taggedEntityPopup.hide();
+	}
+	
 	private String createTaggedSearchString(){
 		Debug.printDbgLine("ResultController.java: createTaggedSearchString()");
 
-		String result = "<span class=\"result_searchedPhrase\">"+textArea.getText()+"</span>";
+		//String result = "<span class=\"result_searchedPhrase\">"+textArea.getText()+"</span>";
+		String result = textArea.getText();
 		String curTag="";
 		String curTitle="";
 		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result = "+result);
@@ -711,7 +834,7 @@ public class Sottotestogwt implements EntryPoint {
 			curTitle=iterTitle.next();
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
 
-			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
+			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"&nbsp;</span>");
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
 		}
 
@@ -728,7 +851,7 @@ public class Sottotestogwt implements EntryPoint {
 			curTitle=iterSkippedTitle.next();
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
 
-			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
+			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"&nbsp;</span>");
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
 		}
 
