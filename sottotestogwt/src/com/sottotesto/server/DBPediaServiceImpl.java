@@ -8,8 +8,10 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.sottotesto.client.DBPediaService;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
@@ -48,21 +50,33 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 				String titletag = itertitle.next();	
 
 				for (int j=0; j <= dbprop.size()-1; j++){
-					String s2 = "PREFIX "+prefix+prefixlink+"\n" +
-							"\n" +
-							"SELECT  *\n" +
+					String s2 = "PREFIX "+prefix+prefixlink+" \n" +
+							"SELECT  ?"+dbprop.get(j)+"\n" +
 							"WHERE {\n" +
 							"<http://dbpedia.org/resource/" + titletag + "> "+prefix+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
 							//"FILTER (LANG(?"+dbprop.get(j)+") = \"en\") .\n"+
-							" }\n" +	            
-							"";
-//					Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
+							" }";
+					Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 					Query query2 = QueryFactory.create(s2); //s2 = the query above
 					QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
 					results = qExe.execSelect();
 					//TODO fix xmlresult
-					resultQueryXML += ResultSetFormatter.asXMLString(results);
-					resultQueryText += ResultSetFormatter.asText(results);
+					Literal abs =  null;
+					for (; results.hasNext() ;){
+						QuerySolution sol = results.nextSolution();
+						String langu = sol.getLiteral(dbprop.get(j)).getLanguage();
+						
+						if(langu.contains("en")){	
+								abs = sol.getLiteral(dbprop.get(j));
+								resultQueryXML +=  abs.getString();
+								Debug.printDbgLine(abs.getString());
+						}else
+							abs = null;
+					}
+					
+					
+					//resultQueryXML += ResultSetFormatter.asXMLString(results);
+					//resultQueryText += ResultSetFormatter.asText(results);
 
 				}
 				//TODO output in json

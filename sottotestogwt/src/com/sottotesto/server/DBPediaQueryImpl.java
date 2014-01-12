@@ -57,9 +57,6 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 						abs=null;
 				}else
 					abs = null;
-
-
-
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
