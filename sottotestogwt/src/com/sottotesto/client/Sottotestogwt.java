@@ -791,15 +791,18 @@ public class Sottotestogwt implements EntryPoint {
 	
 
 	private void showTaggedPopup(String entity){
-		taggedEntityPopup.clear();
-		HTML pupupHtml = new HTML();
 		
-		// DOVREI FAR VEDERE ROBA DI DBPEDIA....
-		pupupHtml.setHTML("<b>"+entity+"</b><br>"+dbpediaResp.getQueryResultXML());
-		
-		taggedEntityPopup.setWidget(pupupHtml);
-		taggedEntityPopup.setPopupPosition(0, RootPanel.get("servicesContainer").getAbsoluteTop());
-		taggedEntityPopup.show();
+		if (entity.length()>0){
+			taggedEntityPopup.clear();
+			HTML pupupHtml = new HTML();
+
+			// DOVREI FAR VEDERE ROBA DI DBPEDIA....
+			pupupHtml.setHTML("<b>"+entity+"</b><br>"+dbpediaResp.getQueryResultXML());
+
+			taggedEntityPopup.setWidget(pupupHtml);
+			taggedEntityPopup.setPopupPosition(0, RootPanel.get("servicesContainer").getAbsoluteTop());
+			taggedEntityPopup.show();
+		}
 	}
 	private void hideTaggedPopup(){
 		taggedEntityPopup.hide();
@@ -827,7 +830,7 @@ public class Sottotestogwt implements EntryPoint {
 			curTitle=iterTitle.next();
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
 
-			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"&nbsp;</span>");
+			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
 		}
 
@@ -844,7 +847,7 @@ public class Sottotestogwt implements EntryPoint {
 			curTitle=iterSkippedTitle.next();
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
 
-			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"&nbsp;</span>");
+			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
 			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
 		}
 
