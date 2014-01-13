@@ -18,6 +18,7 @@ import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.Hor
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.Utility;
 
 public class InfovisController {
@@ -173,7 +174,13 @@ public class InfovisController {
 	
 	
 	//dato un elenco di entita' crea le checkbox corrispondenti
-	public void setCheckBoxes(final List<String> entities){
+	public void setCheckBoxes(final List<EkpResponse> ekpResps){
+		
+		//get entities to show
+		List<String> entities = new ArrayList<String>();
+		for (EkpResponse curResp : ekpResps){
+			entities.add(curResp.getTag());
+		}
 
 		//set checkboxes change handler
 		ValueChangeHandler<Boolean> checkBoxLinksHandler = new ValueChangeHandler<Boolean>() {		       

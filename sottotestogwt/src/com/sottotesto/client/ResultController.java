@@ -34,8 +34,8 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.STResources;
-import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.TreeData;
 import com.sottotesto.shared.TreeDataProperties;
 import com.sottotesto.shared.Utility;
@@ -80,7 +80,7 @@ public class ResultController {
 	//search phrase data
 	String searchedPhrase;	
 	
-	private TagmeResponse tagmeResp;
+	private List<EkpResponse> ekpResponses;
 
 
 
@@ -269,7 +269,7 @@ public class ResultController {
 				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");	
 				infovisC.setListFD(listFD);
-				infovisC.setCheckBoxes(tagmeResp.getTitleTag());
+				infovisC.setCheckBoxes(ekpResponses);
 				infovisC.showFullConfrontationGraph();
 				showLoading(false); //hide loading
 			}
@@ -355,8 +355,8 @@ public class ResultController {
 		listFD = listFDnew;
 	}
 	
-	public void setTagmeResp(TagmeResponse tgmRsp){
-		tagmeResp = new TagmeResponse();
-		tagmeResp = tgmRsp;
+	public void setEkpResponses(List<EkpResponse> ekpResps){
+		ekpResponses = new ArrayList<EkpResponse>();
+		ekpResponses = ekpResps;
 	}
 }

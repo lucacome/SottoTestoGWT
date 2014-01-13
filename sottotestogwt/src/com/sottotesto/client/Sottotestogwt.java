@@ -124,6 +124,7 @@ public class Sottotestogwt implements EntryPoint {
 	private TagmeResponse tagmeResp; //response of TAGME service
 	private DBPediaResponse dbpediaResp; //response of DBPEDIA service
 	private List<EkpResponse> ekpResp; //response of EKP service
+	private int ekpFailsNum;
 	private int dbpqCallsDone;
 	private int dbpqCallsToDo;
 	
@@ -369,8 +370,6 @@ public class Sottotestogwt implements EntryPoint {
 
 					HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
 					showTaggedResult();
-
-					rc.setTagmeResp(tagmeResp);
 					
 					//chiamiamo DBPedia							
 					List<String> dbproperty = new ArrayList<String>();
@@ -460,6 +459,7 @@ public class Sottotestogwt implements EntryPoint {
 
 				//update log
 				spLogger.addEKPlog(ekpRespTmp);
+				ekpFailsNum++;
 				
 				if (ekpRemainingCallNum>0){callEkp();}
 			}
@@ -478,44 +478,41 @@ public class Sottotestogwt implements EntryPoint {
 				//update log
 				spLogger.addEKPlog(ekpRespTmp);
 
-				String jsonHT = "["+result.jdataHT+"]";
-				String jsonFD = "["+result.jdataFD+"]";	
-
-				//callListService(ekpRespTmp);
-				listFD.add(jsonFD);
 				
-				//rc.setJsonHT(tem);
-				//rc.setJsonFD(tem2);
-				//Debug.printDbgLine("MAIN="+tem);
-				
-				// create tree entry for Maps
-				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWMAP));
-				treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
+				if (ekpRespTmp.getCode()==200) {
+					HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
+					
+					String jsonHT = "["+result.jdataHT+"]";
+					String jsonFD = "["+result.jdataFD+"]";	
 
-				// create tree entry for frocedirected graph
-				/*
-				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_FD));
-				tdEntriesList.get(tdEntriesList.size()-1).setJsonFD(jsonFD);
-				treeStore.add(tdForcedirected, tdEntriesList.get(tdEntriesList.size()-1));
-				*/
-				
-				// create tree entry for hypertree graph
-				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
-				tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
-				tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());
-				treeStore.add(tdHyperTree, tdEntriesList.get(tdEntriesList.size()-1));		
+					listFD.add(jsonFD);
+										
+					// create tree entry for Maps
+					tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWMAP));
+					treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
+					
+					// create tree entry for hypertree graph
+					tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
+					tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
+					tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());
+					treeStore.add(tdHyperTree, tdEntriesList.get(tdEntriesList.size()-1));		
 
-				ekpResp.add(ekpRespTmp);
-				if (ekpRespTmp.getCode()==200) HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
-				else HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
+					ekpResp.add(ekpRespTmp);
+				}
+				else{ // not received 200
+					HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
+					ekpFailsNum++;
+				}
 
 				if (ekpRemainingCallNum>0){
 					callEkp();
 				}
 				else {
+					if(ekpFailsNum>0) HtmlEkpService.setHTML(HTMLekpServiceStringFAIL+" (x"+ekpFailsNum+")");
 					rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
 					rc.getTree().expandAll();
 					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
+					rc.setEkpResponses(ekpResp);
 					callListService(ekpResp); //lancia il servizio di "cerca markers"
 				}
 			}});		
@@ -626,6 +623,7 @@ public class Sottotestogwt implements EntryPoint {
 			if(!HtmlDBPediaService.getHTML().contains("Waiting")) spLogger.showDBPediaDataDB();}});
 
 		//ekp service
+		ekpFailsNum = 0;
 		HtmlEkpService = new HTML();
 		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
 		HtmlEkpService.setStylePrimaryName("serviceLabel");
