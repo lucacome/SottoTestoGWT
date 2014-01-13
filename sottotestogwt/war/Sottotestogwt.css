@@ -184,7 +184,7 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 	text-align:left; margin:0px; border:1px;
 }
 .GB2UA-DDDOB{ /*clear.gif*/
-	width:0px; display:none;
+	/*width:0px; display:none;*/
 }
 /*-----------------------------------------------------------------------*/
 

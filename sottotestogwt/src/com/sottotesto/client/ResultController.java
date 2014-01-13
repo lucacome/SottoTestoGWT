@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.LatLng;
 import com.sencha.gxt.core.client.Style.SelectionMode;
+import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.IconProvider;
 import com.sencha.gxt.data.shared.Store;
@@ -164,19 +165,20 @@ public class ResultController {
 		Debug.printDbgLine("ResultController.java: initTree()");
 
 		treeContainer = new FlowLayoutContainer();
+		treeContainer.setScrollMode(ScrollMode.AUTO);
 		treeContainer.setId("treeContainer");
-		treeContainer.addStyleName("margin-10");
+		//treeContainer.addStyleName("margin-10");
 
 		//TREE EXPAND/COLLAPSE BUTTONS
 		treeButtonBar = new ButtonBar();
 		treeExpandButton = new TextButton();
 		treeCollapseButton = new TextButton();
-		treeExpandButton.setText("Expand All");
+		treeExpandButton.setText("Expand");
 		treeExpandButton.addSelectHandler(new SelectHandler() {	 
 			@Override
 			public void onSelect(SelectEvent event) {tree.expandAll();}
 		});
-		treeCollapseButton.setText("Collapse All");
+		treeCollapseButton.setText("Collapse");
 		treeCollapseButton.addSelectHandler(new SelectHandler() {	 
 			@Override
 			public void onSelect(SelectEvent event) {tree.collapseAll();}
@@ -238,7 +240,8 @@ public class ResultController {
 		treeContainer.add(tree);
 
 		lcwest.add(treeContainer);
-
+		treeContainer.setWidth(lcwest.getOffsetWidth());
+		
 		showMap("Mappa completa");
 	}
 
