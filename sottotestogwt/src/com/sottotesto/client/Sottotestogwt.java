@@ -127,6 +127,7 @@ public class Sottotestogwt implements EntryPoint {
 	private int ekpFailsNum;
 	private int dbpqCallsDone;
 	private int dbpqCallsToDo;
+	private int dbpFailsNum;
 	
 	//resources
 	TextResource resourceHTMLmap;
@@ -417,6 +418,7 @@ public class Sottotestogwt implements EntryPoint {
 						"<br><br><b>StackTrace: </b><br>"+Utility.getErrorHtmlString(caught));
 
 				HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL); //show the fail
+				dbpFailsNum++;
 			}
 
 			public void onSuccess(DBPediaResponse result) {	
@@ -426,8 +428,13 @@ public class Sottotestogwt implements EntryPoint {
 
 				spLogger.addDBPlog(result);
 				
-				if (dbpediaResp.getCode()!=200) HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
-				else HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);			
+				if (dbpediaResp.getCode()==200){
+					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);	
+				}
+				else {					
+					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
+					dbpFailsNum++;
+				}
 			}});
 
 	}
@@ -519,8 +526,9 @@ public class Sottotestogwt implements EntryPoint {
 	}
 
 	private void updateDBpediaServiceLabel(DBPQueryResp resp){
-		if (dbpqCallsDone >= dbpqCallsToDo){
-			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
+		if (dbpqCallsDone >= dbpqCallsToDo){ //abbiamo finito le calls
+			if (dbpFailsNum==0) HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
+			else HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL+" (x"+dbpFailsNum+")");
 		}
 		else{
 			HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling+" ("+resp.getCallNum()+"/"+resp.getMaxCalls()+")");
@@ -530,7 +538,8 @@ public class Sottotestogwt implements EntryPoint {
 	private void callDBPediaQuery(final DBPQueryResp resp){
 		dbpqService.sendToServer(resp, new AsyncCallback<DBPQueryResp>() {
 			public void onFailure(Throwable caught) {
-				dbpqCallsDone++; //update main counter				
+				dbpqCallsDone++; //update main counter	
+				dbpFailsNum++;
 				updateDBpediaServiceLabel(resp); //show the status
 				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): ONFAILURE() - call n."+resp.getCallNum()+"/"+resp.getMaxCalls());
 			}
@@ -555,35 +564,36 @@ public class Sottotestogwt implements EntryPoint {
 		//initialize main counter
 		dbpqCallsDone=0;
 		dbpqCallsToDo=0;
-		
+
 		for (EkpResponse resp : respList)
-		if(resp.getCode()==200)	
-		listService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
-			public void onFailure(Throwable caught) {
-				//set the error
-				Debug.printDbgLine("Sottotestogwt.java: callListService(): onFailure()");
-			}
+			if(resp.getCode()==200)	
+				listService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
+					public void onFailure(Throwable caught) {
+						//set the error
+						Debug.printDbgLine("Sottotestogwt.java: callListService(): onFailure()");
+						HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
+					}
 
-			public void onSuccess(List<DBPQueryResp> result) {
-				//update main counter
-				dbpqCallsToDo+=result.size();
-				
-				spLogger.addDBPlog(result.get(0)); //add new tab to dbpedia service log
-				
-				Iterator<DBPQueryResp> iter = result.iterator();
-				Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess(): calling DBPQ "+result.size()+" times for "+result.get(0).getEntity());
+					public void onSuccess(List<DBPQueryResp> result) {
+						//update main counter
+						dbpqCallsToDo+=result.size();
 
-				DBPQueryResp temp = new DBPQueryResp();
-				int callNumber=1;
-				while (iter.hasNext()){
-					temp = iter.next();
-					temp.setCallNum(callNumber);
-					callNumber++;
-					temp.setMaxCall(result.size());
-					callDBPediaQuery(temp);
-				}
+						spLogger.addDBPlog(result.get(0)); //add new tab to dbpedia service log
 
-			}});
+						Iterator<DBPQueryResp> iter = result.iterator();
+						Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess(): calling DBPQ "+result.size()+" times for "+result.get(0).getEntity());
+
+						DBPQueryResp temp = new DBPQueryResp();
+						int callNumber=1;
+						while (iter.hasNext()){
+							temp = iter.next();
+							temp.setCallNum(callNumber);
+							callNumber++;
+							temp.setMaxCall(result.size());
+							callDBPediaQuery(temp);
+						}
+
+					}});
 
 	}
 	
@@ -612,6 +622,7 @@ public class Sottotestogwt implements EntryPoint {
 			if(!HtmlTagmeService.getHTML().contains("Waiting")) spLogger.showTagmeDataDB();}});
 
 		//dbpedia service
+		dbpFailsNum = 0;
 		HtmlDBPediaService = new HTML();
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
 		HtmlDBPediaService.setStylePrimaryName("serviceLabel");
