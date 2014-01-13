@@ -174,8 +174,7 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("searchContainer").add(titleContentPanel);
 
 		//add service panel to page
-		InitServiceStatusPanel();
-		RootPanel.get("servicesContainer").add(serviceStatusPanel);
+		InitServiceStatusPanel();		
 
 		//add results panel to page
 		rc = new ResultController();
@@ -646,6 +645,9 @@ public class Sottotestogwt implements EntryPoint {
 		serviceStatusPanelHC.add(HtmlDBPediaService, new HorizontalLayoutData(0.33, 1, new Margins(4)));
 		serviceStatusPanelHC.setBorders(false);
 		serviceStatusPanel.setWidget(serviceStatusPanelHC);		
+		
+		RootPanel.get("servicesContainer").clear();
+		RootPanel.get("servicesContainer").add(serviceStatusPanel);
 
 	}	
 
@@ -882,9 +884,11 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("searchContainer").add(titleContentPanel);
 
 		//reinit service status panel items
+		/*
 		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
 		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
+		*/
 		InitServiceStatusPanel();
 
 		//reinit results panel items
