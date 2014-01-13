@@ -186,6 +186,9 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 .GB2UA-DDDOB{ /*clear.gif*/
 	/*width:0px; display:none;*/
 }
+.GB2UA-DDBOB>:FIRST-CHILD{
+	width:0px; display:none;
+}
 /*-----------------------------------------------------------------------*/
 
 
