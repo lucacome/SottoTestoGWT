@@ -26,9 +26,9 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 	private static final long serialVersionUID = 1L;
 	//private static org.apache.log4j.Logger log= Logger.getLogger(DBPediaServiceImpl.class);
 
-	public DBPediaResponse sendToServer(TagmeResponse tagmResp, List<String> dbprop) throws IllegalArgumentException {
+	public DBPediaResponse sendToServer(String tagmResp, List<String> dbprop, String type) throws IllegalArgumentException {
 		Debug.printDbgLine("DBPediServiceImpl.java: sendToServer()");
-
+		Debug.printDbgLine("DBPediServiceImpl.java: type="+type);
 
 		DBPediaResponse responseQuery;
 		ResultSet results = null;
@@ -40,14 +40,14 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		String prefix,prefixlink;
 		prefix = "dbo:";
 		prefixlink = "<http://dbpedia.org/ontology/>";
-		List<String> titletagme = tagmResp.getTitleTag();
-		Iterator<String> itertitle =  titletagme.iterator();
+//		List<String> titletagme = tagmResp.getTitleTag();
+//		Iterator<String> itertitle =  titletagme.iterator();
 		try {
 
 
-			while (itertitle.hasNext()){
+//			while (itertitle.hasNext()){
 
-				String titletag = itertitle.next();	
+				String titletag = tagmResp;	
 
 				for (int j=0; j <= dbprop.size()-1; j++){
 					String s2 = "PREFIX "+prefix+prefixlink+" \n" +
@@ -81,7 +81,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 				}
 				//TODO output in json
 
-			}
+			
 			responseQuery.setQueryResultXML(resultQueryXML);
 			responseQuery.setQueryResultText(resultQueryText);
 

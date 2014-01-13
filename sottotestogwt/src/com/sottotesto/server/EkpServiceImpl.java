@@ -122,7 +122,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				
 				
 				type = m.getNsPrefixURI("j.0");
-				
+				result.setType(type.replace("http://www.ontologydesignpatterns.org/aemoo/ekp//", "").replace(".owl#", ""));
 				
 				HttpURLConnection connessione2 = null;
 				InputStream stream2 = null;
@@ -132,7 +132,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				connessione2.setRequestProperty("Accept", "application/rdf+xml");
 
 				stream2 = connessione2.getInputStream();
-				Debug.printDbgLine("1");
 				String responseType = "";
 				if (connessione2.getContentType().contains("application/rdf+xml")){
 					Scanner inputs2 = new Scanner(stream2);	

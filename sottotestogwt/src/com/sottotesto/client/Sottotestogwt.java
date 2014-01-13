@@ -373,13 +373,13 @@ public class Sottotestogwt implements EntryPoint {
 					showTaggedResult();
 					
 					//chiamiamo DBPedia							
-					List<String> dbproperty = new ArrayList<String>();
-					//dbproperty.add("birthDate");
-					//dbproperty.add("title");
-					//dbproperty.add("name");
-					//dbproperty2.add("placeOfBirth");
-					dbproperty.add("abstract");
-					callDBPedia(dbproperty);
+//					List<String> dbproperty = new ArrayList<String>();
+//					//dbproperty.add("birthDate");
+//					//dbproperty.add("title");
+//					//dbproperty.add("name");
+//					//dbproperty2.add("placeOfBirth");
+//					dbproperty.add("abstract");
+//					callDBPedia(dbproperty);
 					//callDBPedia(dbproperty2);
 
 					//chiamiamo Ekp
@@ -405,11 +405,11 @@ public class Sottotestogwt implements EntryPoint {
 		});
 	}
 
-	private void callDBPedia(List<String> dbprop){
+	private void callDBPedia(String tagme, List<String> dbprop, String type){
 		Debug.printDbgLine("Sottotestogwt.java: callDBPedia()");	
 
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling);		
-		dbpediaService.sendToServer(tagmeResp, dbprop, new AsyncCallback<DBPediaResponse>() {
+		dbpediaService.sendToServer(tagme, dbprop, type, new AsyncCallback<DBPediaResponse>() {
 			public void onFailure(Throwable caught) {
 				//set the error
 				dbpediaResp = new DBPediaResponse(); 
@@ -510,6 +510,18 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 					ekpFailsNum++;
 				}
+				List<String> dbproperty = new ArrayList<String>();
+				//dbproperty.add("birthDate");
+				//dbproperty.add("title");
+				//dbproperty.add("name");
+				//dbproperty2.add("placeOfBirth");
+				String ekpType = ekpRespTmp.getType();
+				dbproperty.add("abstract");
+				List<String> tag = tagmeResp.getTitleTag();
+				//Iterator<String> tagList = tag.listIterator();
+				
+				for (String s : tag)
+					callDBPedia(s, dbproperty, ekpType);
 
 				if (ekpRemainingCallNum>0){
 					callEkp();
