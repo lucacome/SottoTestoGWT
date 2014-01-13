@@ -90,7 +90,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
 			//Debug.printDbgLine("EkpServiceImpl.java: respmessage="+connessione.getResponseMessage());
 			String responseEkpTemp = "";
-			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){		
+			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
 				Scanner inputs = new Scanner(stream);	
 				while (inputs.hasNextLine())
 					responseEkpTemp += inputs.nextLine();
@@ -130,7 +130,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					
 					linkmap.put(s.getPredicate().getLocalName(), s.getObject().toString());
 					Resource oth = null;
-					//Debug.printDbgLine(s.getObject().toString());
+					Debug.printDbgLine(s.getObject().toString());
 					oth = m.getResource(s.getObject().toString());
 					StmtIterator a = null;
 
