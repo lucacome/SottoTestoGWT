@@ -8,7 +8,6 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.maps.gwt.client.LatLng;
@@ -275,9 +274,10 @@ public class ResultController {
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
 				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
-				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
-				infovisC.setCheckBoxes(treeDataSelected.getJsonHT());
+				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");				
 				infovisC.setListFD(listFD);
+				infovisC.setLinks(treeDataSelected.getLinks());
+				infovisC.setCheckBoxes(treeDataSelected.getJsonHT());
 				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);		
 				showLoading(false); //hide loading
 			}

@@ -1,5 +1,8 @@
 package com.sottotesto.shared;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TreeData {
 
 	public static final class CLICK_ACTIONS {
@@ -15,6 +18,8 @@ public class TreeData {
 	private String clickAction;
 	private String jsonFD;
 	private String jsonHT;
+	
+	private List<String> linkList;
 
 	public TreeData(String id, String name){
 		this.id = id;
@@ -22,6 +27,7 @@ public class TreeData {
 		this.clickAction = CLICK_ACTIONS.NOTHING;
 		this.jsonFD = "";
 		this.jsonHT = "";
+		this.linkList=new ArrayList<String>();
 
 		Debug.printDbgLine("TreeData.java:new data: "+id+" - "+name);
 	}
@@ -49,7 +55,8 @@ public class TreeData {
 	public void setJsonFD(String jsonFD) {this.jsonFD = jsonFD;}
 	public String getJsonHT() {return jsonHT;}
 	public void setJsonHT(String jsonHT) {this.jsonHT = jsonHT;}
-
+	public List<String> getLinks(){return linkList;}
+	public void setLinks(List<String> listLinks){linkList= new ArrayList<String>(); linkList=listLinks;}
 
 }
 

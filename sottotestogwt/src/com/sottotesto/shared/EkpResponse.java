@@ -55,4 +55,7 @@ public class EkpResponse implements java.io.Serializable{
 	public String getTag(){return tag;}
 	public void setTime(long x) {time = x;}
 	public long getTime(){return time;}
+	
+	public List<String> getLinks(){return linkList;}
+	public void setLinks(List<String> listLinks){linkList= new ArrayList<String>(); linkList=listLinks;}
 }

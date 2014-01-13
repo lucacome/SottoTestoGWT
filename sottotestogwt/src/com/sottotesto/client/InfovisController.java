@@ -1,7 +1,6 @@
 package com.sottotesto.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.core.shared.GWT;
@@ -18,7 +17,6 @@ import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
-import com.sencha.gxt.widget.core.client.info.Info;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.Utility;
 
@@ -49,6 +47,8 @@ public class InfovisController {
 	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
 	private final GHTServiceAsync GHTService = GWT.create(GHTService.class);
 	private List<String> listFD;
+	private List<String> linkList;
+	private List<String> linkNameList;
 
 	public Widget init(){		
 		Debug.printDbgLine("InfovisController.java: init()");
@@ -112,15 +112,13 @@ public class InfovisController {
 		      }
 		    };
 
-		//obtain linksTo
-		List<String> links = new ArrayList<String>();
-		List<String> splittedJson = Arrays.asList(json.split("linksTo"));
-		for(int i=1; i<splittedJson.size(); i++){
-			String s = splittedJson.get(i);
-			s = s.split("\"")[0];
-			if(links.indexOf(s)==-1) links.add(s);
+		linkNameList = new ArrayList<String>();
+		for (String s : linkList){
+			String sSplit[] = s.split("(?=\\p{Upper})");
+			linkNameList.add(sSplit[sSplit.length-1]);
+			Debug.printDbgLine("InfovisController.java: setCheckBoxes(): added->"+linkNameList.get(linkNameList.size()-1));
 		}
-
+		
 		//togli i vecchi checkbox, se presenti
 		checkBoxHC.clear();
 		
@@ -131,7 +129,7 @@ public class InfovisController {
 
 		//crea ed aggiungi i vari checkBox
 		checkBoxes = new ArrayList<CheckBox>();
-		for (String curLink : links){
+		for (String curLink : linkNameList){
 			CheckBox cb = new CheckBox();
 			cb.setId("graphCheckBox");
 			cb.setValue(true);
@@ -146,48 +144,48 @@ public class InfovisController {
 	
 	
 	//dato un elenco di entita' crea le checkbox corrispondenti
-		public void setCheckBoxes(final List<String> entities){
-			
-			//set checkboxes change handler
-			ValueChangeHandler<Boolean> checkBoxLinksHandler = new ValueChangeHandler<Boolean>() {		       
-			      @Override
-			      public void onValueChange(ValueChangeEvent<Boolean> event) {
-			    	
-			    	//check selected checkboxes
-			    	List<String> selectedEntities = new ArrayList<String>();
-			    	selectedEntities = getSelectedDBPlinks();
-			    	
-			    	//if selected 0?
-			    	//callGHTService(json, selectedLinksTo);
-			    	Utility.showLoadingBar();
-			    	callGraphService(listFD, selectedEntities);
-			      }
-			    };
+	public void setCheckBoxes(final List<String> entities){
 
-			
-			//togli i vecchi checkbox, se presenti
-			checkBoxHC.clear();
-			
-			//aggiungi un label
-			HTML checkBoxLabel = new HTML();
-			checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Confronta: </b></span>");		
-			checkBoxHC.add(checkBoxLabel);
+		//set checkboxes change handler
+		ValueChangeHandler<Boolean> checkBoxLinksHandler = new ValueChangeHandler<Boolean>() {		       
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
 
-			//crea ed aggiungi i vari checkBox
-			checkBoxes = new ArrayList<CheckBox>();
-			for (String curEntity : entities){
-				CheckBox cb = new CheckBox();
-				cb.setId("graphCheckBox");
-				cb.setValue(true);
-				curEntity=curEntity.replace("_", " ");
-				cb.setBoxLabel(curEntity);
-				cb.addValueChangeHandler(checkBoxLinksHandler);
-				cb.setAllowTextSelection(false);				
-				checkBoxes.add(cb);
-				checkBoxHC.add(cb);
+				//check selected checkboxes
+				List<String> selectedEntities = new ArrayList<String>();
+				selectedEntities = getSelectedDBPlinks();
+
+				//if selected 0?
+				//callGHTService(json, selectedLinksTo);
+				Utility.showLoadingBar();
+				callGraphService(listFD, selectedEntities);
 			}
-			
+		};
+
+
+		//togli i vecchi checkbox, se presenti
+		checkBoxHC.clear();
+
+		//aggiungi un label
+		HTML checkBoxLabel = new HTML();
+		checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Confronta: </b></span>");		
+		checkBoxHC.add(checkBoxLabel);
+
+		//crea ed aggiungi i vari checkBox
+		checkBoxes = new ArrayList<CheckBox>();
+		for (String curEntity : entities){
+			CheckBox cb = new CheckBox();
+			cb.setId("graphCheckBox");
+			cb.setValue(true);
+			curEntity=curEntity.replace("_", " ");
+			cb.setBoxLabel(curEntity);
+			cb.addValueChangeHandler(checkBoxLinksHandler);
+			cb.setAllowTextSelection(false);				
+			checkBoxes.add(cb);
+			checkBoxHC.add(cb);
 		}
+
+	}
 	
 	 
 	
@@ -196,7 +194,7 @@ public class InfovisController {
 		
 		for(CheckBox cb : checkBoxes){
 			if (cb.getValue()){
-				selectedLinks.add("linksTo"+cb.getBoxLabel());
+				selectedLinks.add(linkList.get(checkBoxes.indexOf(cb)));
 			}
 		}		
 		return selectedLinks;
@@ -298,4 +296,5 @@ public class InfovisController {
 	}-*/;
 
 	public void setListFD(List<String> listFDtoSet){listFD=new ArrayList<String>(); listFD=listFDtoSet;}
+	public void setLinks(List<String> listLinks){linkList=new ArrayList<String>(); linkList=listLinks;}
 }

@@ -506,6 +506,7 @@ public class Sottotestogwt implements EntryPoint {
 				// create tree entry for hypertree graph
 				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
 				tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
+				tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());
 				treeStore.add(tdHyperTree, tdEntriesList.get(tdEntriesList.size()-1));		
 
 				ekpResp.add(ekpRespTmp);
@@ -797,7 +798,7 @@ public class Sottotestogwt implements EntryPoint {
 			HTML pupupHtml = new HTML();
 
 			// DOVREI FAR VEDERE ROBA DI DBPEDIA....
-			pupupHtml.setHTML("<b>"+entity+"</b><br>"+dbpediaResp.getQueryResultXML());
+			pupupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>"+dbpediaResp.getQueryResultXML());
 
 			taggedEntityPopup.setWidget(pupupHtml);
 			taggedEntityPopup.setPopupPosition(0, RootPanel.get("servicesContainer").getAbsoluteTop());
