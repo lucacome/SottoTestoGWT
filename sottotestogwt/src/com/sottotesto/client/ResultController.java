@@ -46,7 +46,7 @@ import com.sottotesto.shared.Utility;
  */
 public class ResultController {
 
-	private int panelMaxWidth, panelMaxHeight;
+	private int panelMaxHeight;
 
 	private ContentPanel panel, centerPanel;
 	private BorderLayoutContainer border;
@@ -89,7 +89,6 @@ public class ResultController {
 		markerList = new ArrayList<DBPQueryResp>();
 		listFD = new ArrayList<String>();
 
-		panelMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 		int bottomMargin = 5;
 		panelMaxHeight = RootPanel.get().getOffsetHeight()-
 				RootPanel.get("searchContainer").getOffsetHeight()-
@@ -100,7 +99,7 @@ public class ResultController {
 		panel = new ContentPanel();
 		panel.setHeadingText("Risultati");	
 		panel.setId("resultPanel");
-		panel.setWidth(panelMaxWidth);
+		panel.setWidth(Utility.getPanelsMaxWidth());
 		panel.setHeight(panelMaxHeight+"px");
 		panel.setCollapsible(false);
 
@@ -135,6 +134,9 @@ public class ResultController {
 		mapC = new MapController(); //initialize map controller	
 		mapC.init();	
 		firstMapLoad=true;
+		
+		RootPanel.get("resultsContainer").clear();
+		RootPanel.get("resultsContainer").add(getPanel());
 	}
 
 	public void reInit(){

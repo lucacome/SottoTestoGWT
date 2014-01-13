@@ -54,8 +54,6 @@ import com.sottotesto.shared.Utility;
  */
 public class Sottotestogwt implements EntryPoint {
 
-	private int panelsMaxWidth;
-
 	//title panel items
 	private String textAreaDefText; //default text written on textarea
 	private String textSendButton;  //default tet written on send button
@@ -162,7 +160,6 @@ public class Sottotestogwt implements EntryPoint {
 	//initialize items and load them on page
 	private void initItems(){
 		Debug.printDbgLine("Sottotestogwt.java: initItems()");
-		panelsMaxWidth = RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 
 		//init services responses
 		tagmeResp = new TagmeResponse();
@@ -179,7 +176,7 @@ public class Sottotestogwt implements EntryPoint {
 		//add results panel to page
 		rc = new ResultController();
 		rc.init();
-		RootPanel.get("resultsContainer").add(rc.getPanel());
+		
 
 	}		
 
@@ -212,7 +209,7 @@ public class Sottotestogwt implements EntryPoint {
 		titleHTML.setHeight("10px");
 		titleContentPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
 		titleContentPanel.setHeadingHtml("SOTTOTESTO WEBAPPLICATION");
-		titleContentPanel.setWidth(panelsMaxWidth);
+		titleContentPanel.setWidth(Utility.getPanelsMaxWidth());
 		titleContentPanel.setHeight(RootPanel.get("searchContainer").getOffsetHeight()+"px");
 
 		textAreaFP = new FlowPanel();
@@ -224,7 +221,7 @@ public class Sottotestogwt implements EntryPoint {
 
 		searchPanelHC = new HorizontalLayoutContainer();
 		searchPanelHC.setId("searchHorContainer");
-		searchPanelHC.setWidth(panelsMaxWidth);
+		searchPanelHC.setWidth(Utility.getPanelsMaxWidth());
 		searchPanelHC.setBorders(false);
 		searchPanelHC.add(textAreaLabel, new HorizontalLayoutData(0.15, 1, new Margins(14)));
 		searchPanelHC.add(textAreaFP, new HorizontalLayoutData(0.70, 1, new Margins(4)));
@@ -601,7 +598,7 @@ public class Sottotestogwt implements EntryPoint {
 		serviceStatusPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
 		serviceStatusPanel.setHeadingText("Service Status");
 		serviceStatusPanel.setId("serviceStatusPanel");
-		serviceStatusPanel.setWidth(panelsMaxWidth);
+		serviceStatusPanel.setWidth(Utility.getPanelsMaxWidth());
 		serviceStatusPanel.setHeight(RootPanel.get("servicesContainer").getOffsetHeight()+"px");
 		serviceStatusPanelHC = new HorizontalLayoutContainer();
 		spLogger = new ServicePanelLogger();
@@ -707,7 +704,7 @@ public class Sottotestogwt implements EntryPoint {
 		searchPanelHC.clear();
 		searchPanelHC = new HorizontalLayoutContainer();
 		searchPanelHC.setId("searchHorContainer");
-		searchPanelHC.setWidth(panelsMaxWidth);
+		searchPanelHC.setWidth(Utility.getPanelsMaxWidth());
 		searchPanelHC.setBorders(false);
 		searchPanelHC.add(textAreaLabel, new HorizontalLayoutData(0.15, 1, new Margins(14)));
 		searchPanelHC.add(taggedPhraseFC, new HorizontalLayoutData(0.70, 1, new Margins(4)));
@@ -884,19 +881,12 @@ public class Sottotestogwt implements EntryPoint {
 		RootPanel.get("searchContainer").add(titleContentPanel);
 
 		//reinit service status panel items
-		/*
-		HtmlTagmeService.setHTML(HTMLtagmeServiceStringWaiting);
-		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
-		HtmlEkpService.setHTML(HTMLekpServiceStringWaiting);
-		*/
 		InitServiceStatusPanel();
 
 		//reinit results panel items
-		RootPanel.get("resultsContainer").clear();
 		rc.init();
-		RootPanel.get("resultsContainer").add(rc.getPanel());
 
-		//show Loading Icon
+		//hide Loading Icon
 		RootPanel.get("homeLoading").setVisible(false);
 		rc.showLoading(false);
 	}

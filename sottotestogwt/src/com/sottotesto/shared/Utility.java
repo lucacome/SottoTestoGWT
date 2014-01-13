@@ -84,5 +84,9 @@ public class Utility {
 		int dbMaxWidth = RootPanel.get().getOffsetWidth()/3;
 		return dbMaxWidth;
 	}
+	
+	public static int getPanelsMaxWidth(){
+		return RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
+	}
 
 }
