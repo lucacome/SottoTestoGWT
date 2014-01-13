@@ -58,6 +58,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		RDFReader arp = null;
 		arp = m.getReader();
 		String jresp = null;
+		String type = "";
 		List<String> linkList = new ArrayList<String>();
 		String inputbello = input;
 
@@ -118,6 +119,43 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				jsonFD.data = mapDataFD;
 
 				
+				
+				
+				type = m.getNsPrefixURI("j.0");
+				
+				
+				HttpURLConnection connessione2 = null;
+				InputStream stream2 = null;
+				connessione2 = (HttpURLConnection)new URL(type).openConnection();
+				connessione2.setRequestMethod("GET");
+				connessione2.setDoOutput(true);
+				connessione2.setRequestProperty("Accept", "application/rdf+xml");
+
+				stream2 = connessione2.getInputStream();
+				Debug.printDbgLine("1");
+				String responseType = "";
+				if (connessione2.getContentType().contains("application/rdf+xml")){
+					Scanner inputs2 = new Scanner(stream2);	
+					while (inputs2.hasNextLine())
+						responseType += inputs2.nextLine();
+
+					inputs2.close();
+					connessione2.disconnect();
+					stream2.close();
+				}
+				//Debug.printDbgLine("response="+responseType);
+				RDFReader arp2 = null;
+				Model m2 = ModelFactory.createDefaultModel();
+						
+				arp2 = m2.getReader();
+
+				InputStream in2 = new ByteArrayInputStream(responseType.getBytes("UTF-8"));
+
+				arp2.read(m2, in2, type);
+
+				Resource connection = null;
+		
+				
 
 				Resource link = null;
 				link = m.getResource(about);
@@ -131,7 +169,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					
 					linkmap.put(s.getPredicate().getLocalName(), s.getObject().toString());
 					Resource oth = null;
-					Debug.printDbgLine(s.getObject().toString());
+					//Debug.printDbgLine(s.getObject().toString());
 					oth = m.getResource(s.getObject().toString());
 					StmtIterator a = null;
 
@@ -163,12 +201,50 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						JData jsonHTsub = new JData();
 
 						String jlast = null;
+						
+											
+						
+						
+						
+						connection = m2.getResource(type+key.toString());
+						
+						StmtIterator i2 = null;
+						
+						String comment = "";
+						String label = "";
+						String range = "";
+						
+						for (i2 = connection.listProperties(); i2.hasNext(); ) {
+							Statement s2 = i2.next();	
+					
+							
+							//Debug.printDbgLine("BOH"+s2+"\n");
+						//	Debug.printDbgLine("BOH2"+s2.getLiteral());
+							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("comment")){
+								Debug.printDbgLine("Comment="+s2.getObject().toString().replace("@en", ""));
+								comment = s2.getObject().toString().replace("@en", "");
+							}
+							
+							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("label")){
+								Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
+								label = s2.getObject().toString().replace("@en", "");
+							}
+							if (s2.getPredicate().toString().contains("range")){
+								Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
+								range = s2.getObject().toString().replace("http://dbpedia.org/ontology/", "");
+								
+							}
 
-
+						
+						}
+						
+	
 						jsonHTsub.id = key.toString();
-						jsonHTsub.name = jsonHTsub.id.replace("linksTo", "");
+						jsonHTsub.name = range;
 						jsonHTsub.data.put("$type", "triangle");
 						jsonHTsub.data.put("$color", "#EB6F24");
+						jsonHTsub.data.put("comment", comment);
+						jsonHTsub.data.put("label", label);
 						jsonHTsub.data.put("relation", key.toString());
 						//Debug.printDbgLine("1");
 
