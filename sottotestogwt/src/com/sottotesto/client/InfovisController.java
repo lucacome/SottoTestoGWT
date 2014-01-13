@@ -95,6 +95,39 @@ public class InfovisController {
 		return infovisContainer;
 	}
 	
+	// legge linkList per creare linkNameList
+	private void setLinkNames(){
+		linkNameList = new ArrayList<String>();
+		
+		List<String> linksPossibilites = new ArrayList<String>();
+		linksPossibilites.add("linksTo");
+		linksPossibilites.add("has");
+		
+		for (String s : linkList){
+			
+			String sName = "";
+			
+			/*
+			//METODO 1: PRENDI SOLO L'ULTIMA PAROLA CHE PARTE CON MAIUSCOLO
+			String sSplit[] = s.split("(?=\\p{Upper})");
+			sName = sSplit[sSplit.length-1];
+			*/
+			
+			
+			//METODO 2: USA UNA LISTA DI POSSIBILITA'
+			sName = s;
+			for(String prefix : linksPossibilites){
+				if (sName.contains(prefix) && sName.charAt(0)==prefix.charAt(0)){
+					sName = sName.replace(prefix, "");
+					break;
+				}
+			}
+			
+			// add found name to list
+			linkNameList.add(sName);			
+		}
+	}
+	
 	//dato un json crea le checkbox con i vari linksTo
 	public void setCheckBoxes(final String json){
 		
@@ -112,12 +145,8 @@ public class InfovisController {
 		      }
 		    };
 
-		linkNameList = new ArrayList<String>();
-		for (String s : linkList){
-			String sSplit[] = s.split("(?=\\p{Upper})");
-			linkNameList.add(sSplit[sSplit.length-1]);
-			Debug.printDbgLine("InfovisController.java: setCheckBoxes(): added->"+linkNameList.get(linkNameList.size()-1));
-		}
+		//create list with links Names for chebox labels
+		 setLinkNames();	
 		
 		//togli i vecchi checkbox, se presenti
 		checkBoxHC.clear();
