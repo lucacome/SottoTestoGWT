@@ -117,6 +117,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				mapDataFD.put("$color", "#BD1B89");
 				jsonFD.data = mapDataFD;
 
+				
 
 				Resource link = null;
 				link = m.getResource(about);
