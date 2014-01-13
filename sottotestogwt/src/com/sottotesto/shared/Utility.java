@@ -2,6 +2,9 @@ package com.sottotesto.shared;
 
 import java.io.UnsupportedEncodingException;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
 
@@ -13,6 +16,15 @@ public class Utility {
 		if(loadingBox == null) loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
 		loadingBox.setProgressText("... Working ...");
 		loadingBox.setShadow(true);
+		HTML closeButton = new HTML("<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\"><img src=\"closeicon.gif\" height=\"20px\"/></div>");
+		closeButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {	
+				loadingBox.hide();
+			}
+		});
+		loadingBox.addTool(closeButton);
 		loadingBox.auto();
 		loadingBox.show();
 	}
