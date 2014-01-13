@@ -499,7 +499,7 @@ public class Sottotestogwt implements EntryPoint {
 				treeStore.add(tdForcedirected, tdEntriesList.get(tdEntriesList.size()-1));
 				*/
 				
-				// create tree entry for hypertree graph
+				// create tree entry for hypertree graph 
 				tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
 				tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
 				tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());
