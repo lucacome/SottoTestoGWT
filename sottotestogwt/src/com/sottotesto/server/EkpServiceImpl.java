@@ -59,6 +59,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		arp = m.getReader();
 		String jresp = null;
 		List<String> linkList = new ArrayList<String>();
+		String inputbello = input;
 
 		try {
 			input = URLEncoder.encode(input, "UTF-8");
@@ -84,12 +85,12 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			result.setMessage(connessione.getResponseMessage());
 			result.setContentType(connessione.getContentType());
 
-			result.setTag(input);
+			result.setTag(inputbello);
 			Debug.printDbgLine("URL="+connessione.getURL());
 			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
 			//Debug.printDbgLine("EkpServiceImpl.java: respmessage="+connessione.getResponseMessage());
 			String responseEkpTemp = "";
-			if (result.getContentType().contains("application/rdf+xml") && result.getCode() > 0){		
+			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){		
 				Scanner inputs = new Scanner(stream);	
 				while (inputs.hasNextLine())
 					responseEkpTemp += inputs.nextLine();
@@ -98,15 +99,15 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				connessione.disconnect();
 				stream.close();
 			}
-			//Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
+			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
 			if (responseEkpTemp.isEmpty()){
-				result.setRDF("Stringa vuota");
+				result.setRDF("Stringa vuota, Code="+result.getCode());
 			}else{
 				result.setRDF(responseEkpTemp);
 
 				InputStream in = new ByteArrayInputStream(responseEkpTemp.getBytes("UTF-8"));
 				arp.read(m, in, null);
-				String about = "http://dbpedia.org/resource/"+input;
+				String about = "http://dbpedia.org/resource/"+inputbello;
 				Map<String, String> mapDataFD = new HashMap<String,String>();
 				String jfd = null;
 
@@ -225,7 +226,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				jsonHT.setLink(linkmap);
 				//Debug.printDbgLine(jsonHT.getLink().toString());
 				tag.clear();
-				tag.put(input, jsonHT.getLink());
+				tag.put(inputbello, jsonHT.getLink());
 				//		jdata.setTag(tag);
 
 				//	Gson ekpj = new GsonBuilder().disableHtmlEscaping().create();
