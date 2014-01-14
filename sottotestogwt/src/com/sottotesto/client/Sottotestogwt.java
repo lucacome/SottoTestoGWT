@@ -122,12 +122,11 @@ public class Sottotestogwt implements EntryPoint {
 
 	//service responses variables
 	private TagmeResponse tagmeResp; //response of TAGME service
-	private DBPediaResponse dbpediaResp; //response of DBPEDIA service
-	private List<EkpResponse> ekpResp; //response of EKP service
+	private List<DBPediaResponse> dbpediaResps; //response of DBPEDIA service
+	private int dbpCallsDone, dbpCallsToDo;
+	private List<EkpResponse> ekpResps; //response of EKP service
 	private int ekpFailsNum;
-	private int dbpqCallsDone;
-	private int dbpqCallsToDo;
-	private int dbpFailsNum;
+	private int dbpqCallsDone, dbpqCallsToDo, dbpFailsNum;
 	
 	//resources
 	TextResource resourceHTMLmap;
@@ -165,8 +164,8 @@ public class Sottotestogwt implements EntryPoint {
 
 		//init services responses
 		tagmeResp = new TagmeResponse();
-		dbpediaResp = new DBPediaResponse();
-		ekpResp = new ArrayList<EkpResponse>();
+		dbpediaResps = new ArrayList<DBPediaResponse>();
+		ekpResps = new ArrayList<EkpResponse>();
 
 		//add search panel to page
 		initSearchPanel();		
@@ -372,15 +371,6 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
 					showTaggedResult();
 					
-					//chiamiamo DBPedia							
-//					List<String> dbproperty = new ArrayList<String>();
-//					//dbproperty.add("birthDate");
-//					//dbproperty.add("title");
-//					//dbproperty.add("name");
-//					//dbproperty2.add("placeOfBirth");
-//					dbproperty.add("abstract");
-//					callDBPedia(dbproperty);
-					//callDBPedia(dbproperty2);
 
 					//chiamiamo Ekp
 					HtmlEkpService.setHTML(HTMLekpServiceStringCalling);
@@ -397,43 +387,49 @@ public class Sottotestogwt implements EntryPoint {
 					//intialize an empty tree
 					initEmptyTree();
 
-					ekpResp = new ArrayList<EkpResponse>();
+					dbpCallsDone=0;
+					dbpCallsToDo=0;
+					dbpFailsNum=0;
+					ekpResps = new ArrayList<EkpResponse>();
 					callEkp();
-					Debug.printDbgLine("SONO QUI");
 				}						
 			}
 		});
 	}
 
-	private void callDBPedia(String tagme, List<String> dbprop, String type){
+	private void callDBPedia(final String tagme, List<String> dbprop, String type){
 		Debug.printDbgLine("Sottotestogwt.java: callDBPedia()");	
 
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling);		
 		dbpediaService.sendToServer(tagme, dbprop, type, new AsyncCallback<DBPediaResponse>() {
 			public void onFailure(Throwable caught) {
 				//set the error
-				dbpediaResp = new DBPediaResponse(); 
-				dbpediaResp.setCode(-1);
-				dbpediaResp.setQueryResultXML("Error Callig service Module:"+
+				DBPediaResponse badResp = new DBPediaResponse(); 
+				badResp.setCode(-1);
+				badResp.setEntity(tagme);
+				badResp.setQueryResultXML("Error Callig service Module:"+
 						"<br><br><b>StackTrace: </b><br>"+Utility.getErrorHtmlString(caught));
 
-				HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL); //show the fail
+				dbpediaResps.add(badResp);
+				spLogger.addDBPlog(badResp);
+				dbpCallsDone++;
 				dbpFailsNum++;
+				HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL+" (x"+dbpFailsNum+")"); //show the fail
 			}
 
-			public void onSuccess(DBPediaResponse result) {	
-				//Debug.printDbgLine("Sottotestogwt.java: DBPedia result="+result.getQueryResultXML());
-
-				dbpediaResp = result;
-
-				spLogger.addDBPlog(result);
+			public void onSuccess(DBPediaResponse dbResp) {	
+				Debug.printDbgLine("Sottotestogwt.java: callDBPedia(): onSuccess()");	
 				
-				if (dbpediaResp.getCode()==200){
-					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);	
+				spLogger.addDBPlog(dbResp);
+				dbpediaResps.add(dbResp);
+								
+				if (dbResp.getCode()==200){
+					if (dbpFailsNum==0) HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringOK);
+					else HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL+" (x"+dbpFailsNum+")");
 				}
-				else {					
-					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL);
+				else {
 					dbpFailsNum++;
+					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL+" (x"+dbpFailsNum+")");					
 				}
 			}});
 
@@ -452,16 +448,13 @@ public class Sottotestogwt implements EntryPoint {
 		Debug.printDbgLine("Sottotestogwt.java: Ekp input="+input);
 		ekpService.sendToServer(input, new AsyncCallback<EkpResponse>() {
 			public void onFailure(Throwable caught) {
-				
-				
-				
 				//set the error
 				EkpResponse ekpRespTmp = new EkpResponse();
 				ekpRespTmp.setCode(-1);
 				ekpRespTmp.setError("Error Callig service Module:"+
 						"<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 
-				ekpResp.add(ekpRespTmp);
+				ekpResps.add(ekpRespTmp);
 				HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 
 				//update log
@@ -504,24 +497,23 @@ public class Sottotestogwt implements EntryPoint {
 					tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());
 					treeStore.add(tdHyperTree, tdEntriesList.get(tdEntriesList.size()-1));		
 
-					ekpResp.add(ekpRespTmp);
+					ekpResps.add(ekpRespTmp);
+					
+					//call dbpedia
+					List<String> dbproperty = new ArrayList<String>();
+					//dbproperty.add("birthDate");
+					//dbproperty.add("title");
+					//dbproperty.add("name");
+					//dbproperty2.add("placeOfBirth");
+					dbproperty.add("abstract");		
+					dbpCallsToDo++;
+					callDBPedia(ekpRespTmp.getTag(), dbproperty, ekpRespTmp.getType());
 				}
 				else{ // not received 200
 					HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 					ekpFailsNum++;
 				}
-				List<String> dbproperty = new ArrayList<String>();
-				//dbproperty.add("birthDate");
-				//dbproperty.add("title");
-				//dbproperty.add("name");
-				//dbproperty2.add("placeOfBirth");
-				String ekpType = ekpRespTmp.getType();
-				dbproperty.add("abstract");
-				List<String> tag = tagmeResp.getTitleTag();
-				//Iterator<String> tagList = tag.listIterator();
 				
-				for (String s : tag)
-					callDBPedia(s, dbproperty, ekpType);
 
 				if (ekpRemainingCallNum>0){
 					callEkp();
@@ -531,8 +523,8 @@ public class Sottotestogwt implements EntryPoint {
 					rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
 					rc.getTree().expandAll();
 					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
-					rc.setEkpResponses(ekpResp);
-					callListService(ekpResp); //lancia il servizio di "cerca markers"
+					rc.setEkpResponses(ekpResps);
+					callListService(ekpResps); //lancia il servizio di "cerca markers"
 				}
 			}});		
 	}
@@ -571,7 +563,7 @@ public class Sottotestogwt implements EntryPoint {
 
 	}
 	private void callListService(List<EkpResponse> respList){
-		Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery()");
+		Debug.printDbgLine("Sottotestogwt.java: callListService()");
 
 		//initialize main counter
 		dbpqCallsDone=0;
@@ -589,8 +581,6 @@ public class Sottotestogwt implements EntryPoint {
 					public void onSuccess(List<DBPQueryResp> result) {
 						//update main counter
 						dbpqCallsToDo+=result.size();
-
-						spLogger.addDBPlog(result.get(0)); //add new tab to dbpedia service log
 
 						Iterator<DBPQueryResp> iter = result.iterator();
 						Debug.printDbgLine("Sottotestogwt.java: callListService(): onSuccess(): calling DBPQ "+result.size()+" times for "+result.get(0).getEntity());
@@ -814,13 +804,23 @@ public class Sottotestogwt implements EntryPoint {
 	private void showTaggedPopup(String entity){
 		
 		if (entity.length()>0){
-			taggedEntityPopup.clear();
-			HTML pupupHtml = new HTML();
+			taggedEntityPopup.clear(); //clear popup from anything old
+			HTML popupHtml = new HTML();
+			boolean dataFound = false;
 
-			// DOVREI FAR VEDERE ROBA DI DBPEDIA....
-			pupupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>"+dbpediaResp.getQueryResultXML());
+			// search for fitting dbpediaResp data
+			for (DBPediaResponse curResp : dbpediaResps){
+				if (curResp.getEntity().equals(entity)){
+					popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>"+curResp.getQueryResultXML());
+					dataFound=true;
+				}
+			}
+			
+			if (!dataFound){
+				popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>Nessun dato per questa entita'.");
+			}
 
-			taggedEntityPopup.setWidget(pupupHtml);
+			taggedEntityPopup.setWidget(popupHtml);
 			taggedEntityPopup.setPopupPosition(0, RootPanel.get("servicesContainer").getAbsoluteTop());
 			taggedEntityPopup.show();
 		}

@@ -35,6 +35,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		long StartTime = System.currentTimeMillis();
 		responseQuery = new DBPediaResponse();
 
+		responseQuery.setEntity(tagmResp);
 		String resultQueryXML = "";
 		String resultQueryText = "";
 		String prefix,prefixlink;

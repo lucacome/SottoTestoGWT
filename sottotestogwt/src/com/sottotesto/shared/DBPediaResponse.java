@@ -13,6 +13,7 @@ public class DBPediaResponse implements java.io.Serializable{
 	private String queryResultJson;
 	private String queryResultXML;
 	private long time;
+	private String entity;
 
 	public DBPediaResponse() {
 		code = 0;
@@ -43,4 +44,6 @@ public class DBPediaResponse implements java.io.Serializable{
 	public long getTime(){return time;}
 	public String getError(){return error;}
 	public void setError(String x) {error = x;}
+	public String getEntity(){return entity;}
+	public void setEntity(String x) {entity = x;}
 }

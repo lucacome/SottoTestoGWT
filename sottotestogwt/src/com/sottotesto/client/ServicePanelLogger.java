@@ -16,6 +16,7 @@ import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
+import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
@@ -164,34 +165,53 @@ public class ServicePanelLogger {
 		ekpTabPanel.add(html, ekpResp.getTag());
 	}
 	public void addDBPlog(DBPediaResponse dbpediaResp){
-		HTML html = new HTML("");		
-		html.setTitle("Description");
-		html.setHTML(html.getHTML()+"<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms");
-		html.setHTML(html.getHTML()+"<br><br><b>Code:</b> "+String.valueOf(dbpediaResp.getCode())+"ms");
-		if (dbpediaResp.getCode()==200){
-			html.setHTML(html.getHTML()+"<br><br><b>Result Query:</b><br>"+dbpediaResp.getQueryResultXML());
-		}
-		else{
-			html.setHTML(html.getHTML()+"<br><br><b>Error:</b><br>"+dbpediaResp.getError());	
-		}		
+		Debug.printDbgLine("ServicePanelLogger.java: addDBPlog(): adding dbpediaResp LOG1: "+dbpediaResp.getEntity()+"*********************_WHY??_*************");
+		boolean tabAlreadyPresent = false;
 		
-		html.setWidth(Utility.getDbMaxWidth()-(Utility.getDbMaxWidth()*8/100)+"px");
-		dbpTabPanel.add(html, "Description");
-	}
-	public void addDBPlog(DBPQueryResp dbpQueryResp){
-		HTML html = new HTML("");
-		html.setTitle(dbpQueryResp.getEntity());
-		
-		html.setWidth(Utility.getDbMaxWidth()-(Utility.getDbMaxWidth()*8/100)+"px");
-		dbpTabPanel.add(html, dbpQueryResp.getEntity());
-	}
-	public void updateDBPQlog(DBPQueryResp dbpQueryResp){
+		// CHECK IF TAB WAS ALREADY PRESENT
 		Iterator<Widget> iterHtml = dbpTabPanel.iterator();
-		
+		String entity = "";
+		entity = dbpediaResp.getEntity();
 		while (iterHtml.hasNext()){
 			HTML html = (HTML)iterHtml.next();
-			if(html.getTitle().equals(dbpQueryResp.getEntity())){
-				html.setHTML(html.getHTML()+"<br>call n."+dbpQueryResp.getCallNum()+"/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> "+dbpQueryResp.getLat()+","+dbpQueryResp.getLng());
+			if(html.getTitle().equals(entity)){
+				tabAlreadyPresent=true;
+				break;
+			}
+		}
+		
+		
+		// IF TAB WASN'T PRESENT, ADD ONE
+		if (!tabAlreadyPresent){
+			HTML html = new HTML("");		
+			html.setTitle(dbpediaResp.getEntity());
+			html.setHTML(html.getHTML()+"<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms");
+			html.setHTML(html.getHTML()+"<br><br><b>Code:</b> "+String.valueOf(dbpediaResp.getCode()));
+			if (dbpediaResp.getCode()==200){
+				html.setHTML(html.getHTML()+"<br><br><b>Query output for "+dbpediaResp.getEntity()+":</b><br>"+dbpediaResp.getQueryResultXML());
+			}
+			else{
+				html.setHTML(html.getHTML()+"<br><br><b>Error:</b><br>"+dbpediaResp.getError());	
+			}
+			html.setHTML(html.getHTML()+"<br><br><b>Gps Coordinates:</b>");
+
+			html.setWidth(Utility.getDbMaxWidth()-(Utility.getDbMaxWidth()*8/100)+"px");
+			dbpTabPanel.add(html, dbpediaResp.getEntity());		
+		}
+	}
+
+	public void updateDBPQlog(DBPQueryResp dbpQueryResp){
+		
+		Iterator<Widget> iterHtml = dbpTabPanel.iterator();
+		String entity = "";
+		entity = dbpQueryResp.getEntity();
+		entity = entity.replace("[", "");
+		entity = entity.replace("]", "");
+		entity = entity.replace(" ", "_");
+		while (iterHtml.hasNext()){ //find correct tab to append gps log
+			HTML html = (HTML)iterHtml.next();
+			if(html.getTitle().equals(entity)){
+				html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> "+dbpQueryResp.getLat()+","+dbpQueryResp.getLng());
 				break;
 			}
 		}
