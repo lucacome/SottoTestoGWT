@@ -85,7 +85,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 				responseTagTmp = "empty";
 			}
 
-			tagmeResp.setJson(responseTagTmp);
+			tagmeResp.setJson(Utility.toUTF8(responseTagTmp));
 
 			//aggiungi la risposta formattata html
 			responseTagTmp = "";

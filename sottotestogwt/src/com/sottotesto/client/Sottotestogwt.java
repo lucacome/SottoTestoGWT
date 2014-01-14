@@ -463,7 +463,7 @@ public class Sottotestogwt implements EntryPoint {
 				ekpRespTmp.setError("Error Callig service Module:"+
 						"<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 
-				ekpResps.add(ekpRespTmp);
+				//ekpResps.add(ekpRespTmp);
 
 				//update log
 				spLogger.addEKPlog(ekpRespTmp);
@@ -579,14 +579,14 @@ public class Sottotestogwt implements EntryPoint {
 
 	}
 	private void callListService(List<EkpResponse> respList){
-		Debug.printDbgLine("Sottotestogwt.java: callListService()");
-
+		
 		//initialize main counter
 		dbpqCallsDone=0;
 		dbpqCallsToDo=0;
 
 		for (EkpResponse resp : respList)
-			if(resp.getCode()==200)	
+			if(resp.getCode()==200)	{
+				Debug.printDbgLine("Sottotestogwt.java: callListService() with "+resp.getTag());
 				listService.sendToServer(resp, new AsyncCallback<List<DBPQueryResp>>() {
 					public void onFailure(Throwable caught) {
 						//set the error
@@ -613,6 +613,7 @@ public class Sottotestogwt implements EntryPoint {
 
 					}});
 
+			}
 	}
 	
 
@@ -820,13 +821,15 @@ public class Sottotestogwt implements EntryPoint {
 			// search for fitting dbpediaResp data
 			for (DBPediaResponse curDbpResp : dbpediaResps){
 				if (curDbpResp.getEntity().equals(entity)){		
-					popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b> ["+curDbpResp.getEntityType()+"]<br><br>"+curDbpResp.getQueryResultXML());
+					String dbpQ = curDbpResp.getQueryResultXML();
+					if (dbpQ.length()<5) dbpQ="Nessun dato trovato per questa entita'";
+					popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b> ["+curDbpResp.getEntityType()+"]<br><br>"+dbpQ);
 					dataFound=true;
 				}
 			}
 			
 			if (!dataFound){
-				popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>Nessun dato per questa entita'.");
+				popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>Entita' ignorata dal servizio TAGME.");
 			}
 
 			taggedEntityPopup.setWidget(popupHtml);

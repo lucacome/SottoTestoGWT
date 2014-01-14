@@ -37,7 +37,7 @@ public class ListServiceImpl extends RemoteServiceServlet implements ListService
 
 		String entity = jd.name;
 
-		dbpqresp.setEntity(entity);
+		dbpqresp.setEntity(resp.getTag());
 		dbpqresp.setLink(dblink);
 		dbpqresp.setName(entity);
 		response.add(dbpqresp);
