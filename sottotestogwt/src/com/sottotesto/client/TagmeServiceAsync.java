@@ -7,7 +7,7 @@ import com.sottotesto.shared.TagmeResponse;
  * The async counterpart of <code>GreetingService</code>.
  */
 public interface TagmeServiceAsync {
-	void sendToServer(String input, AsyncCallback<TagmeResponse> callback)
+	void sendToServer(String input, double roh, AsyncCallback<TagmeResponse> callback)
 			throws IllegalArgumentException;
 
 }

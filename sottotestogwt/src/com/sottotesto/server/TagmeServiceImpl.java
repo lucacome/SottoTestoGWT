@@ -28,7 +28,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 	 */
 	private static final long serialVersionUID = -727904838259956930L;
 
-	public TagmeResponse sendToServer(String input) throws IllegalArgumentException {
+	public TagmeResponse sendToServer(String input, double roh) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
 
 		long StartTime = System.currentTimeMillis();
@@ -40,7 +40,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 		TagmeResponse tagmeResp = new TagmeResponse();
 		try {
 			//config TAGME request parameters
-			tagmeResp.setRho(0.06);
+			tagmeResp.setRho(roh);
 			URL url = new URL ("http://tagme.di.unipi.it/tag");
 			String charset = "UTF-8";
 			String param1name = "text";

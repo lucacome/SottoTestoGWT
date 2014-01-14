@@ -9,6 +9,6 @@ import com.sottotesto.shared.TagmeResponse;
  */
 @RemoteServiceRelativePath("tagme")
 public interface TagmeService extends RemoteService {
-	TagmeResponse sendToServer(String name) throws IllegalArgumentException;
+	TagmeResponse sendToServer(String name, double roh) throws IllegalArgumentException;
 
 }

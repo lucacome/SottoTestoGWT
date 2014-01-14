@@ -36,14 +36,18 @@ import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
+import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.FieldVerifier;
+import com.sottotesto.shared.Global;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.TreeData;
 import com.sottotesto.shared.TreeDataProperties;
@@ -144,6 +148,8 @@ public class Sottotestogwt implements EntryPoint {
 		//show Loading Icon
 		RootPanel.get("homeLoading").setVisible(true);
 
+		Global.init();
+		
 		//Initialize items and load them on html page
 		initItems();	
 
@@ -229,6 +235,16 @@ public class Sottotestogwt implements EntryPoint {
 
 		titleContentPanel.setWidget(searchPanelHC);
 		titleContentPanel.setId("searchAreaPanel");
+		
+		ToolButton optionsTool = new ToolButton(ToolButton.GEAR);
+		optionsTool.setTitle("Configura opzioni");
+		optionsTool.addSelectHandler(new SelectHandler() {			
+			@Override
+			public void onSelect(SelectEvent event) {
+				Global.showOptionsDialog();
+			}
+		});
+		titleContentPanel.addTool(optionsTool);
 
 		// Create a handler for the sendButton and nameField
 		class HomeInputHandler implements ClickHandler, KeyUpHandler {
@@ -291,7 +307,7 @@ public class Sottotestogwt implements EntryPoint {
 		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
 		
 		rc.clearCenterPanel();
-		Utility.showLoadingBar("Calling TAGME Service");
+		
 		
 		// First, we validate the input.
 		errorLabel.setText("");
@@ -311,8 +327,9 @@ public class Sottotestogwt implements EntryPoint {
 		rc.reInit();
 
 		//actually call tagme service
+		Utility.showLoadingBar("Calling TAGME Service");
 		HtmlTagmeService.setHTML(HTMLtagmeServiceStringCalling);		
-		tagmeService.sendToServer(textToServer, new AsyncCallback<TagmeResponse>() {
+		tagmeService.sendToServer(textToServer, Global.getRoh(), new AsyncCallback<TagmeResponse>() {
 			public void onFailure(Throwable caught) {
 				Debug.printDbgLine("Sottotestogwt.java: callTagme(): tagmeService:onFailure()");
 

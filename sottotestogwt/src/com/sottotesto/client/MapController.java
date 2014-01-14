@@ -19,6 +19,7 @@ import com.google.maps.gwt.client.MarkerImage;
 import com.google.maps.gwt.client.MouseEvent;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.Global;
 
 public class MapController {
 
@@ -149,12 +150,12 @@ public class MapController {
 			if (entityName.equals(fullMap)){ //LOAD ALL MARKERS
 				allMarkers.get(index).setAnimation(Animation.DROP);
 				allMarkers.get(index).setMap(theMap);
-				nextCallTimer.schedule(50);
+				nextCallTimer.schedule(Global.getMapMarkerDelay());
 			}
 			else if(allMarkers.get(index).getTitle().contains(entityName)){ //LOAD MARKERS ONLY FOR SELECTED ENTITY
 				allMarkers.get(index).setAnimation(Animation.DROP);
 				allMarkers.get(index).setMap(theMap);
-				nextCallTimer.schedule(50);
+				nextCallTimer.schedule(Global.getMapMarkerDelay());
 			}
 			else{ //skip marker
 				nextCallTimer.schedule(0);
