@@ -468,6 +468,15 @@ public class Sottotestogwt implements EntryPoint {
 				ekpFailsNum++;
 				
 				if (ekpRemainingCallNum>0){callEkp();}
+				else {
+					HtmlEkpService.setHTML(HTMLekpServiceStringFAIL+" (x"+ekpFailsNum+")");
+					rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
+					rc.getTree().expandAll();
+					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
+					rc.setEkpResponses(ekpResps);
+					Utility.hideLoadingBar();
+					callListService(ekpResps); //lancia il servizio di "cerca markers"
+				}
 			}
 
 			public void onSuccess(EkpResponse result) {			
