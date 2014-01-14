@@ -290,6 +290,7 @@ public class Sottotestogwt implements EntryPoint {
 	private void callTagme() {
 		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
 		
+		rc.clearCenterPanel();
 		Utility.showLoadingBar("Calling TAGME Service");
 		
 		// First, we validate the input.
@@ -448,12 +449,15 @@ public class Sottotestogwt implements EntryPoint {
 			ekpRemainingCallNum--;
 		} else return;		
 
+		final String curEntity = input; //used in case of failure
+		
 		Debug.printDbgLine("Sottotestogwt.java: Ekp input="+input);
 		ekpService.sendToServer(input, new AsyncCallback<EkpResponse>() {
 			public void onFailure(Throwable caught) {
 				//set the error
 				EkpResponse ekpRespTmp = new EkpResponse();
 				ekpRespTmp.setCode(-1);
+				ekpRespTmp.setTag(curEntity);
 				ekpRespTmp.setError("Error Callig service Module:"+
 						"<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 

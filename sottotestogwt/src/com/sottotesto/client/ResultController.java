@@ -350,4 +350,7 @@ public class ResultController {
 		ekpResponses = new ArrayList<EkpResponse>();
 		ekpResponses = ekpResps;
 	}
+	public void clearCenterPanel(){
+		centerPanel.clear();
+	}
 }

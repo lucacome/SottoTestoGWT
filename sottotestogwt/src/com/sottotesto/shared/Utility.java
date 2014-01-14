@@ -10,24 +10,37 @@ import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
 
 public class Utility {
 
-	static AutoProgressMessageBox loadingBox;
+	private static AutoProgressMessageBox loadingBox;
 	private static String loadingText="";
 	
 	public static void showLoadingBar(String text){
-		if(loadingBox == null) loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
+		
+		// create loading box if first time
+		if(loadingBox == null){
+			loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
+			
+			//add 'X' close button if first time
+			HTML closeButton = new HTML("<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\"><img src=\"closeicon.gif\" height=\"20px\"/></div>");
+			closeButton.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {	
+					loadingBox.hide();
+				}
+			});
+			
+			loadingBox.addTool(closeButton);
+		}
+		
+		// set working text (if null set default)
 		loadingText=text;
 		if (loadingText=="") loadingBox.setProgressText("... Working ...");
 		else loadingBox.setProgressText("... "+loadingText+" ...");
+		
+		// add extra
 		loadingBox.setShadow(true);
-		HTML closeButton = new HTML("<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\"><img src=\"closeicon.gif\" height=\"20px\"/></div>");
-		closeButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {	
-				loadingBox.hide();
-			}
-		});
-		loadingBox.addTool(closeButton);
+		
+		// show loading box
 		loadingBox.auto();
 		loadingBox.show();
 	}
