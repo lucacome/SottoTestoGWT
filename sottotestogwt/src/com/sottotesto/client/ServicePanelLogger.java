@@ -2,17 +2,11 @@ package com.sottotesto.client;
 
 import java.util.Iterator;
 
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.dom.client.Node;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Event.NativePreviewEvent;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
+import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
@@ -23,18 +17,18 @@ import com.sottotesto.shared.Utility;
 public class ServicePanelLogger {
 	
 	//TAGME ITEMS
-	private ExtendedDialogBox tagmeDialogBox;
+	private Dialog tagmeDialogBox;
 	private TabPanel tagmeTabPanel;
 	private FlowLayoutContainer tagmeFlowContainer;
 	
 	
 	//EKP ITEMS
-	private ExtendedDialogBox ekpDialogBox;
+	private Dialog ekpDialogBox;
 	private TabPanel ekpTabPanel;
 	private FlowLayoutContainer ekpFlowContainer;
 	
-	//DBPEDIA ITEMS
-	private ExtendedDialogBox dbpDialogBox;
+	//DBPEDIA ITEMS	
+	private Dialog dbpDialogBox;
 	private TabPanel dbpTabPanel;
 	private FlowLayoutContainer dbpFlowContainer;
 	
@@ -47,6 +41,8 @@ public class ServicePanelLogger {
 	
 	private void initTAGME(){		
 		tagmeTabPanel = new TabPanel();
+		tagmeTabPanel.setAnimScroll(true);
+		tagmeTabPanel.setTabScroll(true);
 		
 		tagmeFlowContainer = new FlowLayoutContainer();
 		tagmeFlowContainer.setScrollMode(ScrollMode.AUTO);
@@ -54,14 +50,16 @@ public class ServicePanelLogger {
 		tagmeFlowContainer.setHeight(Utility.getDbMaxHeight());
 		tagmeFlowContainer.setWidth(Utility.getDbMaxWidth());
 		
-		tagmeDialogBox = new ExtendedDialogBox();
-		tagmeDialogBox.setText("TAGME Data");
-		tagmeDialogBox.setAnimationEnabled(false);
-		tagmeDialogBox.getElement().setId("tagmeDataDB");
+		tagmeDialogBox = new Dialog();
+		tagmeDialogBox.setHeadingText("TAGME Data");
+		tagmeDialogBox.setId("tagmeDataDB");
+		tagmeDialogBox.setHideOnButtonClick(true);
 		tagmeDialogBox.setWidget(tagmeFlowContainer);
 	}	
 	private void initEKP(){		
 		ekpTabPanel = new TabPanel();
+		ekpTabPanel.setAnimScroll(true);
+		ekpTabPanel.setTabScroll(true);
 		
 		ekpFlowContainer = new FlowLayoutContainer();
 		ekpFlowContainer.setScrollMode(ScrollMode.AUTO);
@@ -69,43 +67,42 @@ public class ServicePanelLogger {
 		ekpFlowContainer.setHeight(Utility.getDbMaxHeight());
 		ekpFlowContainer.setWidth(Utility.getDbMaxWidth());
 		
-		ekpDialogBox = new ExtendedDialogBox();
-		ekpDialogBox.setText("EKP Data");
-		ekpDialogBox.setAnimationEnabled(false);
-		ekpDialogBox.getElement().setId("ekpDataDB");
+		ekpDialogBox = new Dialog();
+		ekpDialogBox.setHeadingText("EKP Data");
+		ekpDialogBox.setId("ekpDataDB");
+		ekpDialogBox.setHideOnButtonClick(true);
 		ekpDialogBox.setWidget(ekpFlowContainer);
 	}	
 	private void initDBP(){		
 		dbpTabPanel = new TabPanel();
+		dbpTabPanel.setAnimScroll(true);
+		dbpTabPanel.setTabScroll(true);
 		
 		dbpFlowContainer = new FlowLayoutContainer();
 		dbpFlowContainer.setScrollMode(ScrollMode.AUTO);
 		dbpFlowContainer.add(dbpTabPanel);
 		dbpFlowContainer.setHeight(Utility.getDbMaxHeight());
-		dbpFlowContainer.setWidth(Utility.getDbMaxWidth());
+		dbpFlowContainer.setWidth(Utility.getDbMaxWidth());		
 		
-		dbpDialogBox = new ExtendedDialogBox();
-		dbpDialogBox.setText("DBPedia Data");
-		dbpDialogBox.setAnimationEnabled(false);
-		dbpDialogBox.getElement().setId("dbPediaDataDB");
-		dbpDialogBox.setWidget(dbpFlowContainer);
+		dbpDialogBox = new Dialog();
+		dbpDialogBox.setHeadingText("DBPedia Data");
+		dbpDialogBox.setId("dbPediaDataDB");
+		dbpDialogBox.setHideOnButtonClick(true);
+		dbpDialogBox.setWidget(dbpFlowContainer);		
 	}
 	
 	
-	public void showTagmeDataDB(){
-		tagmeDialogBox.center();		
+	public void showTagmeDataDB(){				
 		tagmeDialogBox.show();
-		tagmeTabPanel.selectTab(0);	
+		tagmeDialogBox.center();
 	}
-	public void showEkpDataDB(){
-		ekpDialogBox.center();		
+	public void showEkpDataDB(){			
 		ekpDialogBox.show();
-		ekpTabPanel.selectTab(0);	
+		ekpDialogBox.center();		
 	}	
-	public void showDBPediaDataDB(){
-		dbpDialogBox.center();		
+	public void showDBPediaDataDB(){				
 		dbpDialogBox.show();
-		dbpTabPanel.selectTab(0);	
+		dbpDialogBox.center();		
 	}	
 	
 	
@@ -226,58 +223,4 @@ public class ServicePanelLogger {
 			}
 		}
 	}
-	
-	
-	
-	
-	// MODIFIED DIALOGBOX CLASS (to add X button and 'ESC' support)
-	private static class ExtendedDialogBox extends DialogBox {
-
-		private Node closeEventTarget = null;
-
-		public ExtendedDialogBox() {
-			// get the "dialogTopRight" class td
-			Element dialogTopRight = getCellElement(0, 2);
-
-			// close button image html
-			dialogTopRight.setInnerHTML(
-					"<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\">" + 
-							"<img src=\"closeicon.gif\" height=\"20px\"/>" + 
-					"</div>");
-
-			// set the event target
-			closeEventTarget = dialogTopRight.getChild(0).getChild(0);
-		}
-
-		@Override
-		protected void onPreviewNativeEvent(NativePreviewEvent event) {
-			super.onPreviewNativeEvent(event);
-
-			NativeEvent nativeEvent = event.getNativeEvent();
-
-			if (!event.isCanceled() 
-					&& (event.getTypeInt() == Event.ONCLICK)
-					&& isCloseEvent(nativeEvent))
-			{
-				this.hide();
-				this.removeFromParent();
-			}
-
-			switch (event.getTypeInt()) {
-			case Event.ONKEYDOWN:
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ESCAPE ||
-				event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					hide();
-					removeFromParent();
-				}
-				break;
-			}
-		}
-
-		// see if the click target is the close button
-		private boolean isCloseEvent(NativeEvent event) {
-			return event.getEventTarget().equals(closeEventTarget); //compares equality of the underlying DOM elements
-		} 
-	}
-
 }

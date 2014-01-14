@@ -12,10 +12,13 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.core.client.util.Margins;
+import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
@@ -152,6 +155,22 @@ public class InfovisController {
 		//togli i vecchi checkbox, se presenti
 		checkBoxHC.clear();
 		
+		//add refresh button
+		ToolButton refreshTool = new ToolButton(ToolButton.REFRESH);
+		refreshTool.setTitle("Reload current Graph");
+		refreshTool.addSelectHandler(new SelectHandler() {			
+			@Override
+			public void onSelect(SelectEvent event) {
+				//check selected checkboxes
+		    	List<String> selectedLinksTo = new ArrayList<String>();
+		    	selectedLinksTo = getSelectedLinks();		    	
+		    	Utility.showLoadingBar("Preparing Graph");
+		    	callGHTService(json, selectedLinksTo);				
+			}
+		});
+		checkBoxHC.add(refreshTool);
+		checkBoxHC.add(new HTML(" &nbsp;"));
+		
 		//aggiungi un label
 		HTML checkBoxLabel = new HTML();
 		checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Visualizza: </b></span>");		
@@ -190,9 +209,6 @@ public class InfovisController {
 				//check selected checkboxes
 				List<String> selectedEntities = new ArrayList<String>();
 				selectedEntities = getSelectedDBPlinks();
-
-				//if selected 0?
-				//callGHTService(json, selectedLinksTo);
 				Utility.showLoadingBar("Preparing Graph");
 				callGraphService(listFD, selectedEntities);
 			}
@@ -201,6 +217,22 @@ public class InfovisController {
 
 		//togli i vecchi checkbox, se presenti
 		checkBoxHC.clear();
+		
+		//add refresh button
+		ToolButton refreshTool = new ToolButton(ToolButton.REFRESH);
+		refreshTool.setTitle("Reload current Graph");
+		refreshTool.addSelectHandler(new SelectHandler() {			
+			@Override
+			public void onSelect(SelectEvent event) {
+				//check selected checkboxes
+				List<String> selectedEntities = new ArrayList<String>();
+				selectedEntities = getSelectedDBPlinks();
+				Utility.showLoadingBar("Preparing Graph");
+				callGraphService(listFD, selectedEntities);			
+			}
+		});
+		checkBoxHC.add(refreshTool);
+		checkBoxHC.add(new HTML(" &nbsp;"));
 
 		//aggiungi un label
 		HTML checkBoxLabel = new HTML();

@@ -7,6 +7,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
+import com.sencha.gxt.widget.core.client.button.ToolButton;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 
 public class Utility {
 
@@ -29,7 +32,18 @@ public class Utility {
 				}
 			});
 			
-			loadingBox.addTool(closeButton);
+			//loadingBox.addTool(closeButton);
+			
+			ToolButton closeTool = new ToolButton(ToolButton.CLOSE);
+			closeTool.addSelectHandler(new SelectHandler() {
+				
+				@Override
+				public void onSelect(SelectEvent event) {
+					// TODO Auto-generated method stub
+					loadingBox.hide();
+				}
+			});
+			loadingBox.addTool(closeTool);
 		}
 		
 		// set working text (if null set default)
