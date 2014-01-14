@@ -1,6 +1,5 @@
 package com.sottotesto.server;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -15,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import com.google.appengine.labs.repackaged.com.google.common.collect.HashMultimap;
 import com.google.appengine.labs.repackaged.com.google.common.collect.Multimap;
@@ -92,22 +90,23 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			//Debug.printDbgLine("EkpServiceImpl.java: respmessage="+connessione.getResponseMessage());
 			String responseEkpTemp = "";
 			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
-				Scanner inputs = new Scanner(stream);	
-				while (inputs.hasNextLine())
-					responseEkpTemp += inputs.nextLine();
+				//				Scanner inputs = new Scanner(stream);	
+				//				while (inputs.hasNextLine())
+				//					responseEkpTemp += inputs.nextLine();
 
-				inputs.close();
+				//				inputs.close();
+				arp.read(m, stream, null);
 				connessione.disconnect();
 				stream.close();
 			}
 			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
-			if (responseEkpTemp.isEmpty()){
+			if (result.getCode() != 200){
 				result.setRDF("Stringa vuota, Code="+result.getCode());
 			}else{
 				result.setRDF(responseEkpTemp);
 
-				InputStream in = new ByteArrayInputStream(responseEkpTemp.getBytes("UTF-8"));
-				arp.read(m, in, null);
+				//				InputStream in = new ByteArrayInputStream(responseEkpTemp.getBytes("UTF-8"));
+				//		arp.read(m, in, null);
 				String about = "http://dbpedia.org/resource/"+inputbello;
 				Map<String, String> mapDataFD = new HashMap<String,String>();
 				String jfd = null;
@@ -118,12 +117,12 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				mapDataFD.put("$color", "#BD1B89");
 				jsonFD.data = mapDataFD;
 
-				
-				
-				
 				type = m.getNsPrefixURI("j.0");
-				result.setType(type.replace("http://www.ontologydesignpatterns.org/aemoo/ekp//", "").replace(".owl#", ""));
-				
+
+				//result.setType(type.replace("http://www.ontologydesignpatterns.org/aemoo/ekp//", "").replace(".owl#", ""));
+
+				result.setType(type.substring(type.lastIndexOf('/')+1).replace(".owl#", ""));
+				long homeTimeStart = System.currentTimeMillis();
 				HttpURLConnection connessione2 = null;
 				InputStream stream2 = null;
 				connessione2 = (HttpURLConnection)new URL(type).openConnection();
@@ -132,29 +131,28 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				connessione2.setRequestProperty("Accept", "application/rdf+xml");
 
 				stream2 = connessione2.getInputStream();
-				String responseType = "";
-				if (connessione2.getContentType().contains("application/rdf+xml")){
-					Scanner inputs2 = new Scanner(stream2);	
-					while (inputs2.hasNextLine())
-						responseType += inputs2.nextLine();
-
-					inputs2.close();
-					connessione2.disconnect();
-					stream2.close();
-				}
-				//Debug.printDbgLine("response="+responseType);
 				RDFReader arp2 = null;
 				Model m2 = ModelFactory.createDefaultModel();
-						
 				arp2 = m2.getReader();
-
-				InputStream in2 = new ByteArrayInputStream(responseType.getBytes("UTF-8"));
-
-				arp2.read(m2, in2, type);
+				arp2.read(m2, stream2, type);
+				connessione2.disconnect();
+				stream2.close();
+				//				String responseType = "";
+				//				if (connessione2.getContentType().contains("application/rdf+xml")){
+				//					Scanner inputs2 = new Scanner(stream2);	
+				//					while (inputs2.hasNextLine())
+				//						responseType += inputs2.nextLine();
+				//
+				//					inputs2.close();
+				//					connessione2.disconnect();
+				//					stream2.close();
+				//				}
+				long homeTimeStop = System.currentTimeMillis()-homeTimeStart;
+				Debug.printDbgLine("TIME="+homeTimeStop);
+				//Debug.printDbgLine("response="+responseType);
+				//			InputStream in2 = new ByteArrayInputStream(responseType.getBytes("UTF-8"));
 
 				Resource connection = null;
-		
-				
 
 				Resource link = null;
 				link = m.getResource(about);
@@ -165,7 +163,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				for (i = link.listProperties(); i.hasNext(); ) {
 					Statement s = i.next();					
 					//Debug.printDbgLine( "link has property " + s.getPredicate().getLocalName().replace("linksTo", "") + " with value " + s.getObject() );
-					
+
 					linkmap.put(s.getPredicate().getLocalName(), s.getObject().toString());
 					Resource oth = null;
 					//Debug.printDbgLine(s.getObject().toString());
@@ -200,30 +198,30 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						JData jsonHTsub = new JData();
 
 						String jlast = null;
-						
-											
-						
-						
-						
+
+
+
+
+
 						connection = m2.getResource(type+key.toString());
-						
+
 						StmtIterator i2 = null;
-						
+
 						String comment = "";
 						String label = "";
 						String range = "";
-						
+
 						for (i2 = connection.listProperties(); i2.hasNext(); ) {
 							Statement s2 = i2.next();	
-					
-							
+
+
 							//Debug.printDbgLine("BOH"+s2+"\n");
-						//	Debug.printDbgLine("BOH2"+s2.getLiteral());
+							//	Debug.printDbgLine("BOH2"+s2.getLiteral());
 							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("comment")){
 								Debug.printDbgLine("Comment="+s2.getObject().toString().replace("@en", ""));
 								comment = s2.getObject().toString().replace("@en", "");
 							}
-							
+
 							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("label")){
 								Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
 								label = s2.getObject().toString().replace("@en", "");
@@ -231,13 +229,13 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 							if (s2.getPredicate().toString().contains("range")){
 								Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
 								range = s2.getObject().toString().replace("http://dbpedia.org/ontology/", "");
-								
+
 							}
 
-						
+
 						}
-						
-	
+
+
 						jsonHTsub.id = key.toString();
 						jsonHTsub.name = range;
 						jsonHTsub.data.put("$type", "triangle");
