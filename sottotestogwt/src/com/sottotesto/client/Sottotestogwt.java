@@ -123,7 +123,6 @@ public class Sottotestogwt implements EntryPoint {
 	//service responses variables
 	private TagmeResponse tagmeResp; //response of TAGME service
 	private List<DBPediaResponse> dbpediaResps; //response of DBPEDIA service
-	private int dbpCallsDone, dbpCallsToDo;
 	private List<EkpResponse> ekpResps; //response of EKP service
 	private int ekpFailsNum;
 	private int dbpqCallsDone, dbpqCallsToDo, dbpFailsNum;
@@ -290,6 +289,9 @@ public class Sottotestogwt implements EntryPoint {
 	//send input from textarea to tagme
 	private void callTagme() {
 		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
+		
+		Utility.showLoadingBar("Calling TAGME Service");
+		
 		// First, we validate the input.
 		errorLabel.setText("");
 		String textToServer = textArea.getText();
@@ -330,7 +332,7 @@ public class Sottotestogwt implements EntryPoint {
 				HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 				HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 				rc.showError();
-				rc.showLoading(false);
+				Utility.hideLoadingBar();
 			}
 
 			public void onSuccess(TagmeResponse result) {
@@ -352,7 +354,7 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 					HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 					rc.showError();
-					rc.showLoading(false);
+					Utility.hideLoadingBar();
 				}
 				else if (tagmeResp.getTitleTag().size()==0){
 					//Tagme OK, ma non ha taggato nulla!
@@ -363,7 +365,7 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 					HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 					rc.showError();
-					rc.showLoading(false);
+					Utility.hideLoadingBar();
 				}
 				else {
 					//Tagme OK
@@ -387,8 +389,6 @@ public class Sottotestogwt implements EntryPoint {
 					//intialize an empty tree
 					initEmptyTree();
 
-					dbpCallsDone=0;
-					dbpCallsToDo=0;
 					dbpFailsNum=0;
 					ekpResps = new ArrayList<EkpResponse>();
 					callEkp();
@@ -400,6 +400,8 @@ public class Sottotestogwt implements EntryPoint {
 	private void callDBPedia(final String tagme, List<String> dbprop, String type){
 		Debug.printDbgLine("Sottotestogwt.java: callDBPedia()");	
 
+		Utility.showLoadingBar("Calling DBPedia Service");
+		
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringCalling);		
 		dbpediaService.sendToServer(tagme, dbprop, type, new AsyncCallback<DBPediaResponse>() {
 			public void onFailure(Throwable caught) {
@@ -412,7 +414,6 @@ public class Sottotestogwt implements EntryPoint {
 
 				dbpediaResps.add(badResp);
 				spLogger.addDBPlog(badResp);
-				dbpCallsDone++;
 				dbpFailsNum++;
 				HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringFAIL+" (x"+dbpFailsNum+")"); //show the fail
 			}
@@ -438,6 +439,8 @@ public class Sottotestogwt implements EntryPoint {
 	private void callEkp(){
 		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
 
+		Utility.showLoadingBar("Calling EKP Service ("+ekpRemainingCallNum+" left)");
+		
 		String input="";
 
 		if (ekpRemainingCallNum>0){
@@ -455,7 +458,6 @@ public class Sottotestogwt implements EntryPoint {
 						"<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 
 				ekpResps.add(ekpRespTmp);
-				HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 
 				//update log
 				spLogger.addEKPlog(ekpRespTmp);
@@ -480,7 +482,6 @@ public class Sottotestogwt implements EntryPoint {
 
 				
 				if (ekpRespTmp.getCode()==200) {
-					HtmlEkpService.setHTML(HTMLekpServiceStringOK); //show the success
 					
 					String jsonHT = "["+result.jdataHT+"]";
 					String jsonFD = "["+result.jdataFD+"]";	
@@ -505,12 +506,10 @@ public class Sottotestogwt implements EntryPoint {
 					//dbproperty.add("title");
 					//dbproperty.add("name");
 					//dbproperty2.add("placeOfBirth");
-					dbproperty.add("abstract");		
-					dbpCallsToDo++;
+					dbproperty.add("abstract");	
 					callDBPedia(ekpRespTmp.getTag(), dbproperty, ekpRespTmp.getType());
 				}
 				else{ // not received 200
-					HtmlEkpService.setHTML(HTMLekpServiceStringFAIL); //show the fail
 					ekpFailsNum++;
 				}
 				
@@ -520,10 +519,12 @@ public class Sottotestogwt implements EntryPoint {
 				}
 				else {
 					if(ekpFailsNum>0) HtmlEkpService.setHTML(HTMLekpServiceStringFAIL+" (x"+ekpFailsNum+")");
+					else HtmlEkpService.setHTML(HTMLekpServiceStringOK);
 					rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
 					rc.getTree().expandAll();
 					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
 					rc.setEkpResponses(ekpResps);
+					Utility.hideLoadingBar();
 					callListService(ekpResps); //lancia il servizio di "cerca markers"
 				}
 			}});		
@@ -809,9 +810,9 @@ public class Sottotestogwt implements EntryPoint {
 			boolean dataFound = false;
 
 			// search for fitting dbpediaResp data
-			for (DBPediaResponse curResp : dbpediaResps){
-				if (curResp.getEntity().equals(entity)){
-					popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>"+curResp.getQueryResultXML());
+			for (DBPediaResponse curDbpResp : dbpediaResps){
+				if (curDbpResp.getEntity().equals(entity)){		
+					popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b> ["+curDbpResp.getEntityType()+"]<br><br>"+curDbpResp.getQueryResultXML());
 					dataFound=true;
 				}
 			}
@@ -880,7 +881,7 @@ public class Sottotestogwt implements EntryPoint {
 
 		//show Loading Icon
 		RootPanel.get("homeLoading").setVisible(true);
-		rc.showLoading(true);
+		Utility.showLoadingBar("Reinitializing Panels");
 
 		listFD = new ArrayList<String>();
 
@@ -909,7 +910,7 @@ public class Sottotestogwt implements EntryPoint {
 
 		//hide Loading Icon
 		RootPanel.get("homeLoading").setVisible(false);
-		rc.showLoading(false);
+		Utility.hideLoadingBar();
 	}
 
 }

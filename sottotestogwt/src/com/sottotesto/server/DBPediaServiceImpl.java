@@ -1,6 +1,5 @@
 package com.sottotesto.server;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -10,12 +9,10 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.sottotesto.client.DBPediaService;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
-import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
 
 public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaService {
@@ -36,6 +33,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		responseQuery = new DBPediaResponse();
 
 		responseQuery.setEntity(tagmResp);
+		responseQuery.setEntityType(type);
 		String resultQueryXML = "";
 		String resultQueryText = "";
 		String prefix,prefixlink;

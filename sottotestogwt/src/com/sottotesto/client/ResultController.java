@@ -142,22 +142,13 @@ public class ResultController {
 
 	public void reInit(){
 		lcwest.clear(); //remove tree
-		showLoading(true); //show loading gif
+		Utility.showLoadingBar("Reinitializing Result Panel");
 	}
 
 	public void showError(){
 		lcwest.clear(); //remove tree
 		centerPanel.clear();	// clear centerpanel contents
 		centerPanel.add(new HTML(HTMLerrorString));
-	}
-
-	public void showLoading(boolean visible){
-		//centerPanel.clear();	// clear centerpanel contents
-		//centerPanel.add(new HTML(HTMLloadIconString));
-		
-		if(visible)	Utility.showLoadingBar();
-		else Utility.hideLoadingBar();
-		
 	}
 
 	public void loadTree(TreeStore<TreeData> ts){
@@ -252,17 +243,17 @@ public class ResultController {
 		if (!treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.NOTHING)){
 	
 			if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_FD)) {
-				showLoading(true);
+				Utility.showLoadingBar("Preparing Graph");
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
 				infovisC.getInfovisContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt graph size to centerpanel size
 				infovisC.getInfovisContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 				infovisC.showGraph(treeDataSelected.getJsonFD(), InfovisController.GRAPH_TYPE.FORCEDIRECTED);
-				showLoading(false);
+				Utility.hideLoadingBar();
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD)) {		
-				showLoading(true);
+				Utility.showLoadingBar("Preparing Graph");
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
@@ -271,10 +262,10 @@ public class ResultController {
 				infovisC.setListFD(listFD);
 				infovisC.setCheckBoxes(ekpResponses);
 				infovisC.showFullConfrontationGraph();
-				showLoading(false); //hide loading
+				Utility.hideLoadingBar();
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWGRAPH_HT)) {
-				showLoading(true);
+				Utility.showLoadingBar("Preparing Graph");
 				infovisC = new InfovisController();	// initialize new infovis controller
 				centerPanel.clear(); 				// clear centerpanel contents	
 				centerPanel.setWidget(infovisC.init()); // add the graph in centerpanel
@@ -284,10 +275,10 @@ public class ResultController {
 				infovisC.setLinks(treeDataSelected.getLinks());
 				infovisC.setCheckBoxes(treeDataSelected.getJsonHT());
 				infovisC.showGraph(treeDataSelected.getJsonHT(), InfovisController.GRAPH_TYPE.HYPERTREE);		
-				showLoading(false); //hide loading
+				Utility.hideLoadingBar();
 			}
 			else if (treeDataSelected.getClickAction().equals(TreeData.CLICK_ACTIONS.SHOWMAP)) {
-				showLoading(true);
+				Utility.showLoadingBar("Preparing Map");
 				showMap(treeDataSelected.getName());
 			}
 			else {
@@ -314,7 +305,7 @@ public class ResultController {
 		//END BUGFIX	
 		
 		if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
-		showLoading(false); //hide loading
+		Utility.hideLoadingBar();
 		//mapC.loadMarkers(mapName); //load only right markers, depending on selected map
 		mapC.loadMarkersDelayed(mapName, 0);
 	}

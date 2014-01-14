@@ -141,7 +141,7 @@ public class InfovisController {
 		    	List<String> selectedLinksTo = new ArrayList<String>();
 		    	selectedLinksTo = getSelectedLinks();
 		    	
-		    	Utility.showLoadingBar();
+		    	Utility.showLoadingBar("Preparing Graph");
 		    	callGHTService(json, selectedLinksTo);		    	
 		      }
 		    };
@@ -193,7 +193,7 @@ public class InfovisController {
 
 				//if selected 0?
 				//callGHTService(json, selectedLinksTo);
-				Utility.showLoadingBar();
+				Utility.showLoadingBar("Preparing Graph");
 				callGraphService(listFD, selectedEntities);
 			}
 		};

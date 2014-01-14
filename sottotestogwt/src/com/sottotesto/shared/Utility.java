@@ -11,10 +11,13 @@ import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
 public class Utility {
 
 	static AutoProgressMessageBox loadingBox;
+	private static String loadingText="";
 	
-	public static void showLoadingBar(){
+	public static void showLoadingBar(String text){
 		if(loadingBox == null) loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
-		loadingBox.setProgressText("... Working ...");
+		loadingText=text;
+		if (loadingText=="") loadingBox.setProgressText("... Working ...");
+		else loadingBox.setProgressText("... "+loadingText+" ...");
 		loadingBox.setShadow(true);
 		HTML closeButton = new HTML("<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\"><img src=\"closeicon.gif\" height=\"20px\"/></div>");
 		closeButton.addClickHandler(new ClickHandler() {
@@ -30,6 +33,7 @@ public class Utility {
 	}
 	public static void hideLoadingBar(){
 		if (loadingBox != null) loadingBox.hide();
+		loadingText="";
 	}
 	
 

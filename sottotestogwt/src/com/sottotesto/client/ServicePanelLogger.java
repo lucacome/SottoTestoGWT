@@ -16,7 +16,6 @@ import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
-import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.Utility;
@@ -165,7 +164,6 @@ public class ServicePanelLogger {
 		ekpTabPanel.add(html, ekpResp.getTag());
 	}
 	public void addDBPlog(DBPediaResponse dbpediaResp){
-		Debug.printDbgLine("ServicePanelLogger.java: addDBPlog(): adding dbpediaResp LOG1: "+dbpediaResp.getEntity()+"*********************_WHY??_*************");
 		boolean tabAlreadyPresent = false;
 		
 		// CHECK IF TAB WAS ALREADY PRESENT
