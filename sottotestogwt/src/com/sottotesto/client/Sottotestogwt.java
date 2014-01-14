@@ -355,13 +355,15 @@ public class Sottotestogwt implements EntryPoint {
 					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 					HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
 					rc.showError();
+					
 					Utility.hideLoadingBar();
 				}
 				else if (tagmeResp.getTitleTag().size()==0){
 					//Tagme OK, ma non ha taggato nulla!
 
 					HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK+" (but 0!)");
-
+					showTaggedResult();
+					
 					//skip all other services
 					HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringSkipped);
 					HtmlEkpService.setHTML(HTMLekpServiceStringSkipped);
@@ -370,7 +372,7 @@ public class Sottotestogwt implements EntryPoint {
 				}
 				else {
 					//Tagme OK
-
+					
 					HtmlTagmeService.setHTML(HTMLtagmeServiceStringOK); //show the success
 					showTaggedResult();
 					
@@ -682,8 +684,7 @@ public class Sottotestogwt implements EntryPoint {
 		treeProperties = GWT.create(TreeDataProperties.class); // Generate the key provider and value provider for the Data class
 		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
 		
-		//temporaneo per luca:
-		//tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"ForceDirected Graph");
+		
 		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"Confronta entita'", TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD);
 		
 		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Esplora entita'");
@@ -707,14 +708,8 @@ public class Sottotestogwt implements EntryPoint {
 		taggedPhraseFC.setScrollMode(ScrollMode.AUTO);
 		taggedPhraseFC.setId("taggedPhraseFC");
 		taggedPhraseFC.add(taggedPhraseHP);
-		//addTaggedHtmls(taggedPhraseHP);
 		
 		textAreaLabel.setText("Entita' rilevate:");
-		/*
-		HTML htmlPhrase = new HTML();
-		htmlPhrase.setHTML(createTaggedSearchString());
-		htmlPhrase.setStylePrimaryName("taggedPhraseHTMLcontainer");
-		*/
 		addTaggedHtmls(createTaggedSearchString(),taggedPhraseHP);
 		
 		sendButton = new Button("Nuova ricerca");		
@@ -846,12 +841,12 @@ public class Sottotestogwt implements EntryPoint {
 	private String createTaggedSearchString(){
 		Debug.printDbgLine("ResultController.java: createTaggedSearchString()");
 
-		//String result = "<span class=\"result_searchedPhrase\">"+textArea.getText()+"</span>";
 		String result = textArea.getText();
 		String curTag="";
 		String curTitle="";
 		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result = "+result);
-
+		if (tagmeResp.getSpotTag().size()==0) return result;
+		
 		//CHECK TAGGED ENTRIES
 		List<String> taggedEntries;
 		taggedEntries = new ArrayList<String>(tagmeResp.getSpotTag());		

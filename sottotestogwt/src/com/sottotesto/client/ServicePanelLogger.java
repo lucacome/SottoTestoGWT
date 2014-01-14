@@ -119,7 +119,7 @@ public class ServicePanelLogger {
 		
 		
 		if (tagmeResp.getCode()==200){
-			html.setHTML(html.getHTML()+"<br><br><b>Number of Total Json Resource:</b> "+tagmeResp.getResNum());
+			html.setHTML(html.getHTML()+"<br><br><b>Number of Total Resource:</b> "+tagmeResp.getResNum());
 			if (tagmeResp.getResNum()>0)
 			{
 				html.setHTML(html.getHTML()+"<br><br><b>Number of Relevant Tags found:</b> "+tagmeResp.getTitleTag().size());
@@ -132,8 +132,20 @@ public class ServicePanelLogger {
 						taggedTotal+=tagged.next()+"<br>";
 					}
 					html.setHTML(html.getHTML()+"<br><br><b>Elements tagged:</b><br> "+taggedTotal);
-					html.setHTML(html.getHTML()+"<br><br><b>Json data:</b><br> "+tagmeResp.getJson().replaceAll(",",",<br>"));
+					
+					if(!tagmeResp.getSpotSkipped().isEmpty()){
+						String skippedTotal="";
+						Iterator<String> skipped = tagmeResp.getSpotSkipped().iterator();
+						while (skipped.hasNext()){
+							skippedTotal+=skipped.next()+"<br>";
+						}
+						html.setHTML(html.getHTML()+"<br><b>Elements skipped:</b><br> "+skippedTotal);
+					}
+					
+					html.setHTML(html.getHTML()+"<br><b>Json data:</b><br> "+tagmeResp.getJson().replaceAll(",",",<br>"));
 				}
+				
+				
 			}
 		}
 		else{
