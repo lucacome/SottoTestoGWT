@@ -42,7 +42,9 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 	public EkpResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("EkpServiceImpl.java: sendToServer()");
 		Debug.printDbgLine("EkpServiceImpl.java: input="+input);
-
+		
+		
+		
 		long StartTime = System.currentTimeMillis();
 
 		JData jsonHT = new JData();
@@ -72,43 +74,44 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		try {
 
 			//open TAGME connection
-			HttpURLConnection connessione = null;
-			InputStream stream = null;
-			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+inputbello+"?dbpedia-version=3.8").openConnection();
-			connessione.setRequestMethod("GET");
-			
-			
-			connessione.setRequestProperty("Accept-Charset", "utf-8");
-			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
-			
-			connessione.setDoOutput(true);
-			Debug.printDbgLine("Content="+connessione.getContentType());
-
-			stream = connessione.getInputStream();
-
-			result.setCode(connessione.getResponseCode());
-			result.setMessage(connessione.getResponseMessage());
-			result.setContentType(connessione.getContentType());
-
-			result.setTag(inputbello);
-			Debug.printDbgLine("URL="+connessione.getURL());
-			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
+//			HttpURLConnection connessione = null;
+//			InputStream stream = null;
+//			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+inputbello+"?dbpedia-version=3.8").openConnection();
+//			connessione.setRequestMethod("GET");
+//			
+//			
+//			connessione.setRequestProperty("Accept-Charset", "utf-8");
+//			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
+//			
+//			connessione.setDoOutput(true);
+//			Debug.printDbgLine("Content="+connessione.getContentType());
+//
+//			stream = connessione.getInputStream();
+//
+//			result.setCode(connessione.getResponseCode());
+//			result.setMessage(connessione.getResponseMessage());
+//			result.setContentType(connessione.getContentType());
+//
+//			result.setTag(inputbello);
+//			Debug.printDbgLine("URL="+connessione.getURL());
+//			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
 			//Debug.printDbgLine("EkpServiceImpl.java: respmessage="+connessione.getResponseMessage());
 			String responseEkpTemp = "";
-			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
+//			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
 //								Scanner inputs = new Scanner(stream);	
 //								while (inputs.hasNextLine())
 //									responseEkpTemp += inputs.nextLine();
 //
 //								inputs.close();
-				arp.read(m, stream, null);
-				connessione.disconnect();
-				stream.close();
-			}
-			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
-			if (result.getCode() != 200){
-				result.setRDF("Stringa vuota, Code="+result.getCode());
-			}else{
+//				arp.read(m, stream, null);
+				m.read("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+inputbello+"?dbpedia-version=3.8");
+//				connessione.disconnect();
+//				stream.close();
+//			}
+//			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
+//			if (result.getCode() != 200){
+//				result.setRDF("Stringa vuota, Code="+result.getCode());
+//			}else{
 				Debug.printDbgLine("1");
 				result.setRDF(responseEkpTemp);
 //
@@ -379,7 +382,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				Debug.printDbgLine(linkList.toString());
 
 
-			}
+//			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			result.setCode(-1);
