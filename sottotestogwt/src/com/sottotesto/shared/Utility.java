@@ -1,7 +1,6 @@
 package com.sottotesto.shared;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
