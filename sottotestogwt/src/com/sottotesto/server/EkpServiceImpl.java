@@ -42,9 +42,9 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 	public EkpResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("EkpServiceImpl.java: sendToServer()");
 		Debug.printDbgLine("EkpServiceImpl.java: input="+input);
-		
-		
-		
+
+
+
 		long StartTime = System.currentTimeMillis();
 
 		JData jsonHT = new JData();
@@ -63,7 +63,16 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		String inputbello = input;
 
 		try {
-			input = URLEncoder.encode(input, "UTF-8");
+			if (input.contains("(")){
+				String[] a = input.split("\\(");
+				String temp = "";
+				input = URLEncoder.encode(a[0], "UTF-8");
+				temp = "(" + URLEncoder.encode(a[1].substring(0, a[1].length()-1), "UTF-8") + ")";
+				input = input + temp;
+			}
+			else
+				input = URLEncoder.encode(input, "UTF-8");
+
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -72,52 +81,55 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 
 		try {
-
+			long homeTimeStart2 = System.currentTimeMillis();
 			//open TAGME connection
-//			HttpURLConnection connessione = null;
-//			InputStream stream = null;
-//			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+inputbello+"?dbpedia-version=3.8").openConnection();
-//			connessione.setRequestMethod("GET");
-//			
-//			
-//			connessione.setRequestProperty("Accept-Charset", "utf-8");
-//			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
-//			
-//			connessione.setDoOutput(true);
-//			Debug.printDbgLine("Content="+connessione.getContentType());
-//
-//			stream = connessione.getInputStream();
-//
-//			result.setCode(connessione.getResponseCode());
-//			result.setMessage(connessione.getResponseMessage());
-//			result.setContentType(connessione.getContentType());
-//
-//			result.setTag(inputbello);
-//			Debug.printDbgLine("URL="+connessione.getURL());
-//			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
-			//Debug.printDbgLine("EkpServiceImpl.java: respmessage="+connessione.getResponseMessage());
+			InputStream stream = null;
+			HttpURLConnection connessione = null;
+			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+inputbello+"?dbpedia-version=3.8").openConnection();
+			connessione.setRequestMethod("GET");
+
+			connessione.setRequestProperty("Accept-Charset", "utf-8");
+			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
+
+			connessione.setDoOutput(true);
+			stream = connessione.getInputStream();
+			result.setCode(connessione.getResponseCode());
+			result.setMessage(connessione.getResponseMessage());
+			result.setContentType(connessione.getContentType());
+
+			result.setTag(inputbello);
+			Debug.printDbgLine("URL="+connessione.getURL());
+			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
+
 			String responseEkpTemp = "";
-//			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
-//								Scanner inputs = new Scanner(stream);	
-//								while (inputs.hasNextLine())
-//									responseEkpTemp += inputs.nextLine();
-//
-//								inputs.close();
-//				arp.read(m, stream, null);
-				m.read("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+inputbello+"?dbpedia-version=3.8");
-//				connessione.disconnect();
-//				stream.close();
-//			}
-//			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
-//			if (result.getCode() != 200){
-//				result.setRDF("Stringa vuota, Code="+result.getCode());
-//			}else{
+			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
+				//
+				//				BufferedReader inputReader = new BufferedReader(new InputStreamReader(connessione.getInputStream()));
+				//				StringBuilder sb = new StringBuilder();
+				//				String inline = "";
+				//				while ((inline = inputReader.readLine()) != null) {
+				//					sb.append(inline);
+				//				}
+				//				responseEkpTemp = URLDecoder.decode(sb.toString(), "UTF-8");
+				//				Debug.printDbgLine(responseEkpTemp);
+				//				connessione.disconnect();
+				//				m.read(new StringReader(responseEkpTemp), null);
+				//arp.read(m, new StringReader(responseEkpTemp), null);
+				arp.read(m, stream, null);
+				stream.close();
+				connessione.disconnect();
+
+			}
+			long homeTimeStop2 = System.currentTimeMillis()-homeTimeStart2;
+			Debug.printDbgLine("TIME2="+homeTimeStop2);
+			//			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
+			if (result.getCode() != 200){
+				result.setRDF("Stringa vuota, Code="+result.getCode());
+			}else{
 				Debug.printDbgLine("1");
 				result.setRDF(responseEkpTemp);
-//
-//								InputStream in = new ByteArrayInputStream(responseEkpTemp.getBytes("UTF-8"));
-//						arp.read(m, in, null);
-				String about = "http://dbpedia.org/resource/"+inputbello;
+
+				String about = "http://dbpedia.org/resource/"+input;
 				Map<String, String> mapDataFD = new HashMap<String,String>();
 				String jfd = null;
 				Debug.printDbgLine("2");
@@ -127,11 +139,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				mapDataFD.put("$color", "#BD1B89");
 				jsonFD.data = mapDataFD;
 
-
-				//result.setType(type.replace("http://www.ontologydesignpatterns.org/aemoo/ekp//", "").replace(".owl#", ""));
-
-				//Debug.printDbgLine("response="+responseType);
-				//			InputStream in2 = new ByteArrayInputStream(responseType.getBytes("UTF-8"));
 
 				Resource connection = null;
 
@@ -144,7 +151,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				for (i = link.listProperties(); i.hasNext(); ) {
 					Statement s = i.next();					
 					//Debug.printDbgLine( "link has property " + s.getPredicate().getLocalName().replace("linksTo", "") + " with value " + s.getObject() );
-					Debug.printDbgLine("DIO="+s);
+					//Debug.printDbgLine("DIO="+s);
 					if (s.getPredicate().getLocalName().contains("label")){
 						jsonHT.name = s.getObject().toString().replace("@en", "");
 						jsonFD.name = jsonHT.name;	
@@ -155,7 +162,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 							result.setType(type.substring(type.lastIndexOf('/')+1));
 						else
 							type = "";
-						
+
 					}
 					linkmap.put(s.getPredicate().getLocalName(), s.getObject().toString());
 					Resource oth = null;
@@ -171,63 +178,50 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					}	
 				}
 
-				
+
 				RDFReader arp2 = null;
 				Model m2 = ModelFactory.createDefaultModel();
 				arp2 = m2.getReader();
-				
-				
-				
-					String type2 = m.getNsPrefixURI("j.0");
+
+
+
+				String type2 = m.getNsPrefixURI("j.0");
 				if (type.isEmpty()){
 					if (type2 != null)
 						result.setType(type2.substring(type2.lastIndexOf('/')+1).replace(".owl#", ""));
-					
-				}
-				Debug.printDbgLine("3");
-				Debug.printDbgLine(type);
-				
-				if (type2 != null){
-				Debug.printDbgLine("4");
-				long homeTimeStart = System.currentTimeMillis();
-				HttpURLConnection connessione2 = null;
-				InputStream stream2 = null;
-				connessione2 = (HttpURLConnection)new URL(type2).openConnection();
-				connessione2.setRequestMethod("GET");
-				connessione2.setDoOutput(true);
-				connessione2.setRequestProperty("Accept", "application/rdf+xml");
-				Debug.printDbgLine("5");
-				stream2 = connessione2.getInputStream();
 
-				arp2.read(m2, stream2, type2);
-				connessione2.disconnect();
-				stream2.close();
-				
-//								String responseType = "";
-//								if (connessione2.getContentType().contains("application/rdf+xml")){
-//									Scanner inputs2 = new Scanner(stream2);	
-//									while (inputs2.hasNextLine())
-//										responseType += inputs2.nextLine();
-//				
-//									inputs2.close();
-//									connessione2.disconnect();
-//									stream2.close();
-//								}
-//								Debug.printDbgLine(responseType);
-				long homeTimeStop = System.currentTimeMillis()-homeTimeStart;
-				Debug.printDbgLine("TIME="+homeTimeStop);
 				}
-				
-				
-				
-				
+
+				Debug.printDbgLine(type);
+
+				if (type2 != null){
+					long homeTimeStart = System.currentTimeMillis();
+					HttpURLConnection connessione2 = null;
+					InputStream stream2 = null;
+					connessione2 = (HttpURLConnection)new URL(type2).openConnection();
+					connessione2.setRequestMethod("GET");
+					connessione2.setDoOutput(true);
+					connessione2.setRequestProperty("Accept", "application/rdf+xml");
+					stream2 = connessione2.getInputStream();
+
+					arp2.read(m2, stream2, type2);
+					connessione2.disconnect();
+					stream2.close();
+
+					long homeTimeStop = System.currentTimeMillis()-homeTimeStart;
+					Debug.printDbgLine("TIME="+homeTimeStop);
+				}
+
+
+
+
 				for (Object key : linkmap.keySet()){
 					//Debug.printDbgLine(key.toString());
 					if (key.toString().contains("type"))
 						jsonHT.type = key.toString();
 					else if (key.toString().contains("label")){
-//						jsonHT.name = linkmap.asMap().get(key).toString().replace("@en", "");
-//						jsonFD.name = jsonHT.name;
+						//						jsonHT.name = linkmap.asMap().get(key).toString().replace("@en", "");
+						//						jsonFD.name = jsonHT.name;
 					}else{
 						linkList.add(key.toString());
 						Map<String, String> mapNodeHT = new HashMap<String,String>();
@@ -242,10 +236,10 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 						String jlast = null;
 
-				
+
 
 						if (!m2.isEmpty()){
-						connection = m2.getResource(type2+key.toString());
+							connection = m2.getResource(type2+key.toString());
 						}else
 							connection = null;
 
@@ -268,7 +262,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("label")){
 								Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
-								label = s2.getObject().toString().replace("@en", "");
+								label = Utility.toUTF8(s2.getObject().toString().replace("@en", ""));
 							}
 							if (s2.getPredicate().toString().contains("range")){
 								Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
@@ -382,7 +376,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				Debug.printDbgLine(linkList.toString());
 
 
-//			}
+			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			result.setCode(-1);
