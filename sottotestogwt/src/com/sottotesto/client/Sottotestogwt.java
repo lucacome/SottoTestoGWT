@@ -1,5 +1,7 @@
 package com.sottotesto.client;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -519,12 +521,10 @@ public class Sottotestogwt implements EntryPoint {
 					String jsonFD = "["+result.jdataFD+"]";	
 
 					listFD.add(jsonFD);
-										
-					// create tree entry for Maps
+					
 					tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWMAP));
 					treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
 					
-					// create tree entry for hypertree graph
 					tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
 					tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
 					tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());

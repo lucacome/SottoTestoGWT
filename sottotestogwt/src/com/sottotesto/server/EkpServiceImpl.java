@@ -62,21 +62,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		List<String> linkList = new ArrayList<String>();
 		String inputbello = input;
 
-		try {
-			if (input.contains("(")){
-				String[] a = input.split("\\(");
-				String temp = "";
-				input = URLEncoder.encode(a[0], "UTF-8");
-				temp = "(" + URLEncoder.encode(a[1].substring(0, a[1].length()-1), "UTF-8") + ")";
-				input = input + temp;
-			}
-			else
-				input = URLEncoder.encode(input, "UTF-8");
 
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
 
 
@@ -192,7 +178,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 				}
 
-				Debug.printDbgLine(type);
+				//Debug.printDbgLine(type);
 
 				if (type2 != null){
 					long homeTimeStart = System.currentTimeMillis();
@@ -256,16 +242,16 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 							//Debug.printDbgLine("BOH"+s2+"\n");
 							//	Debug.printDbgLine("BOH2"+s2.getLiteral());
 							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("comment")){
-								Debug.printDbgLine("Comment="+s2.getObject().toString().replace("@en", ""));
+								//Debug.printDbgLine("Comment="+s2.getObject().toString().replace("@en", ""));
 								comment = s2.getObject().toString().replace("@en", "");
 							}
 
 							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("label")){
-								Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
-								label = Utility.toUTF8(s2.getObject().toString().replace("@en", ""));
+								//Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
+								label = s2.getObject().toString().replace("@en", "");
 							}
 							if (s2.getPredicate().toString().contains("range")){
-								Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
+								//Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
 								range = s2.getObject().toString().replace("http://dbpedia.org/ontology/", "");
 
 							}
@@ -373,7 +359,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				result.jdataHT=jresp;
 				result.jdataFD=tempf;
 				result.linkList=linkList;
-				Debug.printDbgLine(linkList.toString());
+				//Debug.printDbgLine(linkList.toString());
 
 
 			}

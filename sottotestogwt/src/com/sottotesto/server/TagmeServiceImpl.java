@@ -110,7 +110,24 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
 					//JData.jdata.add("title"+i, jarray);
 					//JData.jdata.addProperty("title"+i, responseTagTmp);
+					
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
+					try {
+						if (responseTagTmp.contains("(")){
+							String[] a = responseTagTmp.split("\\(");
+							String temp = "";
+							responseTagTmp = URLEncoder.encode(a[0], "UTF-8");
+							temp = "(" + URLEncoder.encode(a[1].substring(0, a[1].length()-1), "UTF-8") + ")";
+							responseTagTmp = responseTagTmp + temp;
+						}
+						else
+							responseTagTmp = URLEncoder.encode(responseTagTmp, "UTF-8");
+
+					} catch (UnsupportedEncodingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 					titletag.add(responseTagTmp);	
 
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).spot;

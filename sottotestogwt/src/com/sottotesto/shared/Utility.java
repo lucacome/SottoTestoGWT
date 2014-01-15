@@ -1,6 +1,7 @@
 package com.sottotesto.shared;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -15,28 +16,28 @@ public class Utility {
 
 	private static AutoProgressMessageBox loadingBox;
 	private static String loadingText="";
-	
+
 	public static void showLoadingBar(String text){
-		
+
 		// create loading box if first time
 		if(loadingBox == null){
 			loadingBox = new AutoProgressMessageBox("WORKING", "Processing Request, please wait...");
-			
+
 			//add 'X' close button if first time
 			HTML closeButton = new HTML("<div style=\"margin-left:-25px;margin-top: 2px; cursor:pointer;\"><img src=\"closeicon.gif\" height=\"20px\"/></div>");
 			closeButton.addClickHandler(new ClickHandler() {
-				
+
 				@Override
 				public void onClick(ClickEvent event) {	
 					loadingBox.hide();
 				}
 			});
-			
+
 			//loadingBox.addTool(closeButton);
-			
+
 			ToolButton closeTool = new ToolButton(ToolButton.CLOSE);
 			closeTool.addSelectHandler(new SelectHandler() {
-				
+
 				@Override
 				public void onSelect(SelectEvent event) {
 					// TODO Auto-generated method stub
@@ -45,15 +46,15 @@ public class Utility {
 			});
 			loadingBox.addTool(closeTool);
 		}
-		
+
 		// set working text (if null set default)
 		loadingText=text;
 		if (loadingText=="") loadingBox.setProgressText("... Working ...");
 		else loadingBox.setProgressText("... "+loadingText+" ...");
-		
+
 		// add extra
 		loadingBox.setShadow(true);
-		
+
 		// show loading box
 		loadingBox.auto();
 		loadingBox.show();
@@ -62,7 +63,7 @@ public class Utility {
 		if (loadingBox != null) loadingBox.hide();
 		loadingText="";
 	}
-	
+
 
 	public static long calcTimeTookMs(long StartTimeMs){
 		return (System.currentTimeMillis()-StartTimeMs);
@@ -70,15 +71,12 @@ public class Utility {
 
 	public static String toUTF8(String dirtyString){
 		String cleanString = "";
-		
+
 		try {
 			cleanString = new String(dirtyString.getBytes(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {/*do nothing*/}		
 		return cleanString;
 	}
-	
-
-	
 
 	public static String getErrorHtmlString (Throwable throwable) {
 		String ret="";
@@ -127,7 +125,7 @@ public class Utility {
 		int dbMaxWidth = RootPanel.get().getOffsetWidth()/3;
 		return dbMaxWidth;
 	}
-	
+
 	public static int getPanelsMaxWidth(){
 		return RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 	}
