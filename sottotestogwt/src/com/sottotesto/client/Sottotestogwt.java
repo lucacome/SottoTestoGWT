@@ -951,6 +951,13 @@ public class Sottotestogwt implements EntryPoint {
 			htmlString += s;
 		}
 		
+		//now we can clean double entries in tagmeResp, to avoid multiple interrogation of EKP and DBPEDIA for same things
+		tagmeResp.setTitleTag(Utility.clearDoubleEntries(tagmeResp.getTitleTag()));
+		tagmeResp.setTitleTagClean(Utility.clearDoubleEntries(tagmeResp.getTitleTagClean()));
+		tagmeResp.setSpotTag(Utility.clearDoubleEntries(tagmeResp.getSpotTag()));
+		tagmeResp.setTitleSkipped(Utility.clearDoubleEntries(tagmeResp.getTitleSkipped()));
+		tagmeResp.setSpotSkipped(Utility.clearDoubleEntries(tagmeResp.getSpotSkipped()));
+		
 		return htmlString;
 	}
 

@@ -145,11 +145,15 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 					responseTagTmp = "";
 				}
 			}
+			
 			tagmeResp.setTitleTag(titletag);
 			tagmeResp.setTitleTagClean(titletagClean);
 			tagmeResp.setSpotTag(spotTag);
 			tagmeResp.setTitleSkipped(titleSkipped);
 			tagmeResp.setSpotSkipped(spotSkipped);
+			
+			
+			
 			//JsonElement jelement = null;
 
 			//jarray.add(jelement);

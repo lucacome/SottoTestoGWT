@@ -1,6 +1,8 @@
 package com.sottotesto.shared;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -64,7 +66,19 @@ public class Utility {
 	}
 
 
-	public static long calcTimeTookMs(long StartTimeMs){
+	public static List<String> clearDoubleEntries(List<String> list){
+		List<String> clearedList = new ArrayList<String>();
+		
+		for(String curEntry : list){
+			if(clearedList.indexOf(curEntry)==-1)
+				clearedList.add(curEntry);
+		}
+		Debug.printDbgLine("New cleared list:");
+		for(String s : clearedList) Debug.printDbgLine(s);
+		return clearedList;
+	}
+	
+ 	public static long calcTimeTookMs(long StartTimeMs){
 		return (System.currentTimeMillis()-StartTimeMs);
 	}
 
