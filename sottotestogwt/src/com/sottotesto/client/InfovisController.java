@@ -51,8 +51,9 @@ public class InfovisController {
 	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
 	private final GHTServiceAsync GHTService = GWT.create(GHTService.class);
 	private List<String> listFD;
-	private List<String> linkList;
-	private List<String> linkNameList;
+	private List<String> linkList;		//linksToXXX, hasXXX, ...
+	private List<String> linkNameList;	//only XXX from linkList
+	private List<String> entitiesEscaped;	//entity names with %XX escape chars
 
 	public Widget init(){		
 		Debug.printDbgLine("InfovisController.java: init()");
@@ -132,7 +133,7 @@ public class InfovisController {
 		}
 	}
 	
-	//dato un json crea le checkbox con i vari linksTo
+	//dato un json crea le checkbox con i vari linksTo (usato per il Graph HT)
 	public void setCheckBoxes(final String json){
 		
 		//set checkboxes change handler
@@ -171,6 +172,8 @@ public class InfovisController {
 		checkBoxHC.add(refreshTool);
 		checkBoxHC.add(new HTML(" &nbsp;"));
 		
+		if (linkNameList.size()<1) return;
+		
 		//aggiungi un label
 		HTML checkBoxLabel = new HTML();
 		checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Visualizza: </b></span>");		
@@ -192,13 +195,16 @@ public class InfovisController {
 	}
 	
 	
-	//dato un elenco di entita' crea le checkbox corrispondenti
+	//dato un elenco di entita' crea le checkbox corrispondenti (usato per il Graph FD)
 	public void setCheckBoxes(final List<EkpResponse> ekpResps){
 		
 		//get entities to show
 		List<String> entities = new ArrayList<String>();
+		entitiesEscaped = new ArrayList<String>();
 		for (EkpResponse curResp : ekpResps){
 			entities.add(curResp.getTag());
+			entitiesEscaped.add(curResp.getEncodedTag());
+			Debug.printDbgLine("InfovisController.java; setCheckBoxes(ekpResps): added entityEscaped= "+curResp.getEncodedTag());
 		}
 
 		//set checkboxes change handler
@@ -208,7 +214,7 @@ public class InfovisController {
 
 				//check selected checkboxes
 				List<String> selectedEntities = new ArrayList<String>();
-				selectedEntities = getSelectedDBPlinks();
+				selectedEntities = getSelectedEntityDBPlinks();
 				Utility.showLoadingBar("Preparing Graph");
 				callGraphService(listFD, selectedEntities);
 			}
@@ -226,7 +232,7 @@ public class InfovisController {
 			public void onSelect(SelectEvent event) {
 				//check selected checkboxes
 				List<String> selectedEntities = new ArrayList<String>();
-				selectedEntities = getSelectedDBPlinks();
+				selectedEntities = getSelectedEntityDBPlinks();
 				Utility.showLoadingBar("Preparing Graph");
 				callGraphService(listFD, selectedEntities);			
 			}
@@ -268,6 +274,7 @@ public class InfovisController {
 		return selectedLinks;
 	}
 	
+	//usato nel graphHT
 	private List<String> getSelectedDBPlinks(){
 		List<String> selectedDBPlinks = new ArrayList<String>();
 		
@@ -278,10 +285,28 @@ public class InfovisController {
 		}
 		return selectedDBPlinks;
 	}
+	
+	//usato nel graphFD
+	private List<String> getSelectedEntityDBPlinks(){
+		List<String> selectedDBPlinks = new ArrayList<String>();
+
+		int curCbIndex=0;
+		for(CheckBox cb : checkBoxes){
+			if (cb.getValue()){
+				selectedDBPlinks.add("http://dbpedia.org/resource/"+entitiesEscaped.get(curCbIndex));
+			}
+			curCbIndex++;
+		}
+		return selectedDBPlinks;
+	}
 
 	
 	private void callGraphService(List<String> listFD, List<String> selectedDbpLinks){
-
+		Debug.printDbgLine("InfovisController.java: callGraphService()");
+		Debug.printDbgLine("InfovisController.java: callGraphService(): selected confrontation links:");
+		for (String s : selectedDbpLinks){
+			Debug.printDbgLine(s);
+		}
 		GraphService.sendToServer(listFD, selectedDbpLinks, new AsyncCallback<String>() {
 			public void onFailure(Throwable caught) {
 				//set the error
@@ -342,7 +367,7 @@ public class InfovisController {
 
 	public void showFullConfrontationGraph(){
 		List<String> selectedEntities = new ArrayList<String>();
-    	selectedEntities = getSelectedDBPlinks();
+    	selectedEntities = getSelectedEntityDBPlinks();
     	
     	callGraphService(listFD, selectedEntities);
 	}
