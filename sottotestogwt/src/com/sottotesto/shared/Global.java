@@ -10,15 +10,18 @@ import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.form.TextField;
 
 public class Global {
 	
-	static private int optionsDBwidth=220;
-	static private int optionsDBheight=250;
+	static private int optionsDBwidth=240;
+	static private int optionsDBheight=275;
 	
 	private static Dialog optionsDialog;
 	static VerticalLayoutContainer optionsVC = new VerticalLayoutContainer();
 	
+	private static TextField tagmeKeyTF = new TextField();
+	private static String tagmeKey="plclcd321";
 	
 	final static Slider rohSlider = new Slider();
 	private static double roh = 0.06;
@@ -31,6 +34,13 @@ public class Global {
 	}
 	
 	private static void initOptionsDB(){
+		
+		Label tagmeKeyLabel = new Label("Chiave utilizzo Servizio TAGME");
+		String tagmeKeyTitle = "Chiave gratuita indispensabile per utilizzare il servizio TAGME";
+		tagmeKeyLabel.setTitle(tagmeKeyTitle);
+		tagmeKeyTF.setAllowBlank(false);
+		tagmeKeyTF.setText(tagmeKey);
+		tagmeKeyTF.setTitle("default value: plclcd321");
 		
 		Label rohLabel = new Label("Imposta il valore ROH");
 		String rohTitle = "Piu' ROH e' basso e piu' TAGME trovera' entita' nelle frasi";
@@ -46,12 +56,15 @@ public class Global {
 		String markerDelayTitle = "Intervallo di caduta tra i marker sulla mappa";
 		markerDelayLabel.setTitle(markerDelayTitle);
 		markerDelaySlider.setMinValue(0);
-		markerDelaySlider.setMaxValue(100);
+		markerDelaySlider.setMaxValue(200);
 		markerDelaySlider.setValue(mapMarkerDelay);
 		markerDelaySlider.setTitle("default value: 50ms");
 		markerDelaySlider.setIncrement(1);
 		markerDelaySlider.setMessage("{0}ms");
 		
+		optionsVC.add(new HTML("<br>"));
+		optionsVC.add(tagmeKeyLabel);
+		optionsVC.add(tagmeKeyTF);
 		optionsVC.add(new HTML("<br>"));
 		optionsVC.add(rohLabel);
 		optionsVC.add(rohSlider);
@@ -69,16 +82,25 @@ public class Global {
 		optionsDialog = new Dialog();
 		optionsDialog.setHeadingText("OPZIONI GLOBALI");
 		optionsDialog.setId("optionsDB");
-		optionsDialog.setHideOnButtonClick(true);
+		optionsDialog.setHideOnButtonClick(false);
 		optionsDialog.setPredefinedButtons(PredefinedButton.OK, PredefinedButton.CANCEL);
 		optionsDialog.setWidget(optionsFC);
 		
 		optionsDialog.getButtonById(PredefinedButton.OK.name()).addSelectHandler(new SelectHandler() {			
 			@Override
 			public void onSelect(SelectEvent event) {
-				// TODO Auto-generated method stub
+				if(tagmeKeyTF.getText().isEmpty())return;
+				else tagmeKey=tagmeKeyTF.getText();
 				roh = (double) rohSlider.getValue()/100.0;
 				mapMarkerDelay = markerDelaySlider.getValue();
+				
+				optionsDialog.hide();
+			}
+		});
+		optionsDialog.getButtonById(PredefinedButton.CANCEL.name()).addSelectHandler(new SelectHandler() {			
+			@Override
+			public void onSelect(SelectEvent event) {				
+				optionsDialog.hide();
 			}
 		});
 	}
@@ -92,11 +114,16 @@ public class Global {
 		optionsDialog.center();
 	}
 	
-	private static void reloadOptions(){
+	private static int reloadOptions(){	
+		tagmeKeyTF.setText(tagmeKey);
+		tagmeKeyTF.clearInvalid();
 		rohSlider.setValue((int)(roh*100.0));
 		markerDelaySlider.setValue(mapMarkerDelay);
+		
+		return 0;
 	}
 
+	public static String getTagmeKey(){return tagmeKey;}
 	public static double getRoh(){return roh;}
 	public static int getMapMarkerDelay(){return mapMarkerDelay;}
 }

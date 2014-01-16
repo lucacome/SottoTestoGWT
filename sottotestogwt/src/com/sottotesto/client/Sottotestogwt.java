@@ -329,7 +329,7 @@ public class Sottotestogwt implements EntryPoint {
 		//actually call tagme service
 		Utility.showLoadingBar("Calling TAGME Service");
 		HtmlTagmeService.setHTML(HTMLtagmeServiceStringCalling);		
-		tagmeService.sendToServer(textToServer, Global.getRoh(), new AsyncCallback<TagmeResponse>() {
+		tagmeService.sendToServer(textToServer, Global.getRoh(), Global.getTagmeKey(), new AsyncCallback<TagmeResponse>() {
 			public void onFailure(Throwable caught) {
 				Debug.printDbgLine("Sottotestogwt.java: callTagme(): tagmeService:onFailure()");
 
@@ -653,7 +653,7 @@ public class Sottotestogwt implements EntryPoint {
 		tagmeStatusVP.add(HtmlTagmeService);	
 		tagmeStatusVP.setBorderWidth(0);
 		HtmlTagmeService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlTagmeService.getHTML().contains("Waiting")) spLogger.showTagmeDataDB();}});
+			if(!HtmlTagmeService.getHTML().contains("Waiting") && !HtmlEkpService.getHTML().contains("Skipped")) spLogger.showTagmeDataDB();}});
 
 		//dbpedia service
 		dbpFailsNum = 0;
@@ -665,7 +665,7 @@ public class Sottotestogwt implements EntryPoint {
 		dbpediaStatusVP.add(HtmlDBPediaService);
 		dbpediaStatusVP.setBorderWidth(0);
 		HtmlDBPediaService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlDBPediaService.getHTML().contains("Waiting")) spLogger.showDBPediaDataDB();}});
+			if(!HtmlDBPediaService.getHTML().contains("Waiting") && !HtmlEkpService.getHTML().contains("Skipped")) spLogger.showDBPediaDataDB();}});
 
 		//ekp service
 		ekpFailsNum = 0;
@@ -677,7 +677,7 @@ public class Sottotestogwt implements EntryPoint {
 		ekpStatusVP.add(HtmlEkpService);
 		ekpStatusVP.setBorderWidth(0);
 		HtmlEkpService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlEkpService.getHTML().contains("Waiting")) spLogger.showEkpDataDB();}});
+			if(!HtmlEkpService.getHTML().contains("Waiting") && !HtmlEkpService.getHTML().contains("Skipped")) spLogger.showEkpDataDB();}});
 
 		//add items to panel
 		serviceStatusPanelHC.add(HtmlTagmeService, new HorizontalLayoutData(0.33, 1, new Margins(4)));

@@ -28,7 +28,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 	 */
 	private static final long serialVersionUID = -727904838259956930L;
 
-	public TagmeResponse sendToServer(String input, double roh) throws IllegalArgumentException {
+	public TagmeResponse sendToServer(String input, double roh, String tagmeKey) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
 
 		long StartTime = System.currentTimeMillis();
@@ -46,7 +46,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			String param1name = "text";
 			String param1value = Normalizer.normalize(input, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 			String param2name = "key";
-			String param2value = "plclcd321";
+			String param2value = tagmeKey;
 			String param3name = "include_categories";
 			String param3value = "true";	
 			String query = String.format("%s=%s&%s=%s&%s=%s", URLEncoder.encode(param1name, charset), URLEncoder.encode(param1value, charset), URLEncoder.encode(param2name, charset), URLEncoder.encode(param2value, charset), URLEncoder.encode(param3name, charset), URLEncoder.encode(param3value, charset));
