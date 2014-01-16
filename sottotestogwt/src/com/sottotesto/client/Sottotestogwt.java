@@ -46,7 +46,6 @@ import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
-import com.sottotesto.shared.FieldVerifier;
 import com.sottotesto.shared.Global;
 import com.sottotesto.shared.TagmeResponse;
 import com.sottotesto.shared.TreeData;
@@ -197,7 +196,7 @@ public class Sottotestogwt implements EntryPoint {
 		textAreaLabel = new Label();
 		textAreaLabel.getElement().setClassName("searchAreaLabel"); //for css styling
 		textAreaLabel.setText("Scrivi una frase:");				
-		textAreaDefText = "Enter something here...";
+		textAreaDefText = "Enter something in english here...";
 		textSendButton = "Cerca";
 		sendButton = new Button(textSendButton);
 		textArea = new TextArea();
@@ -250,14 +249,18 @@ public class Sottotestogwt implements EntryPoint {
 		class HomeInputHandler implements ClickHandler, KeyUpHandler {
 			public void onClick(ClickEvent event) {
 				Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): sendButtonOnClick()");
-				callTagme();
+				validateSearch();
+				if (textArea.getText().length()>0)
+					callTagme();		
 			}
 			public void onKeyUp(KeyUpEvent event) {				
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 					Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): textAreaOnKeyUpEnter()");
 					textArea.setText(textArea.getText().replace("\n", ""));	
 					if (sendButton.isEnabled()){
-						callTagme();			
+						validateSearch();
+						if (textArea.getText().length()>0)
+							callTagme();				
 					}
 				}
 			}			
@@ -280,7 +283,9 @@ public class Sottotestogwt implements EntryPoint {
 					Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): textAreaOnKeyUpEnter()");
 					textArea.setText(textArea.getText().replace("\n", ""));	
 					if (sendButton.isEnabled()){
-						callTagme();			
+						validateSearch();
+						if (textArea.getText().length()>0)
+							callTagme();			
 					}
 				}
 			}
@@ -301,6 +306,11 @@ public class Sottotestogwt implements EntryPoint {
 		 */
 	}
 
+	private void validateSearch(){
+		if (textArea.getText().length()<=0) return;
+		
+		
+	}
 
 	//send input from textarea to tagme
 	private void callTagme() {
@@ -312,10 +322,7 @@ public class Sottotestogwt implements EntryPoint {
 		// First, we validate the input.
 		errorLabel.setText("");
 		String textToServer = textArea.getText();
-		if (!FieldVerifier.isValidTagRequest(textToServer)) {
-			errorLabel.setText("Inserisci qualcosa!");
-			return;
-		}
+		
 
 		sendButton.setEnabled(false);
 
@@ -860,13 +867,14 @@ public class Sottotestogwt implements EntryPoint {
 		taggedEntityPopup.hide();
 	}
 	
+
 	private String createTaggedSearchString(){
 		Debug.printDbgLine("ResultController.java: createTaggedSearchString()");
 
 		String result = textArea.getText();
 		String curTag="";
 		String curTitle="";
-		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result = "+result);
+		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): searched = "+result);
 		if (tagmeResp.getSpotTag().size()==0) return result;
 		
 		//CHECK TAGGED ENTRIES
@@ -880,10 +888,9 @@ public class Sottotestogwt implements EntryPoint {
 			curTag=iterTags.next();	
 			curTag=curTag.replaceAll("_", " ");
 			curTitle=iterTitle.next();
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): tagging \""+curTag+"\" as \""+curTitle+"\"");	
 
 			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
 		}
 
 		//CHECK TAGGED ENTRIES WITH LOW ROH
@@ -892,17 +899,46 @@ public class Sottotestogwt implements EntryPoint {
 		Iterator<String> iterSkippedTags =  skippedEntries.iterator();		
 		List<String> skippedTitles;
 		skippedTitles = new ArrayList<String>(tagmeResp.getTitleSkipped());		
-		Iterator<String> iterSkippedTitle =  skippedTitles.iterator();				
+		Iterator<String> iterSkippedTitle =  skippedTitles.iterator();	
+		int skippedIndex=0;
+		boolean spotAlreadyUsed=false;
 		while (iterSkippedTags.hasNext()){
 			curTag=iterSkippedTags.next();	
 			curTag=curTag.replaceAll("_", " ");
 			curTitle=iterSkippedTitle.next();
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): curTag cleared= "+curTag);	
+			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): skipping \""+curTag+"\" as \""+curTitle+"\"");	
 
-			result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): result mod = "+result);	
+			spotAlreadyUsed=false;
+			//check if spot was already used in TAGGED
+			for (String sTagged : tagmeResp.getSpotTag()){
+				if (sTagged.contains(curTag)){
+					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): SPOT ALREADY USED IN TAGGED");
+					spotAlreadyUsed=true;
+					break;
+				}
+			}
+			
+			//check if spot was already used in previous skipped
+			if (!spotAlreadyUsed && skippedIndex>0){
+				for (int i=0; i<skippedIndex; i++){
+					if (tagmeResp.getSpotSkipped().get(i).contains(curTag)){
+						Debug.printDbgLine("ResultController.java: createTaggedSearchString(): SPOT ALREADY USED IN SKIPPED");
+						spotAlreadyUsed=true;
+						break;
+					}
+				}
+			}
+				
+			//if spot is free span it
+			if (!spotAlreadyUsed){
+				Debug.printDbgLine("ResultController.java: createTaggedSearchString(): Skip done");
+				result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
+			}
+			
+			skippedIndex++;
 		}
 
+		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): searchedString = "+result);	
 		return result;
 	}
 
