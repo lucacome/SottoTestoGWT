@@ -790,7 +790,7 @@ public class Sottotestogwt implements EntryPoint {
 				
 				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): curTagText: "+curTagText);
 				HTML curHtml = new HTML();
-				curHtml.setHTML(curSubString+"&nbsp;");
+				curHtml.setHTML(curSubString);
 				curHtml.setTitle(curTitle);				
 								
 				//aggiungi eventi mouse all'html taggato
@@ -815,13 +815,11 @@ public class Sottotestogwt implements EntryPoint {
 				if(taggedSearchString.contains("<")){ // we'll have another span
 					int spanBeginIndex = taggedSearchString.indexOf('<');
 					String curString = taggedSearchString.substring(0, spanBeginIndex);
-					curString.replaceAll(" ", "&nbsp;");
-					HTML curHtml = new HTML(curString+"&nbsp;");
+					HTML curHtml = new HTML(curString);
 					hp.add(curHtml); 
 					taggedSearchString = taggedSearchString.substring(spanBeginIndex, taggedSearchString.length());
 				}
 				else{ //no mor span -> single html until endo of line
-					taggedSearchString.replaceAll(" ", "&nbsp;");
 					HTML curHtml = new HTML(taggedSearchString);
 					hp.add(curHtml);
 					
@@ -929,14 +927,16 @@ public class Sottotestogwt implements EntryPoint {
 				
 				if (lowestIndex==60000){ //search phrase has no more skipped/tagged items!
 					spotTaken=true;
-					partialStrings.add(searchedText);
+					partialStrings.add(searchedText.replaceAll(" ", "&nbsp;"));
 					searchedText = "";
 					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
 					break;
 				}
 				else{ //search phrase must be cut until next tagged/skipped element
 					spotTaken=true;
-					partialStrings.add(searchedText.substring(0, lowestIndex));
+					String sToAdd = searchedText.substring(0, lowestIndex);
+					sToAdd = sToAdd.replaceAll(" ", "&nbsp;");
+					partialStrings.add(sToAdd);
 					searchedText = searchedText.substring(lowestIndex, searchedText.length()); //remove current spotTag from search phrase
 					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
 				}
