@@ -232,6 +232,7 @@ public class ResultController {
 
 		lcwest.add(treeContainer);
 		treeContainer.setWidth(lcwest.getOffsetWidth());
+		treeContainer.setHeight(lcwest.getOffsetHeight());
 		
 		showMap("Mappa completa");
 	}
