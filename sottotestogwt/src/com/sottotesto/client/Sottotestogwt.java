@@ -834,12 +834,16 @@ public class Sottotestogwt implements EntryPoint {
 			boolean dataFound = false;
 
 			// search for fitting dbpediaResp data
+			entity = entity.replaceAll(" ", "_");
 			for (DBPediaResponse curDbpResp : dbpediaResps){
+				Debug.printDbgLine("Sottotestogwt.java: showTaggedPopup(): entity= "+entity+"; dbpediaEntity="+curDbpResp.getEntity());
 				if (curDbpResp.getEntity().equals(entity)){		
+					Debug.printDbgLine("Sottotestogwt.java: showTaggedPopup(): match found!");
 					String dbpQ = curDbpResp.getQueryResultXML();
 					if (dbpQ.length()<5) dbpQ="Nessun dato trovato per questa entita'";
 					popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b> ["+curDbpResp.getEntityType()+"]<br><br>"+dbpQ);
 					dataFound=true;
+					break;
 				}
 			}
 			
@@ -870,7 +874,7 @@ public class Sottotestogwt implements EntryPoint {
 		taggedEntries = new ArrayList<String>(tagmeResp.getSpotTag());		
 		Iterator<String> iterTags =  taggedEntries.iterator();		
 		List<String> taggedTitles;
-		taggedTitles = new ArrayList<String>(tagmeResp.getTitleTag());		
+		taggedTitles = new ArrayList<String>(tagmeResp.getTitleTagClean());		
 		Iterator<String> iterTitle =  taggedTitles.iterator();				
 		while (iterTags.hasNext()){
 			curTag=iterTags.next();	

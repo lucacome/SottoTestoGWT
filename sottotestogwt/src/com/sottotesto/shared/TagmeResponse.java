@@ -1,5 +1,6 @@
 package com.sottotesto.shared;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TagmeResponse implements java.io.Serializable{
@@ -18,6 +19,7 @@ public class TagmeResponse implements java.io.Serializable{
 	private double maxrho;
 	private long time;
 	private List<String> titleTag;
+	private List<String> titleTagClean;
 	private List<String> spotTag;
 	private List<String> titleSkipped;
 	private List<String> spotSkipped;
@@ -32,7 +34,8 @@ public class TagmeResponse implements java.io.Serializable{
 		jsonData = new TagmeData();
 		resNum = 0;
 		time = 0;
-		titleTag = null;
+		titleTag = new ArrayList<String>();
+		titleTagClean = new ArrayList<String>();
 		maxrho = 0.1;
 	}
 
@@ -60,6 +63,8 @@ public class TagmeResponse implements java.io.Serializable{
 	public long getTime(){return time;}	
 	public void setTitleTag(List<String> x) {titleTag = x;}
 	public List<String> getTitleTag(){return titleTag;}
+	public void setTitleTagClean(List<String> x) {titleTagClean = x;}
+	public List<String> getTitleTagClean(){return titleTagClean;}
 	public void setSpotTag(List<String> x) {spotTag = x;}
 	public List<String> getSpotTag(){return spotTag;}
 

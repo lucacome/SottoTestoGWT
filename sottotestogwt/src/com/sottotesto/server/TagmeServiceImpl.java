@@ -93,6 +93,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 
 			//liste per entita' e spotPlace con rho sufficiente
 			List<String> titletag = new ArrayList<String>();
+			List<String> titletagClean = new ArrayList<String>();
 			List<String> spotTag = new ArrayList<String>();
 
 			//liste per entita' e spotPlace con rho non sufficiente
@@ -111,6 +112,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 					//JData.jdata.add("title"+i, jarray);
 					//JData.jdata.addProperty("title"+i, responseTagTmp);
 					
+					titletagClean.add(responseTagTmp);
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
 					try {
 						if (responseTagTmp.contains("(")){
@@ -144,6 +146,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 				}
 			}
 			tagmeResp.setTitleTag(titletag);
+			tagmeResp.setTitleTagClean(titletagClean);
 			tagmeResp.setSpotTag(spotTag);
 			tagmeResp.setTitleSkipped(titleSkipped);
 			tagmeResp.setSpotSkipped(spotSkipped);
