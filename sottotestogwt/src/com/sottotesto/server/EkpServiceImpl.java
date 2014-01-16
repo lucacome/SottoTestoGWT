@@ -71,40 +71,40 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		try {
 			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input+"?dbpedia-version=3.8").openConnection();
 
-		connessione.setRequestMethod("GET");
+			connessione.setRequestMethod("GET");
 
-		connessione.setRequestProperty("Accept-Charset", "utf-8");
-		connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
+			connessione.setRequestProperty("Accept-Charset", "utf-8");
+			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
 
-		connessione.setDoOutput(true);
-		stream = connessione.getInputStream();
-		result.setCode(connessione.getResponseCode());
-		result.setMessage(connessione.getResponseMessage());
-		result.setContentType(connessione.getContentType());
-		result.setEncodedTag(input);
-		result.setTag(URLDecoder.decode(input, "UTF-8"));
-		Debug.printDbgLine("URL="+connessione.getURL());
-		Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
+			connessione.setDoOutput(true);
+			stream = connessione.getInputStream();
+			result.setCode(connessione.getResponseCode());
+			result.setMessage(connessione.getResponseMessage());
+			result.setContentType(connessione.getContentType());
+			result.setEncodedTag(input);
+			result.setTag(URLDecoder.decode(input, "UTF-8"));
+			Debug.printDbgLine("URL="+connessione.getURL());
+			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
 
-		
-		if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
-			//
-			//				BufferedReader inputReader = new BufferedReader(new InputStreamReader(connessione.getInputStream()));
-			//				StringBuilder sb = new StringBuilder();
-			//				String inline = "";
-			//				while ((inline = inputReader.readLine()) != null) {
-			//					sb.append(inline);
-			//				}
-			//				responseEkpTemp = URLDecoder.decode(sb.toString(), "UTF-8");
-			//				Debug.printDbgLine(responseEkpTemp);
-			//				connessione.disconnect();
-			//				m.read(new StringReader(responseEkpTemp), null);
-			//arp.read(m, new StringReader(responseEkpTemp), null);
-			arp.read(m, stream, null);
-			stream.close();
-			connessione.disconnect();
 
-		}
+			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
+				//
+				//				BufferedReader inputReader = new BufferedReader(new InputStreamReader(connessione.getInputStream()));
+				//				StringBuilder sb = new StringBuilder();
+				//				String inline = "";
+				//				while ((inline = inputReader.readLine()) != null) {
+				//					sb.append(inline);
+				//				}
+				//				responseEkpTemp = URLDecoder.decode(sb.toString(), "UTF-8");
+				//				Debug.printDbgLine(responseEkpTemp);
+				//				connessione.disconnect();
+				//				m.read(new StringReader(responseEkpTemp), null);
+				//arp.read(m, new StringReader(responseEkpTemp), null);
+				arp.read(m, stream, null);
+				stream.close();
+				connessione.disconnect();
+
+			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -141,7 +141,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			for (i = link.listProperties(); i.hasNext(); ) {
 				Statement s = i.next();					
 				//Debug.printDbgLine( "link has property " + s.getPredicate().getLocalName().replace("linksTo", "") + " with value " + s.getObject() );
-				//Debug.printDbgLine("DIO="+s);
+//				Debug.printDbgLine("DIO="+s);
 				if (s.getPredicate().getLocalName().contains("label")){
 					try {
 						jsonHT.name = URLDecoder.decode(s.getObject().toString().replace("@en", ""),"UTF-8");
@@ -155,6 +155,8 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					type=s.getObject().toString();
 					if (!type.isEmpty() && type.contains("http://dbpedia.org/ontology/"))
 						result.setType(type.substring(type.lastIndexOf('/')+1));
+					else if (!type.isEmpty() && type.contains("http://www.w3.org/2002/07/owl#"))
+						result.setType(type.substring(type.lastIndexOf('#')+1));
 					else
 						type = "";
 
@@ -197,14 +199,14 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					connessione2 = (HttpURLConnection)new URL(type2).openConnection();
 
 
-				connessione2.setRequestMethod("GET");
-				connessione2.setDoOutput(true);
-				connessione2.setRequestProperty("Accept", "application/rdf+xml");
-				stream2 = connessione2.getInputStream();
+					connessione2.setRequestMethod("GET");
+					connessione2.setDoOutput(true);
+					connessione2.setRequestProperty("Accept", "application/rdf+xml");
+					stream2 = connessione2.getInputStream();
 
-				arp2.read(m2, stream2, type2);
-				connessione2.disconnect();
-				stream2.close();
+					arp2.read(m2, stream2, type2);
+					connessione2.disconnect();
+					stream2.close();
 				} catch (MalformedURLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -254,34 +256,34 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					String range = "";
 
 					if (connection != null)
-					for (i2 = connection.listProperties(); i2.hasNext(); ) {
-						Statement s2 = i2.next();	
+						for (i2 = connection.listProperties(); i2.hasNext(); ) {
+							Statement s2 = i2.next();	
 
 
-						//Debug.printDbgLine("BOH"+s2+"\n");
-						//	Debug.printDbgLine("BOH2"+s2.getLiteral());
-						if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("comment")){
-							//Debug.printDbgLine("Comment="+s2.getObject().toString().replace("@en", ""));
-							comment = s2.getObject().toString().replace("@en", "");
-						}
-
-						if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("label")){
-							//Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
-							try {
-								label = URLDecoder.decode(s2.getObject().toString().replace("@en", ""),"UTF-8");
-							} catch (UnsupportedEncodingException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+							//Debug.printDbgLine("BOH"+s2+"\n");
+							//	Debug.printDbgLine("BOH2"+s2.getLiteral());
+							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("comment")){
+								//Debug.printDbgLine("Comment="+s2.getObject().toString().replace("@en", ""));
+								comment = s2.getObject().toString().replace("@en", "");
 							}
-						}
-						if (s2.getPredicate().toString().contains("range")){
-							//Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
-							range = s2.getObject().toString().replace("http://dbpedia.org/ontology/", "");
+
+							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("label")){
+								//Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
+								try {
+									label = URLDecoder.decode(s2.getObject().toString().replace("@en", ""),"UTF-8");
+								} catch (UnsupportedEncodingException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+							if (s2.getPredicate().toString().contains("range")){
+								//Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
+								range = s2.getObject().toString().replace("http://dbpedia.org/ontology/", "");
+
+							}
+
 
 						}
-
-
-					}
 
 
 					jsonHTsub.id = key.toString();
