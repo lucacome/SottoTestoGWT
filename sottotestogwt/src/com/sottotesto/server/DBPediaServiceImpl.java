@@ -2,6 +2,7 @@ package com.sottotesto.server;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -54,23 +55,31 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 			//			while (itertitle.hasNext()){
 
 			String titletag = tagmResp;	
+			List <String> allTag = new ArrayList<String>();
+			
+			allTag.add(URLDecoder.decode(titletag, "UTF-8"));
+			allTag.add(titletag);
+			
 
+			for (String s : allTag){
 
-			String redirect = "PREFIX dbo: <http://dbpedia.org/ontology/> \n"+
-					"SELECT ?uri WHERE {\n" +
-					"<http://dbpedia.org/resource/"+ titletag +">  dbo:wikiPageRedirects ?uri .\n"+
-					" }";
+				String redirect = "PREFIX dbo: <http://dbpedia.org/ontology/> \n"+
+						"SELECT ?uri WHERE {\n" +
+						"<http://dbpedia.org/resource/"+ s +">  dbo:wikiPageRedirects ?uri .\n"+
+						" }";
 
-			Query query3 = QueryFactory.create(redirect); //s2 = the query above
-			QueryExecution qExe3 = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query3 );
-			ResultSet results3 = qExe3.execSelect();
+				Query query3 = QueryFactory.create(redirect); //s2 = the query above
+				QueryExecution qExe3 = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query3 );
+				ResultSet results3 = qExe3.execSelect();
 
-			if (results3.hasNext()){
-				Debug.printDbgLine("REDIRECT - DBPediaService");
-				QuerySolution sol = results3.nextSolution();
-				titletag = sol.getResource("uri").toString().replace("http://dbpedia.org/resource/", "");
+				if (results3.hasNext()){
+					QuerySolution sol = results3.nextSolution();
+					titletag = sol.getResource("uri").toString().replace("http://dbpedia.org/resource/", "");
+					Debug.printDbgLine("REDIRECT - DBPediaService= "+titletag);
+					break;
+				}
 			}
-
+			
 			for (int j=0; j <= dbprop.size()-1; j++){
 				String s2 = "PREFIX "+prefix+prefixlink+" \n" +
 						"SELECT  ?"+dbprop.get(j)+"\n" +

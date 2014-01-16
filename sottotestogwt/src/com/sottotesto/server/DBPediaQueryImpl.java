@@ -1,5 +1,10 @@
 package com.sottotesto.server;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -22,12 +27,23 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 	@Override
 	public DBPQueryResp sendToServer(DBPQueryResp resp)	throws IllegalArgumentException {
 
-
-
 		String entlink = resp.getLink();
+		List <String> allTag = new ArrayList<String>();
+		
+		try {
+			allTag.add(URLDecoder.decode(entlink.replace("http://dbpedia.org/resource/", ""), "UTF-8"));
+		} catch (UnsupportedEncodingException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		allTag.add(entlink.replace("http://dbpedia.org/resource/", ""));
+		
+
+		for (String s : allTag){
+		
 		String redirect = "PREFIX dbo: <http://dbpedia.org/ontology/> \n"+
 				"SELECT ?uri WHERE {\n" +
-				"<http://dbpedia.org/resource/"+ entlink +">  dbo:wikiPageRedirects ?uri .\n"+
+				"<http://dbpedia.org/resource/"+ s +">  dbo:wikiPageRedirects ?uri .\n"+
 				" }";
 
 		try {
@@ -36,13 +52,15 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 			ResultSet results3 = qExe3.execSelect();
 
 			if (results3.hasNext()){
-				Debug.printDbgLine("REDIRECT - DBPediaQuery");
 				QuerySolution sol = results3.nextSolution();
-				entlink = sol.getResource("uri").toString().replace("http://dbpedia.org/resource/", "");
+				entlink = sol.getResource("uri").toString();
+				Debug.printDbgLine("REDIRECT - DBPediaQuery= "+entlink);
+				break;
 			}
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		}
 		}
 
 		ResultSet results = null;
