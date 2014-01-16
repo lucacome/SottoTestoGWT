@@ -20,6 +20,7 @@ public class EkpResponse implements java.io.Serializable{
 	private String type;
 	private String tag;
 	private long time;
+	private String encodedtag;
 	public String jdataHT;
 	public String jdataFD;
 	public List<String> linkList;
@@ -34,6 +35,7 @@ public class EkpResponse implements java.io.Serializable{
 		type = "";
 		jdataHT = "";
 		jdataFD = "";
+		encodedtag = "";
 		linkList = new ArrayList<String>();
 	}
 
@@ -55,6 +57,8 @@ public class EkpResponse implements java.io.Serializable{
 	public String getTag(){return tag;}
 	public void setTime(long x) {time = x;}
 	public long getTime(){return time;}
+	public void setEncodedTag(String x) {encodedtag = x;}
+	public String getEncodedTag(){return encodedtag;}
 	
 	public List<String> getLinks(){return linkList;}
 	public void setLinks(List<String> listLinks){linkList= new ArrayList<String>(); linkList=listLinks;}

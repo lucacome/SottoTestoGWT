@@ -81,7 +81,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		result.setCode(connessione.getResponseCode());
 		result.setMessage(connessione.getResponseMessage());
 		result.setContentType(connessione.getContentType());
-
+		result.setEncodedTag(input);
 		result.setTag(URLDecoder.decode(input, "UTF-8"));
 		Debug.printDbgLine("URL="+connessione.getURL());
 		Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
