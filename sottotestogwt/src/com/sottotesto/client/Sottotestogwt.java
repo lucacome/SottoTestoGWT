@@ -537,7 +537,7 @@ public class Sottotestogwt implements EntryPoint {
 					//dbproperty.add("name");
 					//dbproperty2.add("placeOfBirth");
 					dbproperty.add("abstract");	
-					callDBPedia(ekpRespTmp.getTag(), dbproperty, ekpRespTmp.getType());
+					callDBPedia(ekpRespTmp.getEncodedTag(), dbproperty, ekpRespTmp.getType());
 				}
 				else{ // not received 200
 					ekpFailsNum++;

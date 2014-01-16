@@ -253,6 +253,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					String label = "";
 					String range = "";
 
+					if (connection != null)
 					for (i2 = connection.listProperties(); i2.hasNext(); ) {
 						Statement s2 = i2.next();	
 

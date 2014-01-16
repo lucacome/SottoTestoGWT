@@ -24,10 +24,31 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 
 
 
+		String entlink = resp.getLink();
+		String redirect = "PREFIX dbo: <http://dbpedia.org/ontology/> \n"+
+				"SELECT ?uri WHERE {\n" +
+				"<http://dbpedia.org/resource/"+ entlink +">  dbo:wikiPageRedirects ?uri .\n"+
+				" }";
+
+		try {
+			Query query3 = QueryFactory.create(redirect); //s2 = the query above
+			QueryExecution qExe3 = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query3 );
+			ResultSet results3 = qExe3.execSelect();
+
+			if (results3.hasNext()){
+				Debug.printDbgLine("REDIRECT - DBPediaQuery");
+				QuerySolution sol = results3.nextSolution();
+				entlink = sol.getResource("uri").toString().replace("http://dbpedia.org/resource/", "");
+			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		ResultSet results = null;
 
 		String gps = "";
-		String entlink = resp.getLink();
+
 		String spq = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+
 				"PREFIX grs: <http://www.georss.org/georss/point>\n"+
 				"select ?abstract ?grs\n"+
