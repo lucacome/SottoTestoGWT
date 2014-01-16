@@ -74,6 +74,7 @@ public class MapController {
 	public void loadSingleDBPQmarkerOnMap(DBPQueryResp dbqMarker){
 
 		String entityName = dbqMarker.getEntity().replace("[","").replace("]", ""); //clear entity name
+		entityName = entityName.replaceAll("_", " ");
 
 		//resize abstract
 		String sAbstract = dbqMarker.getAbstract();
@@ -147,12 +148,13 @@ public class MapController {
 
 		//cycle all markers recursively and delayed
 		if (index<allMarkers.size()){
+			Debug.printDbgLine("ResultController.java: loadMarkers(): load="+entityName+"; curMarker= "+allMarkers.get(index).getTitle());
 			if (entityName.equals(fullMap)){ //LOAD ALL MARKERS
 				allMarkers.get(index).setAnimation(Animation.DROP);
 				allMarkers.get(index).setMap(theMap);
 				nextCallTimer.schedule(Global.getMapMarkerDelay());
 			}
-			else if(allMarkers.get(index).getTitle().contains(entityName)){ //LOAD MARKERS ONLY FOR SELECTED ENTITY
+			else if(allMarkers.get(index).getTitle().contains("("+entityName+")")){ //LOAD MARKERS ONLY FOR SELECTED ENTITY
 				allMarkers.get(index).setAnimation(Animation.DROP);
 				allMarkers.get(index).setMap(theMap);
 				nextCallTimer.schedule(Global.getMapMarkerDelay());

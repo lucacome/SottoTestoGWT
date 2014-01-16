@@ -49,7 +49,7 @@ public class ListServiceImpl extends RemoteServiceServlet implements ListService
 			JData jdata = new JData();
 			jdata =	pa.fromJson(array.get(i), JData.class);
 			if (jdata.id.contains("http")){
-				dbpqresp.setEntity(entity);
+				dbpqresp.setEntity(resp.getTag());
 				dbpqresp.setName(jdata.name);
 				dbpqresp.setLink(jdata.id);
 				dbpqresp.setRelation(relation);

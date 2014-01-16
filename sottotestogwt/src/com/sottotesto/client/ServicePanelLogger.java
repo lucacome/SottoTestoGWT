@@ -119,12 +119,12 @@ public class ServicePanelLogger {
 			html.setHTML(html.getHTML()+"<br><br><b>Number of Total Resource:</b> "+tagmeResp.getResNum());
 			if (tagmeResp.getResNum()>0)
 			{
-				html.setHTML(html.getHTML()+"<br><br><b>Number of Relevant Tags found:</b> "+tagmeResp.getTitleTag().size());
+				html.setHTML(html.getHTML()+"<br><br><b>Number of Relevant Tags found:</b> "+tagmeResp.getTitleTagClean().size());
 
-				if (!tagmeResp.getTitleTag().isEmpty())
+				if (!tagmeResp.getTitleTagClean().isEmpty())
 				{
 					String taggedTotal="";
-					Iterator<String> tagged = tagmeResp.getTitleTag().iterator();
+					Iterator<String> tagged = tagmeResp.getTitleTagClean().iterator();
 					while (tagged.hasNext()){
 						taggedTotal+=tagged.next()+"<br>";
 					}
@@ -195,6 +195,7 @@ public class ServicePanelLogger {
 			html.setHTML(html.getHTML()+"<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms");
 			html.setHTML(html.getHTML()+"<br><br><b>Code:</b> "+String.valueOf(dbpediaResp.getCode()));
 			if (dbpediaResp.getCode()==200){
+				html.setHTML(html.getHTML()+"<br><br><b>Entity Type: </b>"+dbpediaResp.getEntityType()+"</b><br>");
 				html.setHTML(html.getHTML()+"<br><br><b>Query output for "+dbpediaResp.getEntity()+":</b><br>"+dbpediaResp.getQueryResultXML());
 			}
 			else{
