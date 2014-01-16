@@ -817,12 +817,12 @@ public class Sottotestogwt implements EntryPoint {
 					String curString = taggedSearchString.substring(0, spanBeginIndex);
 					curString.replaceAll(" ", "&nbsp;");
 					HTML curHtml = new HTML(curString+"&nbsp;");
-					hp.add(curHtml);
+					hp.add(curHtml); 
 					taggedSearchString = taggedSearchString.substring(spanBeginIndex, taggedSearchString.length());
 				}
 				else{ //no mor span -> single html until endo of line
 					taggedSearchString.replaceAll(" ", "&nbsp;");
-					HTML curHtml = new HTML(taggedSearchString+"&nbsp;");
+					HTML curHtml = new HTML(taggedSearchString);
 					hp.add(curHtml);
 					
 					taggedSearchString="";
@@ -867,79 +867,91 @@ public class Sottotestogwt implements EntryPoint {
 		taggedEntityPopup.hide();
 	}
 	
-
 	private String createTaggedSearchString(){
-		Debug.printDbgLine("ResultController.java: createTaggedSearchString()");
-
-		String result = textArea.getText();
-		String curTag="";
-		String curTitle="";
-		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): searched = "+result);
-		if (tagmeResp.getSpotTag().size()==0) return result;
+		String searchedText = textArea.getText();
+		List<String> partialStrings = new ArrayList<String>();
+		boolean spotTaken = false;
+		int index=0;
 		
-		//CHECK TAGGED ENTRIES
-		List<String> taggedEntries;
-		taggedEntries = new ArrayList<String>(tagmeResp.getSpotTag());		
-		Iterator<String> iterTags =  taggedEntries.iterator();		
-		List<String> taggedTitles;
-		taggedTitles = new ArrayList<String>(tagmeResp.getTitleTagClean());		
-		Iterator<String> iterTitle =  taggedTitles.iterator();				
-		while (iterTags.hasNext()){
-			curTag=iterTags.next();	
-			curTag=curTag.replaceAll("_", " ");
-			curTitle=iterTitle.next();
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): tagging \""+curTag+"\" as \""+curTitle+"\"");	
-
-			result=result.replaceAll(curTag, "<span class=\"result_taggedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
-		}
-
-		//CHECK TAGGED ENTRIES WITH LOW ROH
-		List<String> skippedEntries;
-		skippedEntries = new ArrayList<String>(tagmeResp.getSpotSkipped());		
-		Iterator<String> iterSkippedTags =  skippedEntries.iterator();		
-		List<String> skippedTitles;
-		skippedTitles = new ArrayList<String>(tagmeResp.getTitleSkipped());		
-		Iterator<String> iterSkippedTitle =  skippedTitles.iterator();	
-		int skippedIndex=0;
-		boolean spotAlreadyUsed=false;
-		while (iterSkippedTags.hasNext()){
-			curTag=iterSkippedTags.next();	
-			curTag=curTag.replaceAll("_", " ");
-			curTitle=iterSkippedTitle.next();
-			Debug.printDbgLine("ResultController.java: createTaggedSearchString(): skipping \""+curTag+"\" as \""+curTitle+"\"");	
-
-			spotAlreadyUsed=false;
-			//check if spot was already used in TAGGED
-			for (String sTagged : tagmeResp.getSpotTag()){
-				if (sTagged.contains(curTag)){
-					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): SPOT ALREADY USED IN TAGGED");
-					spotAlreadyUsed=true;
+		// CREATE ARRAY OF HTML SUBSTRINGS
+		while (searchedText.length()>0){
+			spotTaken = false;
+			
+			//search if first phrase is a tagged element
+			index=0;
+			for (String curSpotTag : tagmeResp.getSpotTag()){
+				if(searchedText.indexOf(curSpotTag)==0){ // searchedText = "TAGGED bla bla bla"
+					spotTaken=true;
+					partialStrings.add("<span class=\"result_taggedWord\" title=\""+tagmeResp.getTitleTag().get(index)+"\">"+curSpotTag+"</span>");
+					searchedText = searchedText.substring(curSpotTag.length(), searchedText.length()); //remove current spotTag from search phrase
+					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
 					break;
 				}
+				index++;
 			}
 			
-			//check if spot was already used in previous skipped
-			if (!spotAlreadyUsed && skippedIndex>0){
-				for (int i=0; i<skippedIndex; i++){
-					if (tagmeResp.getSpotSkipped().get(i).contains(curTag)){
-						Debug.printDbgLine("ResultController.java: createTaggedSearchString(): SPOT ALREADY USED IN SKIPPED");
-						spotAlreadyUsed=true;
+			//search if first phrase is a skipped element
+			if (!spotTaken){	
+				index=0;
+				for (String curSpotSkipped : tagmeResp.getSpotSkipped()){
+					if(searchedText.indexOf(curSpotSkipped)==0){ // searchedText = "SKIPPED bla bla bla"
+						spotTaken=true;
+						partialStrings.add("<span class=\"result_skippedWord\" title=\""+tagmeResp.getTitleSkipped().get(index)+"\">"+curSpotSkipped+"</span>");
+						searchedText = searchedText.substring(curSpotSkipped.length(), searchedText.length()); //remove current spotTag from search phrase
+						Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
 						break;
 					}
+					index++;
 				}
 			}
-				
-			//if spot is free span it
-			if (!spotAlreadyUsed){
-				Debug.printDbgLine("ResultController.java: createTaggedSearchString(): Skip done");
-				result=result.replaceAll(curTag, "<span class=\"result_skippedWord\" title=\""+curTitle+"\">"+curTag+"</span>");
-			}
 			
-			skippedIndex++;
+			//if still no spot taken -> searchedText = "bla bla ?TAGGED? bla ?SKIPPED?"
+			if (!spotTaken){
+				int lowestIndex = 60000;
+				int curIndex=0;
+				
+				//find lowest index among tagged elements
+				for (String curSpotTag : tagmeResp.getSpotTag()){
+					curIndex = searchedText.indexOf(curSpotTag);
+					if(curIndex!=-1 && curIndex<lowestIndex){
+						lowestIndex=curIndex;
+					}
+				}
+				
+				//find lowest index among skipped elements
+				curIndex=0;
+				for (String curSkipTag : tagmeResp.getSpotSkipped()){
+					curIndex = searchedText.indexOf(curSkipTag);
+					if(curIndex!=-1 && curIndex<lowestIndex){
+						lowestIndex=curIndex;
+					}
+				}
+				
+				if (lowestIndex==60000){ //search phrase has no more skipped/tagged items!
+					spotTaken=true;
+					partialStrings.add(searchedText);
+					searchedText = "";
+					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
+					break;
+				}
+				else{ //search phrase must be cut until next tagged/skipped element
+					spotTaken=true;
+					partialStrings.add(searchedText.substring(0, lowestIndex));
+					searchedText = searchedText.substring(lowestIndex, searchedText.length()); //remove current spotTag from search phrase
+					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
+				}
+			
+			}
+		} // END while (searchedText.length()>0)
+		
+		
+		// return joined partialStrings
+		String htmlString = "";		
+		for (String s : partialStrings){
+			htmlString += s;
 		}
-
-		Debug.printDbgLine("ResultController.java: createTaggedSearchString(): searchedString = "+result);	
-		return result;
+		
+		return htmlString;
 	}
 
 	//reinizializza i pannelli con una nuova ricerca
