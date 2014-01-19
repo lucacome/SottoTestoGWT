@@ -6,6 +6,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sottotesto.shared.DBPQueryResp;
@@ -19,18 +20,14 @@ public class ServicePanelLogger {
 	//TAGME ITEMS
 	private Dialog tagmeDialogBox;
 	private TabPanel tagmeTabPanel;
-	private FlowLayoutContainer tagmeFlowContainer;
-	
 	
 	//EKP ITEMS
 	private Dialog ekpDialogBox;
 	private TabPanel ekpTabPanel;
-	private FlowLayoutContainer ekpFlowContainer;
 	
 	//DBPEDIA ITEMS	
 	private Dialog dbpDialogBox;
 	private TabPanel dbpTabPanel;
-	private FlowLayoutContainer dbpFlowContainer;
 	
 	public ServicePanelLogger(){
 		initTAGME();
@@ -38,69 +35,60 @@ public class ServicePanelLogger {
 		initDBP();
 	}
 	
-	
+
 	private void initTAGME(){		
 		tagmeTabPanel = new TabPanel();
 		tagmeTabPanel.setAnimScroll(true);
 		tagmeTabPanel.setTabScroll(true);
-		
-		tagmeFlowContainer = new FlowLayoutContainer();
-		tagmeFlowContainer.setScrollMode(ScrollMode.AUTO);
-		tagmeFlowContainer.add(tagmeTabPanel);
-		tagmeFlowContainer.setHeight(Utility.getDbMaxHeight());
-		tagmeFlowContainer.setWidth(Utility.getDbMaxWidth());
+		tagmeTabPanel.setId("tagmeTabPanel");	
 		
 		tagmeDialogBox = new Dialog();
 		tagmeDialogBox.setHeadingText("TAGME Data");
 		tagmeDialogBox.setId("tagmeDataDB");
 		tagmeDialogBox.setHideOnButtonClick(true);
-		tagmeDialogBox.setWidget(tagmeFlowContainer);
+		tagmeDialogBox.setHeight(Utility.getDbMaxHeight());
+		tagmeDialogBox.setWidth(Utility.getDbMaxWidth());
+		tagmeDialogBox.setWidget(tagmeTabPanel);
 	}	
 	private void initEKP(){		
 		ekpTabPanel = new TabPanel();
 		ekpTabPanel.setAnimScroll(true);
 		ekpTabPanel.setTabScroll(true);
-		
-		ekpFlowContainer = new FlowLayoutContainer();
-		ekpFlowContainer.setScrollMode(ScrollMode.AUTO);
-		ekpFlowContainer.add(ekpTabPanel);
-		ekpFlowContainer.setHeight(Utility.getDbMaxHeight());
-		ekpFlowContainer.setWidth(Utility.getDbMaxWidth());
+		ekpTabPanel.setId("ekpTabPanel");
 		
 		ekpDialogBox = new Dialog();
 		ekpDialogBox.setHeadingText("EKP Data");
 		ekpDialogBox.setId("ekpDataDB");
 		ekpDialogBox.setHideOnButtonClick(true);
-		ekpDialogBox.setWidget(ekpFlowContainer);
+		ekpDialogBox.setHeight(Utility.getDbMaxHeight());
+		ekpDialogBox.setWidth(Utility.getDbMaxWidth());
+		ekpDialogBox.setWidget(ekpTabPanel);
 	}	
 	private void initDBP(){		
 		dbpTabPanel = new TabPanel();
 		dbpTabPanel.setAnimScroll(true);
 		dbpTabPanel.setTabScroll(true);
-		
-		dbpFlowContainer = new FlowLayoutContainer();
-		dbpFlowContainer.setScrollMode(ScrollMode.AUTO);
-		dbpFlowContainer.add(dbpTabPanel);
-		dbpFlowContainer.setHeight(Utility.getDbMaxHeight());
-		dbpFlowContainer.setWidth(Utility.getDbMaxWidth());		
+		dbpTabPanel.setId("dbpTabPanel");		
 		
 		dbpDialogBox = new Dialog();
 		dbpDialogBox.setHeadingText("DBPedia Data");
 		dbpDialogBox.setId("dbPediaDataDB");
 		dbpDialogBox.setHideOnButtonClick(true);
-		dbpDialogBox.setWidget(dbpFlowContainer);		
+		dbpDialogBox.setHeight(Utility.getDbMaxHeight());
+		dbpDialogBox.setWidth(Utility.getDbMaxWidth());
+		dbpDialogBox.setWidget(dbpTabPanel);		
 	}
 	
 	
-	public void showTagmeDataDB(){				
+	public void showTagmeDataDB(){	
 		tagmeDialogBox.show();
 		tagmeDialogBox.center();
 	}
-	public void showEkpDataDB(){			
+	public void showEkpDataDB(){
 		ekpDialogBox.show();
 		ekpDialogBox.center();		
 	}	
-	public void showDBPediaDataDB(){				
+	public void showDBPediaDataDB(){	
 		dbpDialogBox.show();
 		dbpDialogBox.center();		
 	}	
@@ -147,10 +135,12 @@ public class ServicePanelLogger {
 		}
 		else{
 			html.setHTML(html.getHTML()+"<br><br><b>Error:</b><br>"+tagmeResp.getError());	
-		}	
+		}			
 		
-		html.setWidth(Utility.getDbMaxWidth()-(Utility.getDbMaxWidth()*8/100)+"px");
-		tagmeTabPanel.add(html, "TAGME Result");
+		FlowLayoutContainer tabFC = new FlowLayoutContainer();
+		tabFC.setScrollMode(ScrollMode.AUTO);
+		tabFC.add(html);
+		tagmeTabPanel.add(tabFC, new TabItemConfig("TAGME Result"));
 	}
 	public void addEKPlog(EkpResponse ekpResp){
 		HTML html = new HTML("");		
@@ -167,10 +157,12 @@ public class ServicePanelLogger {
 		}
 		else{
 			html.setHTML(html.getHTML()+"<br><br><b>Error:</b><br>"+ekpResp.getError());	
-		}		
+		}				
 		
-		html.setWidth(Utility.getDbMaxWidth()-(Utility.getDbMaxWidth()*8/100)+"px");
-		ekpTabPanel.add(html, ekpResp.getTag());
+		FlowLayoutContainer tabFC = new FlowLayoutContainer();
+		tabFC.setScrollMode(ScrollMode.AUTO);
+		tabFC.add(html);
+		ekpTabPanel.add(tabFC, new TabItemConfig(ekpResp.getTag()));
 	}
 	public void addDBPlog(DBPediaResponse dbpediaResp){
 		boolean tabAlreadyPresent = false;
@@ -180,7 +172,8 @@ public class ServicePanelLogger {
 		String entity = "";
 		entity = dbpediaResp.getEntity();
 		while (iterHtml.hasNext()){
-			HTML html = (HTML)iterHtml.next();
+			FlowLayoutContainer tabFC = (FlowLayoutContainer)iterHtml.next();
+			HTML html = (HTML)tabFC.getWidget(0);
 			if(html.getTitle().equals(entity)){
 				tabAlreadyPresent=true;
 				break;
@@ -203,8 +196,10 @@ public class ServicePanelLogger {
 			}
 			html.setHTML(html.getHTML()+"<br><br><b>Gps Coordinates:</b>");
 
-			html.setWidth(Utility.getDbMaxWidth()-(Utility.getDbMaxWidth()*8/100)+"px");
-			dbpTabPanel.add(html, dbpediaResp.getEntity());		
+			FlowLayoutContainer tabFC = new FlowLayoutContainer();
+			tabFC.setScrollMode(ScrollMode.AUTO);
+			tabFC.add(html);
+			dbpTabPanel.add(tabFC, new TabItemConfig(dbpediaResp.getEntity()));
 		}
 	}
 
@@ -217,7 +212,8 @@ public class ServicePanelLogger {
 		entity = entity.replace("]", "");
 		entity = entity.replace(" ", "_");
 		while (iterHtml.hasNext()){ //find correct tab to append gps log
-			HTML html = (HTML)iterHtml.next();
+			FlowLayoutContainer tabFC = (FlowLayoutContainer)iterHtml.next();
+			HTML html = (HTML)tabFC.getWidget(0);
 			if(html.getTitle().equals(entity)){
 				html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> "+dbpQueryResp.getLat()+","+dbpQueryResp.getLng());
 				break;
