@@ -885,7 +885,7 @@ public class Sottotestogwt implements EntryPoint {
 			for (String curSpotTag : tagmeResp.getSpotTag()){
 				if(searchedText.indexOf(curSpotTag)==0){ // searchedText = "TAGGED bla bla bla"
 					spotTaken=true;
-					partialStrings.add("<span class=\"result_taggedWord\" title=\""+tagmeResp.getTitleTag().get(index)+"\">"+curSpotTag+"</span>");
+					partialStrings.add("<span class=\"result_taggedWord\" title=\""+tagmeResp.getTitleTagClean().get(index)+"\">"+curSpotTag+"</span>");
 					searchedText = searchedText.substring(curSpotTag.length(), searchedText.length()); //remove current spotTag from search phrase
 					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
 					break;
