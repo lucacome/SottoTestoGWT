@@ -641,6 +641,11 @@ public class Sottotestogwt implements EntryPoint {
 
 	private void InitServiceStatusPanel(){
 		Debug.printDbgLine("Sottotestogwt.java: initServiceStatusPanel()");
+		
+		//init services responses
+		tagmeResp = new TagmeResponse();
+		dbpediaResps = new ArrayList<DBPediaResponse>();
+		ekpResps = new ArrayList<EkpResponse>();
 
 		//main panel
 		serviceStatusPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
