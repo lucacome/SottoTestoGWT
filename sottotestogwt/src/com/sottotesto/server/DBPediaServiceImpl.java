@@ -35,6 +35,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		long StartTime = System.currentTimeMillis();
 		responseQuery = new DBPediaResponse();
 
+
 		try {
 			responseQuery.setEntity(URLDecoder.decode(tagmResp, "UTF-8"));
 		} catch (UnsupportedEncodingException e1) {
@@ -56,10 +57,16 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 
 			String titletag = tagmResp;	
 			List <String> allTag = new ArrayList<String>();
-			
-			allTag.add(URLDecoder.decode(titletag, "UTF-8"));
+			String tempDecode = "";
+
+			tempDecode = URLDecoder.decode(titletag, "UTF-8");
+			if (tempDecode.equals(titletag))
+				Debug.printDbgLine("DBP Stringa uguale: "+titletag);
+			else
+				allTag.add(tempDecode);
+
 			allTag.add(titletag);
-			
+
 
 			for (String s : allTag){
 
@@ -79,7 +86,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 					break;
 				}
 			}
-			
+
 			for (int j=0; j <= dbprop.size()-1; j++){
 				String s2 = "PREFIX "+prefix+prefixlink+" \n" +
 						"SELECT  ?"+dbprop.get(j)+"\n" +
@@ -87,7 +94,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 						"<http://dbpedia.org/resource/" + titletag + "> "+prefix+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
 						//"FILTER (LANG(?"+dbprop.get(j)+") = \"en\") .\n"+
 						" }";
-//				Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
+				//				Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
 				Query query2 = QueryFactory.create(s2); //s2 = the query above
 				QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
 				results = qExe.execSelect();
