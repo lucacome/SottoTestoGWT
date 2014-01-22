@@ -35,8 +35,8 @@ public class MapController {
 	List<String> entities;			 //stringhe con tutte le entita sulla mappa (usato per i colori)
 
 	//Altro
-	String curEntityMap;			//che mappa viene visualizzata al momento ("mappa completa, "entita 1", "entita 2" ecc)
-	String fullMap = "Mappa completa"; //come si chiama il nome di "mappa completa" (cosi se lo cambiamo basta modificare qui)
+	String curEntityMap;			//che mappa viene visualizzata al momento ("full map, "entita 1", "entita 2" ecc)
+	String fullMap = "Full Map"; //come si chiama il nome di "full map" (cosi se lo cambiamo basta modificare qui)
 
 	public void init(){
 		Debug.printDbgLine("MapController.java: init()");

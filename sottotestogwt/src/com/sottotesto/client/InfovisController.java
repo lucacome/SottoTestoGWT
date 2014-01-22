@@ -176,7 +176,7 @@ public class InfovisController {
 		
 		//aggiungi un label
 		HTML checkBoxLabel = new HTML();
-		checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Visualizza: </b></span>");		
+		checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Filter data: </b></span>");		
 		checkBoxHC.add(checkBoxLabel);
 
 		//crea ed aggiungi i vari checkBox
@@ -242,7 +242,7 @@ public class InfovisController {
 
 		//aggiungi un label
 		HTML checkBoxLabel = new HTML();
-		checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Confronta: </b></span>");		
+		checkBoxLabel.setHTML("<span id=\"checkBoxLabel\"><b>Entities to compare: </b></span>");		
 		checkBoxHC.add(checkBoxLabel);
 
 		//crea ed aggiungi i vari checkBox

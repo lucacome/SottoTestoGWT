@@ -98,7 +98,7 @@ public class ResultController {
 
 		if (panel != null) panel.clear();
 		panel = new ContentPanel();
-		panel.setHeadingText("Risultati");	
+		panel.setHeadingText("Results");	
 		panel.setId("resultPanel");
 		panel.setWidth(Utility.getPanelsMaxWidth());
 		panel.setHeight(panelMaxHeight+"px");
@@ -217,8 +217,8 @@ public class ResultController {
 			@Override
 			public ImageResource getIcon( TreeData model )
 			{
-				if ( model.getName().equals("Confronta entita'") ) return STResources.INSTANCE.iconHyperTree();
-				if ( model.getName().equals("Esplora entita'") ) return STResources.INSTANCE.iconHyperTree();
+				if ( model.getName().equals("Compare Entities") ) return STResources.INSTANCE.iconHyperTree();
+				if ( model.getName().equals("Explore Entities") ) return STResources.INSTANCE.iconHyperTree();
 				if ( model.getName().equals("Knowledge Map") ) return STResources.INSTANCE.iconMap();
 				else return STResources.INSTANCE.iconTreeEntity();
 				//else return null;
@@ -234,7 +234,7 @@ public class ResultController {
 		treeContainer.setWidth(lcwest.getOffsetWidth());
 		treeContainer.setHeight(lcwest.getOffsetHeight());
 		
-		showMap("Mappa completa");
+		showMap("Full Map");
 	}
 
 

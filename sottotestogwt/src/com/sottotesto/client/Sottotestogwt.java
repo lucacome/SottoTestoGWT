@@ -195,9 +195,9 @@ public class Sottotestogwt implements EntryPoint {
 
 		textAreaLabel = new Label();
 		textAreaLabel.getElement().setClassName("searchAreaLabel"); //for css styling
-		textAreaLabel.setText("Scrivi una frase:");				
+		textAreaLabel.setText("Phrase to search:");				
 		textAreaDefText = "Enter something in english here...";
-		textSendButton = "Cerca";
+		textSendButton = "Search";
 		sendButton = new Button(textSendButton);
 		textArea = new TextArea();
 		textArea.setStylePrimaryName("searchAreaTextArea");
@@ -713,9 +713,9 @@ public class Sottotestogwt implements EntryPoint {
 		treeStore = new TreeStore<TreeData>(treeProperties.id()); // Create the store that the contains the data to display in the tree
 		
 		
-		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"Confronta entita'", TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD);
+		tdForcedirected = new TreeData(String.valueOf(treeDataIdProvider++),"Compare Entities", TreeData.CLICK_ACTIONS.SHOWJOINEDGRAPH_FD);
 		
-		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Esplora entita'");
+		tdHyperTree = new TreeData(String.valueOf(treeDataIdProvider++),"Explore Entities");
 		tdMap = new TreeData(String.valueOf(treeDataIdProvider++),"Knowledge Map");
 
 		treeStore.add(tdMap);
@@ -723,7 +723,7 @@ public class Sottotestogwt implements EntryPoint {
 		treeStore.add(tdHyperTree);
 
 		//add 'all entity' entry to tree
-		tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++), "Mappa completa", TreeData.CLICK_ACTIONS.SHOWMAP));
+		tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++), "Full Map", TreeData.CLICK_ACTIONS.SHOWMAP));
 		treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
 	}
 

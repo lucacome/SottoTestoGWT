@@ -35,15 +35,15 @@ public class Global {
 	
 	private static void initOptionsDB(){
 		
-		Label tagmeKeyLabel = new Label("Chiave utilizzo Servizio TAGME");
-		String tagmeKeyTitle = "Chiave gratuita indispensabile per utilizzare il servizio TAGME";
+		Label tagmeKeyLabel = new Label("Tagme Key");
+		String tagmeKeyTitle = "TAGME free key used to contact service";
 		tagmeKeyLabel.setTitle(tagmeKeyTitle);
 		tagmeKeyTF.setAllowBlank(false);
 		tagmeKeyTF.setText(tagmeKey);
 		tagmeKeyTF.setTitle("default value: plclcd321");
 		
-		Label rohLabel = new Label("Imposta il valore ROH");
-		String rohTitle = "Piu' ROH e' basso e piu' TAGME trovera' entita' nelle frasi";
+		Label rohLabel = new Label("Set TAGME roh value");
+		String rohTitle = "LOWER = more tags; HIGHER = fewer tags";
 		rohLabel.setTitle(rohTitle);
 		rohSlider.setMinValue(1);
 		rohSlider.setMaxValue(20);
@@ -52,8 +52,8 @@ public class Global {
 		rohSlider.setIncrement(1);
 		rohSlider.setMessage("{0} / 100");
 
-		Label markerDelayLabel = new Label("Imposta il dealy tra i Marker");
-		String markerDelayTitle = "Intervallo di caduta tra i marker sulla mappa";
+		Label markerDelayLabel = new Label("Map Markers drop delay");
+		String markerDelayTitle = "Milliseconds between marker drops on map";
 		markerDelayLabel.setTitle(markerDelayTitle);
 		markerDelaySlider.setMinValue(0);
 		markerDelaySlider.setMaxValue(200);
