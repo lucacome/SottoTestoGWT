@@ -77,12 +77,15 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
 
 			connessione.setDoOutput(true);
+			
+			result.setEncodedTag(input);
+			result.setTag(URLDecoder.decode(input, "UTF-8"));
 			stream = connessione.getInputStream();
 			result.setCode(connessione.getResponseCode());
 			result.setMessage(connessione.getResponseMessage());
 			result.setContentType(connessione.getContentType());
-			result.setEncodedTag(input);
-			result.setTag(URLDecoder.decode(input, "UTF-8"));
+			
+			
 			Debug.printDbgLine("URL="+connessione.getURL());
 			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
 
@@ -106,10 +109,12 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 			}
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			result.setCode(400);
+			result.setError("MalformedURLException\n"+Utility.getErrorHtmlString(e));
+			e.printStackTrace();			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			result.setCode(408);
+			result.setError("IOException\n"+Utility.getErrorHtmlString(e));
 			e.printStackTrace();
 		}
 		long homeTimeStop2 = System.currentTimeMillis()-homeTimeStart2;

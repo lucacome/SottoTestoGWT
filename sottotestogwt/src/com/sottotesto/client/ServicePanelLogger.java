@@ -146,16 +146,15 @@ public class ServicePanelLogger {
 		HTML html = new HTML("");		
 		html.setTitle(ekpResp.getTag());
 		html.setHTML(html.getHTML()+"<b>Response time:</b> "+String.valueOf(ekpResp.getTime())+"ms");
-		html.setHTML(html.getHTML()+"<br><br><b>Code:</b> "+String.valueOf(ekpResp.getCode()));
-		html.setHTML(html.getHTML()+"<br><br><b>Message:</b> "+ekpResp.getMessage());
-		html.setHTML(html.getHTML()+"<br><br><b>ContentType:</b> "+ekpResp.getContentType());
-		
+		html.setHTML(html.getHTML()+"<br><br><b>Code:</b> "+String.valueOf(ekpResp.getCode()));	
 		
 		if (ekpResp.getCode()==200){
+			html.setHTML(html.getHTML()+"<br><br><b>Message:</b> "+ekpResp.getMessage());
+			html.setHTML(html.getHTML()+"<br><br><b>ContentType:</b> "+ekpResp.getContentType());
 			html.setHTML(html.getHTML()+"<br><br><b>Response:</b> ");
 			html.setHTML(html.getHTML()+"<br>"+ekpResp.jdataHT);
 		}
-		else{
+		else{			
 			html.setHTML(html.getHTML()+"<br><br><b>Error:</b><br>"+ekpResp.getError());	
 		}				
 		
