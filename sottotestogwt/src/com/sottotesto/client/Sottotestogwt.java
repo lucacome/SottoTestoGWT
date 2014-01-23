@@ -734,7 +734,7 @@ public class Sottotestogwt implements EntryPoint {
 		taggedPhraseFC.setId("taggedPhraseFC");
 		taggedPhraseFC.add(taggedPhraseHP);
 		
-		textAreaLabel.setText("Found Entities:");
+		textAreaLabel.setText("Tagged phrase:");
 		addTaggedHtmls(createTaggedSearchString(),taggedPhraseHP);
 		
 		sendButton = new Button("New Search");		
