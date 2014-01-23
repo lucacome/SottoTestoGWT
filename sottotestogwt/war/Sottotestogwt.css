@@ -138,7 +138,7 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 	text-align: center;
 }
 .searchAreaTextArea{
-	position: absolute !important; width: 50% !important; height:50% !important; text-align:center !important; vertical-align:middle !important; top:0 !important; bottom:0 !important; left:0 !important; right:0 !important; margin:auto !important;
+	position: absolute !important; width: 90% !important; height:90% !important; text-align:center !important; vertical-align:middle !important; top:0 !important; bottom:0 !important; left:0 !important; right:0 !important; margin:auto !important;
 }
 .taggedPhraseHTMLcontainer{
 	position: relative !important; height:100% !important; line-height:50px !important; text-align:center !important; vertical-align:middle !important; top:0 !important; bottom:0 !important; left:0 !important; right:0 !important; margin:auto !important;

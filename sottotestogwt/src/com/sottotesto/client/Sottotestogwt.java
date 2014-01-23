@@ -195,7 +195,7 @@ public class Sottotestogwt implements EntryPoint {
 
 		textAreaLabel = new Label();
 		textAreaLabel.getElement().setClassName("searchAreaLabel"); //for css styling
-		textAreaLabel.setText("Phrase to search:");				
+		textAreaLabel.setText("Text to search:");				
 		textAreaDefText = "Enter something in english here...";
 		textSendButton = "Search";
 		sendButton = new Button(textSendButton);
@@ -734,7 +734,7 @@ public class Sottotestogwt implements EntryPoint {
 		taggedPhraseFC.setId("taggedPhraseFC");
 		taggedPhraseFC.add(taggedPhraseHP);
 		
-		textAreaLabel.setText("Tagged phrase:");
+		textAreaLabel.setText("Tagged text:");
 		addTaggedHtmls(createTaggedSearchString(),taggedPhraseHP);
 		
 		sendButton = new Button("New Search");		
