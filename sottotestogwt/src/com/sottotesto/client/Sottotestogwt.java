@@ -315,7 +315,7 @@ public class Sottotestogwt implements EntryPoint {
 
 	//send input from textarea to tagme
 	private void callTagme() {
-		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
+		Debug.printDbgLine("\nSottotestogwt.java: callTagme()");
 		
 		rc.clearCenterPanel();	
 		
@@ -459,107 +459,107 @@ public class Sottotestogwt implements EntryPoint {
 	}
 
 	private void callEkp(){
-		Debug.printDbgLine("Sottotestogwt.java: callEkp()");
-
-		Utility.showLoadingBar("Calling EKP Service ("+ekpRemainingCallNum+" left)");
+		Debug.printDbgLine("\nSottotestogwt.java: callEkp()");		
 		
-		String input="";
-
-		if (ekpRemainingCallNum>0){
-			input=ekpRemainingCallInputs.remove(0);
-			ekpRemainingCallNum--;
-		} else return;		
-
-		final String curEntity = input; //used in case of failure
+		Utility.showLoadingBar("Calling EKP Service ("+ekpRemainingCallNum+" left)"); // update loading status
 		
-		Debug.printDbgLine("Sottotestogwt.java: Ekp input="+input);
-		ekpService.sendToServer(input, new AsyncCallback<EkpResponse>() {
-			public void onFailure(Throwable caught) {
-				//set the error
-				EkpResponse ekpRespTmp = new EkpResponse();
-				ekpRespTmp.setCode(-1);
-				ekpRespTmp.setTag(curEntity);
-				ekpRespTmp.setError("Error Callig service Module:"+
-						"<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
+		ekpRemainingCallNum = ekpRemainingCallInputs.size(); //set remaining calls number
+		for (String tag : ekpRemainingCallInputs){
 
-				//ekpResps.add(ekpRespTmp);
-
-				//update log
-				spLogger.addEKPlog(ekpRespTmp);
-				ekpFailsNum++;
-				
-				if (ekpRemainingCallNum>0){callEkp();}
-				else {
-					HtmlEkpService.setHTML(HTMLekpServiceStringFAIL+" (x"+ekpFailsNum+")");
-					rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
-					rc.getTree().expandAll();
-					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
-					rc.setEkpResponses(ekpResps);
-					Utility.hideLoadingBar();
-					callListService(ekpResps); //lancia il servizio di "cerca markers"
-				}
-			}
-
-			public void onSuccess(EkpResponse result) {			
-				Debug.printDbgLine("Sottotestogwt.java: Ekp output="+result.getMessage());
-
-				//clean non-utf8 characters
-				result.jdataHT = Utility.toUTF8(result.jdataHT);
-				result.jdataFD = Utility.toUTF8(result.jdataFD);
-				
-				
-				EkpResponse ekpRespTmp = new EkpResponse();
-				ekpRespTmp = result;
-				
-				//update log
-				spLogger.addEKPlog(ekpRespTmp);
-
-				
-				if (ekpRespTmp.getCode()==200) {
+			final String curEntity = tag; //used in case of failure
+			Debug.printDbgLine("Sottotestogwt.java: callEkp(): calling sendToServer("+tag+")");
+			
+			ekpService.sendToServer(tag, new AsyncCallback<EkpResponse>() {
+				public void onFailure(Throwable caught) {
+					Debug.printDbgLine("Sottotestogwt.java: callEkp(): ("+curEntity+")");
 					
-					String jsonHT = "["+result.jdataHT+"]";
-					String jsonFD = "["+result.jdataFD+"]";	
-
-					listFD.add(jsonFD);
+					//set the error
+					EkpResponse ekpRespTmp = new EkpResponse();
+					ekpRespTmp.setCode(-1);
+					ekpRespTmp.setTag(curEntity);
+					ekpRespTmp.setError("Error Callig service Module:"+
+							"<br><br>StackTrace: "+Utility.getErrorHtmlString(caught));
 					
-					tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWMAP));
-					treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
+					spLogger.addEKPlog(ekpRespTmp); //add to log
 					
-					tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
-					tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
-					tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());
-					treeStore.add(tdHyperTree, tdEntriesList.get(tdEntriesList.size()-1));		
-
-					ekpResps.add(ekpRespTmp);
-					
-					//call dbpedia
-					List<String> dbproperty = new ArrayList<String>();
-					//dbproperty.add("birthDate");
-					//dbproperty.add("title");
-					//dbproperty.add("name");
-					//dbproperty2.add("placeOfBirth");
-					dbproperty.add("abstract");	
-					callDBPedia(ekpRespTmp.getEncodedTag(), dbproperty, ekpRespTmp.getType());
-				}
-				else{ // not received 200
+					//update counters
 					ekpFailsNum++;
+					ekpRemainingCallNum--;
+					
+					Utility.showLoadingBar("Calling EKP Service ("+ekpRemainingCallNum+" left)"); // update loading status
+					
+					// if this was last call
+					if (ekpRemainingCallNum<=0){
+						HtmlEkpService.setHTML(HTMLekpServiceStringFAIL+" (x"+ekpFailsNum+")");
+						rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
+						rc.getTree().expandAll();
+						rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
+						rc.setEkpResponses(ekpResps);
+						Utility.hideLoadingBar();
+						callListService(ekpResps); //lancia il servizio di "cerca markers"
+					}
 				}
-				
 
-				if (ekpRemainingCallNum>0){
-					callEkp();
-				}
-				else {
-					if(ekpFailsNum>0) HtmlEkpService.setHTML(HTMLekpServiceStringFAIL+" (x"+ekpFailsNum+")");
-					else HtmlEkpService.setHTML(HTMLekpServiceStringOK);
-					rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
-					rc.getTree().expandAll();
-					rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
-					rc.setEkpResponses(ekpResps);
-					Utility.hideLoadingBar();
-					callListService(ekpResps); //lancia il servizio di "cerca markers"
-				}
-			}});		
+				public void onSuccess(EkpResponse result) {			
+					Debug.printDbgLine("Sottotestogwt.java: callEkp(): onSuccess("+result.getTag()+")");
+
+					//clean non-utf8 characters
+					result.jdataHT = Utility.toUTF8(result.jdataHT);
+					result.jdataFD = Utility.toUTF8(result.jdataFD);
+
+
+					EkpResponse ekpRespTmp = new EkpResponse();
+					ekpRespTmp = result;
+					
+					spLogger.addEKPlog(ekpRespTmp); //update log
+
+					if (ekpRespTmp.getCode()==200) {
+
+						String jsonHT = "["+result.jdataHT+"]";
+						String jsonFD = "["+result.jdataFD+"]";	
+
+						listFD.add(jsonFD);
+
+						tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWMAP));
+						treeStore.add(tdMap, tdEntriesList.get(tdEntriesList.size()-1));
+
+						tdEntriesList.add(new TreeData(String.valueOf(treeDataIdProvider++),result.getTag().replaceAll("_", " "), TreeData.CLICK_ACTIONS.SHOWGRAPH_HT));
+						tdEntriesList.get(tdEntriesList.size()-1).setJsonHT(jsonHT);
+						tdEntriesList.get(tdEntriesList.size()-1).setLinks(result.getLinks());
+						treeStore.add(tdHyperTree, tdEntriesList.get(tdEntriesList.size()-1));		
+
+						ekpResps.add(ekpRespTmp);
+
+						//call dbpedia
+						List<String> dbproperty = new ArrayList<String>();
+						//dbproperty.add("birthDate");
+						//dbproperty.add("title");
+						//dbproperty.add("name");
+						//dbproperty2.add("placeOfBirth");
+						dbproperty.add("abstract");	
+						callDBPedia(ekpRespTmp.getEncodedTag(), dbproperty, ekpRespTmp.getType());
+					}
+					else{ // not received 200
+						ekpFailsNum++;
+					}
+
+
+					ekpRemainingCallNum--;	//update counter
+					Utility.showLoadingBar("Calling EKP Service ("+ekpRemainingCallNum+" left)"); // update loading status
+					
+					// if this was the last call
+					if (ekpRemainingCallNum<=0){
+						if(ekpFailsNum>0) HtmlEkpService.setHTML(HTMLekpServiceStringFAIL+" (x"+ekpFailsNum+")");
+						else HtmlEkpService.setHTML(HTMLekpServiceStringOK);
+						rc.loadTree(treeStore);  //carica l'albero, mostra la mappa come prima cosa
+						rc.getTree().expandAll();
+						rc.setListFD(listFD); //ora che la lista completa, salvala nel resultcontroller
+						rc.setEkpResponses(ekpResps);
+						Utility.hideLoadingBar();
+						callListService(ekpResps); //lancia il servizio di "cerca markers"
+					}
+				}});		
+		}
 	}
 
 	private void updateDBpediaServiceLabel(DBPQueryResp resp){
@@ -598,6 +598,7 @@ public class Sottotestogwt implements EntryPoint {
 
 	}
 	private void callListService(List<EkpResponse> respList){
+		Debug.printDbgLine("\nSottotestogwt.java: callListService()");
 		
 		//initialize main counter
 		dbpqCallsDone=0;
@@ -762,7 +763,7 @@ public class Sottotestogwt implements EntryPoint {
 	}
 	
 	private void addTaggedHtmls(String taggedSearchString, HorizontalPanel hp){
-		Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls2()");
+		Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls()");
 		hp.clear();
 		
 		//CYCLE ALL STRING
@@ -771,17 +772,10 @@ public class Sottotestogwt implements EntryPoint {
 				taggedSearchString = taggedSearchString.substring(1, taggedSearchString.length());
 			}
 			else if(taggedSearchString.substring(0,1).equals("<")){ /* if we have a span*/
-				//CREATE HTML ELEMENT CONTAINING SPAN
-				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): taggedSearchString: "+taggedSearchString);
-				
+				//CREATE HTML ELEMENT CONTAINING SPAN				
 				int spanEndIndex = taggedSearchString.indexOf("</span>")+7;
-				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): spanEndIndex: "+spanEndIndex);
 				String curSubString = taggedSearchString.substring(0, spanEndIndex); //<span ... </span>
-				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): curSubString: "+curSubString);
-				taggedSearchString = taggedSearchString.substring(spanEndIndex); //[</span>] ..... [end]
-				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): taggedSearchString trimmed: "+taggedSearchString);
-				
-				
+				taggedSearchString = taggedSearchString.substring(spanEndIndex); //[</span>] ..... [end]			
 				
 				String curTagText = "";
 				String curTitle = "";
@@ -790,7 +784,6 @@ public class Sottotestogwt implements EntryPoint {
 				if(tagmeResp.getSpotTag().contains(curTagText)) curTitle=tagmeResp.getTitleTag().get(tagmeResp.getSpotTag().indexOf(curTagText));
 				else if(tagmeResp.getSpotSkipped().contains(curTagText)) curTitle=tagmeResp.getTitleTag().get(tagmeResp.getSpotSkipped().indexOf(curTagText));
 				
-				Debug.printDbgLine("Sottotestogwt.java: addTaggedHtmls(): curTagText: "+curTagText);
 				HTML curHtml = new HTML();
 				curHtml.setHTML(curSubString);
 				curHtml.setTitle(curTitle);				
@@ -843,7 +836,7 @@ public class Sottotestogwt implements EntryPoint {
 			// search for fitting dbpediaResp data
 			entity = entity.replaceAll(" ", "_");
 			for (DBPediaResponse curDbpResp : dbpediaResps){
-				Debug.printDbgLine("Sottotestogwt.java: showTaggedPopup(): entity= "+entity+"; dbpediaEntity="+curDbpResp.getEntity());
+				//Debug.printDbgLine("Sottotestogwt.java: showTaggedPopup(): entity= "+entity+"; dbpediaEntity="+curDbpResp.getEntity());
 				if (curDbpResp.getEntity().equals(entity)){		
 					Debug.printDbgLine("Sottotestogwt.java: showTaggedPopup(): match found!");
 					String dbpQ = curDbpResp.getQueryResultXML();
@@ -884,7 +877,7 @@ public class Sottotestogwt implements EntryPoint {
 					spotTaken=true;
 					partialStrings.add("<span class=\"result_taggedWord\" title=\""+tagmeResp.getTitleTagClean().get(index)+"\">"+curSpotTag+"</span>");
 					searchedText = searchedText.substring(curSpotTag.length(), searchedText.length()); //remove current spotTag from search phrase
-					Debug.printDbgLine("ResultController.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
+					Debug.printDbgLine("Sottotesto.java.java: createTaggedSearchString(): added: "+partialStrings.get(partialStrings.size()-1));
 					break;
 				}
 				index++;
