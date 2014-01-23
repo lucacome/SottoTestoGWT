@@ -72,9 +72,7 @@ public class Utility {
 		for(String curEntry : list){
 			if(clearedList.indexOf(curEntry)==-1)
 				clearedList.add(curEntry);
-		}
-		Debug.printDbgLine("New cleared list:");
-		for(String s : clearedList) Debug.printDbgLine(s);
+		}		
 		return clearedList;
 	}
 	

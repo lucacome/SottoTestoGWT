@@ -216,7 +216,7 @@ public class ServicePanelLogger {
 			HTML html = (HTML)tabFC.getWidget(0);
 			if(html.getTitle().equals(entity)){
 				if (dbpQueryResp.getSuccess()) html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> "+dbpQueryResp.getLat()+","+dbpQueryResp.getLng());
-				else  html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> FAILED");
+				else  html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> FAILED: "+dbpQueryResp.getError());
 				break;
 			}
 		}
