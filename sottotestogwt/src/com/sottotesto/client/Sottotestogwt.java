@@ -42,6 +42,7 @@ import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.info.Info;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
 import com.sottotesto.shared.Debug;
@@ -63,7 +64,6 @@ public class Sottotestogwt implements EntryPoint {
 	private Button sendButton;     //button to call tagme
 	private TextArea textArea;     //textarea for user input
 	private Label textAreaLabel;   //label for text area
-	private Label errorLabel;      //errorlabel for textarea misuse
 	private ContentPanel titleContentPanel;
 	private HTML titleHTML;
 	private HorizontalLayoutContainer searchPanelHC;
@@ -205,15 +205,13 @@ public class Sottotestogwt implements EntryPoint {
 		textArea.setSize("550px", "25px");				
 		textArea.setFocus(true);
 		textArea.selectAll();
-		errorLabel = new Label();
-		errorLabel.setStylePrimaryName("searchAreaErrorLabel");
 		sendButton.addStyleName("sendButton");
 
 		titleHTML = new HTML();
 		titleHTML.setHTML("<h1>Sottotesto Web App</h1>");
 		titleHTML.setHeight("10px");
 		titleContentPanel = new ContentPanel(GWT.<ContentPanelAppearance> create(FramedPanelAppearance.class));
-		titleContentPanel.setHeadingHtml("SOTTOTESTO WEBAPPLICATION");
+		titleContentPanel.setHeadingHtml("SOTTOTESTO WEBAPP");
 		titleContentPanel.setWidth(Utility.getPanelsMaxWidth());
 		titleContentPanel.setHeight(RootPanel.get("searchContainer").getOffsetHeight()+"px");
 
@@ -222,7 +220,6 @@ public class Sottotestogwt implements EntryPoint {
 		//textAreaFP.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
 		//textAreaFP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		textAreaFP.add(textArea);
-		textAreaFP.add(errorLabel);
 
 		searchPanelHC = new HorizontalLayoutContainer();
 		searchPanelHC.setId("searchHorContainer");
@@ -236,7 +233,7 @@ public class Sottotestogwt implements EntryPoint {
 		titleContentPanel.setId("searchAreaPanel");
 		
 		ToolButton optionsTool = new ToolButton(ToolButton.GEAR);
-		optionsTool.setTitle("Configura opzioni");
+		optionsTool.setTitle("General Settings");
 		optionsTool.addSelectHandler(new SelectHandler() {			
 			@Override
 			public void onSelect(SelectEvent event) {
@@ -250,24 +247,21 @@ public class Sottotestogwt implements EntryPoint {
 			public void onClick(ClickEvent event) {
 				Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): sendButtonOnClick()");
 				validateSearch();
-				if (textArea.getText().length()>0)
+				if (textArea.getText().length()>0 && !textArea.getText().equals(textAreaDefText))
 					callTagme();		
 			}
 			public void onKeyUp(KeyUpEvent event) {				
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 					Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): textAreaOnKeyUpEnter()");
 					textArea.setText(textArea.getText().replace("\n", ""));	
-					if (sendButton.isEnabled()){
-						validateSearch();
-						if (textArea.getText().length()>0)
-							callTagme();				
+					if (validateSearch()){
+						callTagme();				
 					}
 				}
 			}			
 		}
 
 		// Add a handler to send the name to the server
-		Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): creating handlers");
 		HomeInputHandler hihandler = new HomeInputHandler();
 		sendButton.addClickHandler(hihandler);
 		textArea.addClickHandler(new ClickHandler() {	
@@ -282,10 +276,8 @@ public class Sottotestogwt implements EntryPoint {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 					Debug.printDbgLine("Sottotestogwt.java: onModuleLoad(): textAreaOnKeyUpEnter()");
 					textArea.setText(textArea.getText().replace("\n", ""));	
-					if (sendButton.isEnabled()){
-						validateSearch();
-						if (textArea.getText().length()>0)
-							callTagme();			
+					if (validateSearch()){
+						callTagme();			
 					}
 				}
 			}
@@ -306,25 +298,28 @@ public class Sottotestogwt implements EntryPoint {
 		 */
 	}
 
-	private void validateSearch(){
-		if (textArea.getText().length()<=0) return;
+	// textArea search validation
+	private boolean validateSearch(){
+		boolean retValue = true;
 		
-		
+		if (textArea.getText().length()<=0){
+			retValue = false;
+			Info.display("WARNING", "Please write something to search!");
+		}
+		else if (textArea.getText().equals(textAreaDefText)){
+			retValue = false;
+			Info.display("WARNING", "Please write something to search!");
+		}		
+		return retValue;
 	}
 
 	//send input from textarea to tagme
 	private void callTagme() {
 		Debug.printDbgLine("Sottotestogwt.java: callTagme()");
 		
-		rc.clearCenterPanel();
+		rc.clearCenterPanel();	
 		
-		
-		// First, we validate the input.
-		errorLabel.setText("");
 		String textToServer = textArea.getText();
-		
-
-		sendButton.setEnabled(false);
 
 		//reinit service status panel items
 		HtmlDBPediaService.setHTML(HTMLdbpediaServiceStringWaiting);
@@ -370,7 +365,7 @@ public class Sottotestogwt implements EntryPoint {
 				//update log
 				spLogger.addTAGMElog(tagmeResp);
 
-				if (!(tagmeResp.getCode()==200)){
+				if (tagmeResp.getCode()!=200){
 					//Tagme ha avuto qualche problema!
 
 					HtmlTagmeService.setHTML(HTMLtagmeServiceStringFAIL); //show the fail
@@ -583,13 +578,15 @@ public class Sottotestogwt implements EntryPoint {
 				dbpqCallsDone++; //update main counter	
 				dbpFailsNum++;
 				updateDBpediaServiceLabel(resp); //show the status
+				resp.setSuccess(false);
+				spLogger.updateDBPQlog(resp);
 				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): ONFAILURE() - call n."+resp.getCallNum()+"/"+resp.getMaxCalls());
 			}
 
 			public void onSuccess(DBPQueryResp result) {
 				dbpqCallsDone++; //update main counter
 				updateDBpediaServiceLabel(result); //show the status		
-				
+				result.setSuccess(true);
 				spLogger.updateDBPQlog(result);
 				
 				Debug.printDbgLine("Sottotestogwt.java: callDBPediaQuery(): onSuccess() - call n."+result.getCallNum()+"/"+result.getMaxCalls()+" - "+result.getEntity()+" - "+result.getName()+" -> "+result.getLat()+","+result.getLng());
@@ -665,7 +662,7 @@ public class Sottotestogwt implements EntryPoint {
 		tagmeStatusVP.add(HtmlTagmeService);	
 		tagmeStatusVP.setBorderWidth(0);
 		HtmlTagmeService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlTagmeService.getHTML().contains("Waiting") && !HtmlEkpService.getHTML().contains("Skipped")) spLogger.showTagmeDataDB();}});
+			if(!HtmlTagmeService.getHTML().contains("Waiting") && !HtmlTagmeService.getHTML().contains("Skipped")) spLogger.showTagmeDataDB();}});
 
 		//dbpedia service
 		dbpFailsNum = 0;
@@ -677,7 +674,7 @@ public class Sottotestogwt implements EntryPoint {
 		dbpediaStatusVP.add(HtmlDBPediaService);
 		dbpediaStatusVP.setBorderWidth(0);
 		HtmlDBPediaService.addClickHandler(new ClickHandler(){public void onClick(ClickEvent event){
-			if(!HtmlDBPediaService.getHTML().contains("Waiting") && !HtmlEkpService.getHTML().contains("Skipped")) spLogger.showDBPediaDataDB();}});
+			if(!HtmlDBPediaService.getHTML().contains("Waiting") && !HtmlDBPediaService.getHTML().contains("Skipped")) spLogger.showDBPediaDataDB();}});
 
 		//ekp service
 		ekpFailsNum = 0;
@@ -737,7 +734,7 @@ public class Sottotestogwt implements EntryPoint {
 		taggedPhraseFC.setId("taggedPhraseFC");
 		taggedPhraseFC.add(taggedPhraseHP);
 		
-		textAreaLabel.setText("Found Entities");
+		textAreaLabel.setText("Found Entities:");
 		addTaggedHtmls(createTaggedSearchString(),taggedPhraseHP);
 		
 		sendButton = new Button("New Search");		
@@ -759,7 +756,7 @@ public class Sottotestogwt implements EntryPoint {
 		searchPanelHC.add(sendButton, new HorizontalLayoutData(0.15, 1, new Margins(14)));
 
 		titleContentPanel.clear();
-		titleContentPanel.setHeadingHtml("SOTTOTESTO WEBAPPLICATION");
+		titleContentPanel.setHeadingHtml("SOTTOTESTO WEBAPP");
 
 		titleContentPanel.setWidget(searchPanelHC);
 	}

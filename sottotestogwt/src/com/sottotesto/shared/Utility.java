@@ -123,14 +123,14 @@ public class Utility {
 
 	public static int getDbMaxHeight(){
 		int dbMaxHeight = (RootPanel.get("body").getOffsetHeight()*80)/100;
-		Debug.printDbgLine("Utility.java: getDbMaxHeight(): "+dbMaxHeight);
+		//Debug.printDbgLine("Utility.java: getDbMaxHeight(): "+dbMaxHeight);
 		return dbMaxHeight;
 	}
 
 
 	public static int getDbMaxWidth(){
 		int dbMaxWidth = RootPanel.get().getOffsetWidth()/3;
-		Debug.printDbgLine("Utility.java: getDbMaxWidth(): "+dbMaxWidth);
+		//Debug.printDbgLine("Utility.java: getDbMaxWidth(): "+dbMaxWidth);
 		return dbMaxWidth;
 	}
 

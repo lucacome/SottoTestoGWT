@@ -116,21 +116,22 @@ public class ServicePanelLogger {
 					while (tagged.hasNext()){
 						taggedTotal+=tagged.next()+"<br>";
 					}
-					html.setHTML(html.getHTML()+"<br><br><b>Elements tagged:</b><br> "+taggedTotal);
-					
-					if(!tagmeResp.getSpotSkipped().isEmpty()){
-						String skippedTotal="";
-						Iterator<String> skipped = tagmeResp.getSpotSkipped().iterator();
-						while (skipped.hasNext()){
-							skippedTotal+=skipped.next()+"<br>";
-						}
-						html.setHTML(html.getHTML()+"<br><b>Elements skipped:</b><br> "+skippedTotal);
-					}
-					
-					html.setHTML(html.getHTML()+"<br><b>Json data:</b><br> "+tagmeResp.getJson().replaceAll(",",",<br>"));
+					html.setHTML(html.getHTML()+"<br><br><b>Elements tagged:</b><br> "+taggedTotal);					
 				}
 				
+				if(!tagmeResp.getSpotSkipped().isEmpty()){
+					String skippedTotal="";
+					Iterator<String> skipped = tagmeResp.getSpotSkipped().iterator();
+					while (skipped.hasNext()){
+						skippedTotal+=skipped.next()+"<br>";
+					}
+					html.setHTML(html.getHTML()+"<br><b>Elements skipped:</b><br> "+skippedTotal);
+				}
 				
+				if (!tagmeResp.getTitleTagClean().isEmpty())
+				{
+					html.setHTML(html.getHTML()+"<br><b>Json data:</b><br> "+tagmeResp.getJson().replaceAll(",",",<br>"));
+				}
 			}
 		}
 		else{
@@ -214,7 +215,8 @@ public class ServicePanelLogger {
 			FlowLayoutContainer tabFC = (FlowLayoutContainer)iterHtml.next();
 			HTML html = (HTML)tabFC.getWidget(0);
 			if(html.getTitle().equals(entity)){
-				html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> "+dbpQueryResp.getLat()+","+dbpQueryResp.getLng());
+				if (dbpQueryResp.getSuccess()) html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> "+dbpQueryResp.getLat()+","+dbpQueryResp.getLng());
+				else  html.setHTML(html.getHTML()+"<br>call n.<b>"+dbpQueryResp.getCallNum()+"</b>/"+dbpQueryResp.getMaxCalls()+" - "+dbpQueryResp.getName()+" -> FAILED");
 				break;
 			}
 		}

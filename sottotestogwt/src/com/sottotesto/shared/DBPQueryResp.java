@@ -14,6 +14,7 @@ public class DBPQueryResp implements java.io.Serializable {
 	private String abstr;
 	private double lat;
 	private double lng;
+	private boolean success;
 	
 	//for updating service interface
 	private int call;
@@ -30,6 +31,7 @@ public class DBPQueryResp implements java.io.Serializable {
 		lng = 0.0;
 		call=0;
 		callMax=0;
+		success=false;
 
 	}
 	public void setEntity(String e){entity = e;}
@@ -49,6 +51,8 @@ public class DBPQueryResp implements java.io.Serializable {
 	public double getLng(){return lng;}
 	public int getCallNum(){return call;}
 	public int getMaxCalls(){return callMax;}
+	public void setSuccess(boolean x){success=x;}
+	public boolean getSuccess(){return success;}
 
 
 }

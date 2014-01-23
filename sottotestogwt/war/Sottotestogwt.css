@@ -156,7 +156,7 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 	color:orange; text-decoration:line-through;
 }
 .sendButton{
-	height: 30px !important; width: 50px !important; top:0 !important; bottom:0 !important; margin:auto !important;
+	height: 30px !important; width: 60px !important; top:0 !important; bottom:0 !important; margin:auto !important;
 }
 .newSearchButton{
 	height: 30px !important; width: 100px !important; top:0 !important; bottom:0 !important; margin:auto !important;

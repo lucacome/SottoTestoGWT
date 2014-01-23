@@ -55,9 +55,9 @@ public class ResultController {
 	private BorderLayoutData west;
 	private BoxLayoutData vBoxData;
 	private HTML defaultCenterHTML;
-	private String HTMLsearchSomethingString="<div class=\"result_searchSomethingString\">Effettua una ricerca!</div>";
+	private String HTMLsearchSomethingString="<div class=\"result_searchSomethingString\">Search something!</div>";
 	//private String HTMLloadIconString="<div class=\"result_loadingGifContainer\"><img class=\"result_loadingGif\" src='loading.gif'/></div>";
-	private String HTMLerrorString="<div class=\"result_errorString\">E' avvenuto un errore, rieffettua la tua ricerca!</div>";
+	private String HTMLerrorString="<div class=\"result_errorString\">Something wrong happened, please try again.</div>";
 
 	//infovis data
 	private InfovisController infovisC;
