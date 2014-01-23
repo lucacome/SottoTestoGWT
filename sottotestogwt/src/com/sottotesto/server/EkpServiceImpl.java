@@ -39,8 +39,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 	 */
 	private static final long serialVersionUID = 1L;
 	public EkpResponse sendToServer(String input) throws IllegalArgumentException {
-		Debug.printDbgLine("EkpServiceImpl.java: sendToServer()");
-		Debug.printDbgLine("EkpServiceImpl.java: input="+input);
+		Debug.printDbgLine("EkpServiceImpl.java: sendToServer("+input+")");
 
 
 
@@ -86,23 +85,11 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			result.setContentType(connessione.getContentType());
 			
 			
-			Debug.printDbgLine("URL="+connessione.getURL());
-			Debug.printDbgLine("EkpServiceImpl.java: respcode="+connessione.getResponseCode());
+			//Debug.printDbgLine("URL="+connessione.getURL());
+			Debug.printDbgLine("EkpServiceImpl.java: respcode for "+result.getTag()+"="+connessione.getResponseCode());
 
 
 			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
-				//
-				//				BufferedReader inputReader = new BufferedReader(new InputStreamReader(connessione.getInputStream()));
-				//				StringBuilder sb = new StringBuilder();
-				//				String inline = "";
-				//				while ((inline = inputReader.readLine()) != null) {
-				//					sb.append(inline);
-				//				}
-				//				responseEkpTemp = URLDecoder.decode(sb.toString(), "UTF-8");
-				//				Debug.printDbgLine(responseEkpTemp);
-				//				connessione.disconnect();
-				//				m.read(new StringReader(responseEkpTemp), null);
-				//arp.read(m, new StringReader(responseEkpTemp), null);
 				arp.read(m, stream, null);
 				stream.close();
 				connessione.disconnect();
@@ -118,7 +105,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			e.printStackTrace();
 		}
 		long homeTimeStop2 = System.currentTimeMillis()-homeTimeStart2;
-		Debug.printDbgLine("TIME2="+homeTimeStop2);
+		Debug.printDbgLine("EkpServiceImpl.java: "+input+" TIME2="+homeTimeStop2);
 		//			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
 		if (result.getCode() != 200){
 			result.setRDF("Stringa vuota, Code="+result.getCode());
@@ -220,7 +207,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					e.printStackTrace();
 				}
 				long homeTimeStop = System.currentTimeMillis()-homeTimeStart;
-				Debug.printDbgLine("TIME="+homeTimeStop);
+				Debug.printDbgLine("EkpServiceImpl.java: "+input+" TIME="+homeTimeStop);
 			}
 
 
@@ -386,7 +373,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			else
 				jresp =  aa.toJson(jsonHT)+ "," + jresp ;
 
-			Debug.printDbgLine("EkpServiceImpl: json response="+jresp);
+			Debug.printDbgLine("EkpServiceImpl.java: "+input+" json response="+jresp);
 			result.jdataHT=jresp;
 			result.jdataFD=tempf;
 			result.linkList=linkList;
