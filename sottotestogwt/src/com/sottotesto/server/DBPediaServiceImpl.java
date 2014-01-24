@@ -130,10 +130,8 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 			//set error code
 			responseQuery.setCode(500);
 
-			//set error message
-			if (e.getMessage().contains("imeout")){responseQuery.setError("Timeout contacting DBPedia");}
-			if (e.getMessage().contains("IOException")){responseQuery.setError("Unable to fetch URL");}
-			else responseQuery.setError("Error processing Request");
+			//set error message			
+			responseQuery.setError(e.getCause().getClass().getName()+"<br>"+e.getClass().getName());
 
 			responseQuery.setTime(Utility.calcTimeTookMs(StartTime));
 			return responseQuery;			

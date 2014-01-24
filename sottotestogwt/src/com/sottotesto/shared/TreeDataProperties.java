@@ -1,7 +1,5 @@
 package com.sottotesto.shared;
 
-import java.util.List;
-
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
@@ -18,13 +16,11 @@ public interface TreeDataProperties extends PropertyAccess<TreeData>{
 	  @Path("firstName")
 	  LabelProvider<Person> simpleLabel(); 
 	 */
-
-	// None of these are used in this example, and could be removed, but could be helpful in other cases
+	
 	ValueProvider<TreeData, String> name();
 	ValueProvider<TreeData, String> clickAction(); 
 	ValueProvider<TreeData, String> jsonFD(); 
 
 	ValueProvider<TreeData, String> jsonHT(); 
-	ValueProvider<TreeData, List<String>> linkList(); 
 
 }

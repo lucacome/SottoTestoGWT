@@ -187,7 +187,7 @@ public class ServicePanelLogger {
 			html.setHTML(html.getHTML()+"<b>Response time:</b> "+String.valueOf(dbpediaResp.getTime())+"ms");
 			html.setHTML(html.getHTML()+"<br><br><b>Code:</b> "+String.valueOf(dbpediaResp.getCode()));
 			if (dbpediaResp.getCode()==200){
-				html.setHTML(html.getHTML()+"<br><br><b>Entity Type: </b>"+dbpediaResp.getEntityType()+"</b><br>");
+				html.setHTML(html.getHTML()+"<br><br><b>Entity Type: </b>"+dbpediaResp.getEntityType()+"</b>");
 				html.setHTML(html.getHTML()+"<br><br><b>Query output for "+dbpediaResp.getEntity()+":</b><br>"+dbpediaResp.getQueryResultXML());
 			}
 			else{
