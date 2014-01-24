@@ -1,10 +1,7 @@
 package com.sottotesto.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -69,11 +66,9 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 		long homeTimeStart2 = System.currentTimeMillis();
 		//open TAGME connection
-		InputStream stream = null;
-		InputStream error = null;
-		HttpURLConnection connessione = null;
+
 		try {
-			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input+"?dbpedia-version=3.8").openConnection();
+			HttpURLConnection connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input+"?dbpedia-version=3.8").openConnection();
 
 			connessione.setRequestMethod("GET");
 
@@ -81,38 +76,42 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
 
 			connessione.setDoOutput(true);
-			
+
 			result.setEncodedTag(input);
 			result.setTag(URLDecoder.decode(input, "UTF-8"));
-//			stream = connessione.getInputStream();
-//			error = connessione.getErrorStream();
+			InputStream stream = connessione.getInputStream();
+			//			error = connessione.getErrorStream();
 			result.setCode(connessione.getResponseCode());
 			result.setMessage(connessione.getResponseMessage());
 			result.setContentType(connessione.getContentType());
-			
-			//Debug.printDbgLine("URL="+connessione.getURL());
+
+			Debug.printDbgLine("URL="+connessione.getURL());
 			Debug.printDbgLine("EkpServiceImpl.java: respcode for "+result.getTag()+"="+connessione.getResponseCode());
+			try{
+				if (connessione.getContentType().contains("application/rdf+xml") && connessione.getResponseCode() == 200){
+					//InputStream stream = new BufferedInputStream(connessione.getInputStream());
 
+					//                                                BufferedReader inputReader = new BufferedReader(new InputStreamReader(stream));
+					//                                                StringBuilder sb = new StringBuilder();
+					//                                                String inline = "";
+					//                                                while ((inline = inputReader.readLine()) != null) {
+					//                                                        sb.append(inline);
+					//                                                }
+					//                                                responseEkpTemp = sb.toString();
+					//                                                Debug.printDbgLine(input+" risposta "+responseEkpTemp);
+					////                //                                m.read(new StringReader(responseEkpTemp), null);
+					//                arp.read(m, new StringReader(responseEkpTemp), null);
+					//				
+					arp.read(m, stream, null);
+					//				stream.close();
+					//				connessione.disconnect();
 
-			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
-                //
-                                                BufferedReader inputReader = new BufferedReader(new InputStreamReader(connessione.getInputStream()));
-                                                StringBuilder sb = new StringBuilder();
-                                                String inline = "";
-                                                while ((inline = inputReader.readLine()) != null) {
-                                                        sb.append(inline);
-                                                }
-                                                responseEkpTemp = URLDecoder.decode(sb.toString(), "UTF-8");
-                                                Debug.printDbgLine(responseEkpTemp);
-                                                connessione.disconnect();
-                //                                m.read(new StringReader(responseEkpTemp), null);
-                arp.read(m, new StringReader(responseEkpTemp), null);
-				
-//				arp.read(m, stream, null);
-//				stream.close();
-//				connessione.disconnect();
-
+				}
+			}finally{
+				stream.close();
+				connessione.disconnect();
 			}
+
 		} catch (MalformedURLException e) {
 			result.setCode(400);
 			result.setError("MalformedURLException\n"+Utility.getErrorHtmlString(e));
@@ -124,9 +123,9 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		}
 		long homeTimeStop2 = System.currentTimeMillis()-homeTimeStart2;
 		Debug.printDbgLine("EkpServiceImpl.java: "+input+" TIME2="+homeTimeStop2);
-//					Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
 		if (result.getCode() != 200){
 			result.setRDF("Stringa vuota, Code="+result.getCode());
+			result.setError("Risposta vuota");
 		}else{
 			result.setRDF(responseEkpTemp);
 
@@ -143,6 +142,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			Resource connection = null;
 
 			Resource link = null;
+			Debug.printDbgLine("ABOUT="+about);
 			link = m.getResource(about);
 			StmtIterator i = new StmtIteratorImpl(null);				
 			linkmap.clear();

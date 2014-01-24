@@ -36,6 +36,7 @@ public class EkpResponse implements java.io.Serializable{
 		jdataHT = "";
 		jdataFD = "";
 		encodedtag = "";
+		rdf = "";
 		linkList = new ArrayList<String>();
 	}
 
