@@ -316,6 +316,7 @@ public class Sottotestogwt implements EntryPoint {
 		}		
 		
 		if (retValue) textArea.clearInvalid();
+		else textArea.validate();
 		return retValue;
 	}
 
