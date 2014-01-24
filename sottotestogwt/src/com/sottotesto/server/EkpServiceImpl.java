@@ -1,7 +1,10 @@
 package com.sottotesto.server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -25,6 +28,7 @@ import com.hp.hpl.jena.rdf.model.RDFReader;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.impl.StmtIteratorImpl;
 import com.sottotesto.client.EkpService;
 import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
@@ -66,6 +70,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		long homeTimeStart2 = System.currentTimeMillis();
 		//open TAGME connection
 		InputStream stream = null;
+		InputStream error = null;
 		HttpURLConnection connessione = null;
 		try {
 			connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input+"?dbpedia-version=3.8").openConnection();
@@ -79,20 +84,33 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			
 			result.setEncodedTag(input);
 			result.setTag(URLDecoder.decode(input, "UTF-8"));
-			stream = connessione.getInputStream();
+//			stream = connessione.getInputStream();
+//			error = connessione.getErrorStream();
 			result.setCode(connessione.getResponseCode());
 			result.setMessage(connessione.getResponseMessage());
 			result.setContentType(connessione.getContentType());
-			
 			
 			//Debug.printDbgLine("URL="+connessione.getURL());
 			Debug.printDbgLine("EkpServiceImpl.java: respcode for "+result.getTag()+"="+connessione.getResponseCode());
 
 
 			if (result.getContentType().contains("application/rdf+xml") && result.getCode() == 200){
-				arp.read(m, stream, null);
-				stream.close();
-				connessione.disconnect();
+                //
+                                                BufferedReader inputReader = new BufferedReader(new InputStreamReader(connessione.getInputStream()));
+                                                StringBuilder sb = new StringBuilder();
+                                                String inline = "";
+                                                while ((inline = inputReader.readLine()) != null) {
+                                                        sb.append(inline);
+                                                }
+                                                responseEkpTemp = URLDecoder.decode(sb.toString(), "UTF-8");
+                                                Debug.printDbgLine(responseEkpTemp);
+                                                connessione.disconnect();
+                //                                m.read(new StringReader(responseEkpTemp), null);
+                arp.read(m, new StringReader(responseEkpTemp), null);
+				
+//				arp.read(m, stream, null);
+//				stream.close();
+//				connessione.disconnect();
 
 			}
 		} catch (MalformedURLException e) {
@@ -106,7 +124,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		}
 		long homeTimeStop2 = System.currentTimeMillis()-homeTimeStart2;
 		Debug.printDbgLine("EkpServiceImpl.java: "+input+" TIME2="+homeTimeStop2);
-		//			Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
+//					Debug.printDbgLine("EkpServiceImpl.java: resp="+responseEkpTemp);
 		if (result.getCode() != 200){
 			result.setRDF("Stringa vuota, Code="+result.getCode());
 		}else{
@@ -126,14 +144,14 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 			Resource link = null;
 			link = m.getResource(about);
-			StmtIterator i = null;				
+			StmtIterator i = new StmtIteratorImpl(null);				
 			linkmap.clear();
 			Map<String,String> linklabel = new HashMap<String,String>();
-
+			Debug.printDbgLine("PIPPA"+link.listProperties().toList());
 			for (i = link.listProperties(); i.hasNext(); ) {
 				Statement s = i.next();					
 				//Debug.printDbgLine( "link has property " + s.getPredicate().getLocalName().replace("linksTo", "") + " with value " + s.getObject() );
-//				Debug.printDbgLine("DIO="+s);
+				//Debug.printDbgLine("DIO="+s);
 				if (s.getPredicate().getLocalName().contains("label")){
 					try {
 						jsonHT.name = URLDecoder.decode(s.getObject().toString().replace("@en", ""),"UTF-8");
