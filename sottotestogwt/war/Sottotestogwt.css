@@ -134,11 +134,17 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 .searchAreaLabel{ /*  */
 	position: absolute !important; width: auto !important; height:50px !important; line-height:50px !important; text-align:left !important; vertical-align:middle !important; top:0 !important; bottom:0 !important; margin:auto !important;
 }
+#textAreaCLC{
+	bottom: -18px;	position: relative;
+}
 .searchAreaFlowPanel{
 	text-align: center;
 }
-.searchAreaTextArea{
-	position: absolute !important; width: 90% !important; height:90% !important; text-align:center !important; vertical-align:middle !important; top:0 !important; bottom:0 !important; left:0 !important; right:0 !important; margin:auto !important;
+#searchAreaTextArea-input{
+	position: relative !important; /*width: 180% !important; height:90% !important; */text-align:center !important; vertical-align:middle !important; top:0 !important; bottom:0 !important; left:0 !important; right:0 !important; margin:auto !important;
+}
+#taggedPhraseCLC{
+	bottom: -11px;	position: relative;
 }
 .taggedPhraseHTMLcontainer{
 	position: relative !important; height:100% !important; line-height:50px !important; text-align:center !important; vertical-align:middle !important; top:0 !important; bottom:0 !important; left:0 !important; right:0 !important; margin:auto !important;
@@ -156,10 +162,10 @@ html, body{width:99%; height:99%; min-height:99%;position:absolute;}/* make sure
 	color:orange; text-decoration:line-through;
 }
 .sendButton{
-	height: 30px !important; width: 60px !important; top:0 !important; bottom:0 !important; margin:auto !important;
+	height: 30px !important; width: 60px !important; top:0 !important; bottom:0 !important; right: 0 !important; left: auto !importnat; margin:auto !important;
 }
 .newSearchButton{
-	height: 30px !important; width: 100px !important; top:0 !important; bottom:0 !important; margin:auto !important;
+	height: 30px !important; width: 100px !important; top:0 !important; bottom:0 !important; right: 0 !important; left: auto !importnat; margin:auto !important;
 }
 .searchAreaErrorLabel{
 	color: red; text-align: center; vertical-align: bottom; bottom:0px;

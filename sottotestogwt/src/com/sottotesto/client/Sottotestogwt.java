@@ -28,7 +28,6 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.core.client.util.Margins;
@@ -37,11 +36,13 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.ContentPanel.ContentPanelAppearance;
 import com.sencha.gxt.widget.core.client.FramedPanel.FramedPanelAppearance;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
+import com.sencha.gxt.widget.core.client.container.CenterLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sottotesto.shared.DBPQueryResp;
 import com.sottotesto.shared.DBPediaResponse;
@@ -201,10 +202,10 @@ public class Sottotestogwt implements EntryPoint {
 		sendButton = new Button(textSendButton);
 		textArea = new TextArea();
 		textArea.setStylePrimaryName("searchAreaTextArea");
-		textArea.setText(textAreaDefText);		
-		textArea.setSize("550px", "25px");				
-		textArea.setFocus(true);
-		textArea.selectAll();
+		textArea.setId("searchAreaTextArea");
+		textArea.setSize(Utility.getTextAreaMaxWidth(), Utility.getTextAreaMaxHeight());
+		textArea.setEmptyText(textAreaDefText);
+		textArea.setAllowBlank(false);
 		sendButton.addStyleName("sendButton");
 
 		titleHTML = new HTML();
@@ -218,8 +219,11 @@ public class Sottotestogwt implements EntryPoint {
 		textAreaFP = new FlowPanel();
 		textAreaFP.setStylePrimaryName("searchAreaFlowPanel");
 		//textAreaFP.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
-		//textAreaFP.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-		textAreaFP.add(textArea);
+		
+		CenterLayoutContainer textAreaCLC = new CenterLayoutContainer();
+		textAreaCLC.setId("textAreaCLC");
+		textAreaCLC.add(textArea);
+		textAreaFP.add(textAreaCLC);
 
 		searchPanelHC = new HorizontalLayoutContainer();
 		searchPanelHC.setId("searchHorContainer");
@@ -264,12 +268,12 @@ public class Sottotestogwt implements EntryPoint {
 		// Add a handler to send the name to the server
 		HomeInputHandler hihandler = new HomeInputHandler();
 		sendButton.addClickHandler(hihandler);
-		textArea.addClickHandler(new ClickHandler() {	
+		/*textArea.addClickHandler(new ClickHandler() {	
 			@Override
 			public void onClick(ClickEvent event) {
 				if (textArea.getText().equals(textAreaDefText)) textArea.setText("");				
 			}
-		});
+		});*/
 		textArea.addKeyUpHandler(new KeyUpHandler() {			
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
@@ -310,6 +314,8 @@ public class Sottotestogwt implements EntryPoint {
 			retValue = false;
 			Info.display("WARNING", "Please write something to search!");
 		}		
+		
+		if (retValue) textArea.clearInvalid();
 		return retValue;
 	}
 
@@ -836,7 +842,10 @@ public class Sottotestogwt implements EntryPoint {
 		FlowLayoutContainer taggedPhraseFC = new FlowLayoutContainer();
 		taggedPhraseFC.setScrollMode(ScrollMode.AUTO);
 		taggedPhraseFC.setId("taggedPhraseFC");
-		taggedPhraseFC.add(taggedPhraseHP);
+		CenterLayoutContainer taggedPhraseCLC = new CenterLayoutContainer();
+		taggedPhraseCLC.setId("taggedPhraseCLC");
+		taggedPhraseCLC.add(taggedPhraseHP);
+		taggedPhraseFC.add(taggedPhraseCLC);
 		
 		textAreaLabel.setText("Tagged text:");
 		addTaggedHtmls(createTaggedSearchString(),taggedPhraseHP);
@@ -954,8 +963,9 @@ public class Sottotestogwt implements EntryPoint {
 				popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>Entita' ignorata dal servizio TAGME.");
 			}
 
-			taggedEntityPopup.setWidget(popupHtml);
-			taggedEntityPopup.setPopupPosition(0, RootPanel.get("servicesContainer").getAbsoluteTop());
+			taggedEntityPopup.setWidget(popupHtml);			
+			taggedEntityPopup.center();
+			taggedEntityPopup.setPopupPosition(taggedEntityPopup.getAbsoluteLeft(), RootPanel.get("servicesContainer").getAbsoluteTop()-10);
 			taggedEntityPopup.show();
 		}
 	}

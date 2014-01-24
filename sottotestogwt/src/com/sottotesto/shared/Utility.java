@@ -131,9 +131,22 @@ public class Utility {
 		//Debug.printDbgLine("Utility.java: getDbMaxWidth(): "+dbMaxWidth);
 		return dbMaxWidth;
 	}
+	
 
 	public static int getPanelsMaxWidth(){
 		return RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 	}
 
+	public static String getTextAreaMaxWidth(){
+		String width="";
+		int panelwidth = getPanelsMaxWidth();		
+		width = String.valueOf(panelwidth*0.6)+"px";		
+		return width;
+	}
+	public static String getTextAreaMaxHeight(){
+		String height="";
+		int panelheight = RootPanel.get("searchContainer").getOffsetHeight();
+		height = String.valueOf(panelheight*0.45)+"px";		
+		return height;
+	}
 }
