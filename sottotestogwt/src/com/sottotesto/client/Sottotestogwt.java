@@ -420,7 +420,7 @@ public class Sottotestogwt implements EntryPoint {
 
 					dbpFailsNum=0;
 					ekpResps = new ArrayList<EkpResponse>();
-					callEkpAsync();
+					callEkp();
 				}						
 			}
 		});

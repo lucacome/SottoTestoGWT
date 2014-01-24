@@ -308,7 +308,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 			String tempf = null;
 			tempf = tempfd2.toJson(jsonFD);
-
 			tempf = tempf +","+ jfd;
 
 			if (jresp == null)
