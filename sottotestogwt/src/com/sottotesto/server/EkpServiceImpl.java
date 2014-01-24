@@ -41,9 +41,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 	private static final long serialVersionUID = 1L;
 	public EkpResponse sendToServer(String input) throws IllegalArgumentException {
 		Debug.printDbgLine("EkpServiceImpl.java: sendToServer("+input+")");
-
-
-
 		long StartTime = System.currentTimeMillis();
 
 		JData jsonHT = new JData();
@@ -60,27 +57,18 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 		String type = "";
 		List<String> linkList = new ArrayList<String>();
 		String responseEkpTemp = "";
-
-
-
-
 		long homeTimeStart2 = System.currentTimeMillis();
-		//open TAGME connection
 
 		try {
 			HttpURLConnection connessione = (HttpURLConnection)new URL("http://wit.istc.cnr.it:9090/ekp/get/http://dbpedia.org/resource/"+input+"?dbpedia-version=3.8").openConnection();
-
 			connessione.setRequestMethod("GET");
-
 			connessione.setRequestProperty("Accept-Charset", "utf-8");
 			connessione.setRequestProperty("Accept", "application/rdf+xml; charset=utf-8");
-
 			connessione.setDoOutput(true);
 
 			result.setEncodedTag(input);
 			result.setTag(URLDecoder.decode(input, "UTF-8"));
 			InputStream stream = connessione.getInputStream();
-			//			error = connessione.getErrorStream();
 			result.setCode(connessione.getResponseCode());
 			result.setMessage(connessione.getResponseMessage());
 			result.setContentType(connessione.getContentType());
@@ -89,23 +77,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			Debug.printDbgLine("EkpServiceImpl.java: respcode for "+result.getTag()+"="+connessione.getResponseCode());
 			try{
 				if (connessione.getContentType().contains("application/rdf+xml") && connessione.getResponseCode() == 200){
-					//InputStream stream = new BufferedInputStream(connessione.getInputStream());
-
-					//                                                BufferedReader inputReader = new BufferedReader(new InputStreamReader(stream));
-					//                                                StringBuilder sb = new StringBuilder();
-					//                                                String inline = "";
-					//                                                while ((inline = inputReader.readLine()) != null) {
-					//                                                        sb.append(inline);
-					//                                                }
-					//                                                responseEkpTemp = sb.toString();
-					//                                                Debug.printDbgLine(input+" risposta "+responseEkpTemp);
-					////                //                                m.read(new StringReader(responseEkpTemp), null);
-					//                arp.read(m, new StringReader(responseEkpTemp), null);
-					//				
 					arp.read(m, stream, null);
-					//				stream.close();
-					//				connessione.disconnect();
-
 				}
 			}finally{
 				stream.close();
@@ -147,11 +119,10 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			StmtIterator i = new StmtIteratorImpl(null);				
 			linkmap.clear();
 			Map<String,String> linklabel = new HashMap<String,String>();
-			Debug.printDbgLine("PIPPA"+link.listProperties().toList());
 			for (i = link.listProperties(); i.hasNext(); ) {
 				Statement s = i.next();					
 				//Debug.printDbgLine( "link has property " + s.getPredicate().getLocalName().replace("linksTo", "") + " with value " + s.getObject() );
-				//Debug.printDbgLine("DIO="+s);
+				//Debug.printDbgLine("LINK="+s);
 				if (s.getPredicate().getLocalName().contains("label")){
 					try {
 						jsonHT.name = URLDecoder.decode(s.getObject().toString().replace("@en", ""),"UTF-8");
@@ -173,7 +144,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 				}
 				linkmap.put(s.getPredicate().getLocalName(), s.getObject().toString());
 				Resource oth = null;
-				//Debug.printDbgLine(s.getObject().toString());
 				oth = m.getResource(s.getObject().toString());
 				StmtIterator a = null;
 
@@ -190,17 +160,12 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			Model m2 = ModelFactory.createDefaultModel();
 			arp2 = m2.getReader();
 
-
-
 			String type2 = m.getNsPrefixURI("j.0");
 			if (type.isEmpty()){
 				if (type2 != null)
 					result.setType(type2.substring(type2.lastIndexOf('/')+1).replace(".owl#", ""));
 
 			}
-
-			//Debug.printDbgLine(type);
-
 			if (type2 != null){
 				long homeTimeStart = System.currentTimeMillis();
 				HttpURLConnection connessione2 = null;
@@ -229,15 +194,11 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			}
 
 
-
-
 			for (Object key : linkmap.keySet()){
-				//Debug.printDbgLine(key.toString());
 				if (key.toString().contains("type"))
 					jsonHT.type = key.toString();
 				else if (key.toString().contains("label")){
-					//						jsonHT.name = linkmap.asMap().get(key).toString().replace("@en", "");
-					//						jsonFD.name = jsonHT.name;
+					//non fa niente
 				}else{
 					linkList.add(key.toString());
 					Map<String, String> mapNodeHT = new HashMap<String,String>();
@@ -247,12 +208,8 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					Collection<String> boh = linkmap.asMap().get(key);
 					Iterator<String> iter;
 					iter = boh.iterator();
-
 					JData jsonHTsub = new JData();
-
 					String jlast = null;
-
-
 
 					if (!m2.isEmpty()){
 						connection = m2.getResource(type2+key.toString());
@@ -260,23 +217,17 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						connection = null;
 
 					StmtIterator i2 = null;
-
 					String comment = "";
 					String label = "";
 					String range = "";
 
 					if (connection != null)
 						for (i2 = connection.listProperties(); i2.hasNext(); ) {
-							Statement s2 = i2.next();	
-
-
-							//Debug.printDbgLine("BOH"+s2+"\n");
-							//	Debug.printDbgLine("BOH2"+s2.getLiteral());
+							Statement s2 = i2.next();
 							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("comment")){
 								//Debug.printDbgLine("Comment="+s2.getObject().toString().replace("@en", ""));
 								comment = s2.getObject().toString().replace("@en", "");
 							}
-
 							if (s2.getObject().toString().contains("@en") && s2.getPredicate().toString().contains("label")){
 								//Debug.printDbgLine("label="+s2.getObject().toString().replace("@en", ""));
 								try {
@@ -289,10 +240,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 							if (s2.getPredicate().toString().contains("range")){
 								//Debug.printDbgLine("range="+s2.getObject().toString().replace("http://dbpedia.org/ontology/", ""));
 								range = s2.getObject().toString().replace("http://dbpedia.org/ontology/", "");
-
 							}
-
-
 						}
 
 
@@ -303,7 +251,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 					jsonHTsub.data.put("comment", comment);
 					jsonHTsub.data.put("label", label);
 					jsonHTsub.data.put("relation", key.toString());
-					//Debug.printDbgLine("1");
 
 					while (iter.hasNext()){
 						Map<String, String> mapNodeHTsub = new HashMap<String,String>();
@@ -317,7 +264,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						Gson tempfd = new GsonBuilder().disableHtmlEscaping().create();
 						jsonHTsub2.id = node;
 						jsonFDsub.id = node;
-						jsonHTsub2.name = linklabel.get(node).toString();//node.replace("http://dbpedia.org/resource/", "").replace("_", " ");
+						jsonHTsub2.name = linklabel.get(node).toString();
 						jsonFDsub.name = linklabel.get(node).toString();
 						jsonFDsub.adjacencies = null;
 						jsonHTsub2.data.put("$type", "star");
@@ -335,8 +282,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						}else{
 							jlast = jlast +","+templastj.toJson(jsonHTsub2);
 						}
-
-						//Debug.printDbgLine(key.toString()+"="+node);
 					}
 
 					Gson tempj = new GsonBuilder().disableHtmlEscaping().create();
@@ -346,45 +291,25 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 
 
 					temresp = tempj.toJson(jsonHTsub);
-					//Debug.printDbgLine(temresp);
+
 					if (jresp == null)
 						jresp = temresp;
 					else
 						jresp = jresp+","+temresp;
-					//Debug.printDbgLine("jresp="+jresp);
+
 					jresp = jresp +","+jlast;
-					//Debug.printDbgLine("jresp+jrasp="+jresp);
 				}
-				//Debug.printDbgLine("dopo");
 			}
 			jsonHT.setLink(linkmap);
-			//Debug.printDbgLine(jsonHT.getLink().toString());
 			tag.clear();
 			tag.put(input, jsonHT.getLink());
-			//		jdata.setTag(tag);
-
-			//	Gson ekpj = new GsonBuilder().disableHtmlEscaping().create();
 			Gson aa = new GsonBuilder().disableHtmlEscaping().create();
 			Gson tempfd2 = new GsonBuilder().disableHtmlEscaping().create();
 
-			//JsonElement jj = aa.toJsonTree(tag);
-
-
-			//jj.getAsJsonObject().add(input, ekpj.toJsonTree(jdata.getLink().asMap()));
-
-			//jresp = aa.toJson(jj);
-
-
 			String tempf = null;
-
-
-
-
 			tempf = tempfd2.toJson(jsonFD);
 
 			tempf = tempf +","+ jfd;
-			//Debug.printDbgLine("jsonfd="+tempf);
-
 
 			if (jresp == null)
 				jresp = aa.toJson(jsonHT);
@@ -395,9 +320,6 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			result.jdataHT=jresp;
 			result.jdataFD=tempf;
 			result.linkList=linkList;
-			//Debug.printDbgLine(linkList.toString());
-
-
 		}
 		result.setTime(Utility.calcTimeTookMs(StartTime));
 
