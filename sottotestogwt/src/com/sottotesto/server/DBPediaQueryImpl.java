@@ -131,7 +131,7 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 			//e.printStackTrace();
 			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
 			resp.setSuccess(false);
-			resp.setError(e.getClass().getName());
+			resp.setError(e.getCause().getClass().getName()+" "+e.getClass().getName());
 		}
 		return resp;
 	}

@@ -32,7 +32,7 @@ public class DBPQueryResp implements java.io.Serializable {
 		lng = 0.0;
 		call=0;
 		callMax=0;
-		success=false;
+		success=true;
 		error="";
 
 	}
