@@ -66,7 +66,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			finally {
 				if (output != null) try { output.close(); } 
 				catch (IOException err){ tagmeResp.setCode(-1);
-				tagmeResp.setError("Error closing OutputStream");
+				tagmeResp.setError("Error closing OutputStream:<br>"+err.getClass().getName());
 				tagmeResp.setTime(Utility.calcTimeTookMs(StartTime));
 				return tagmeResp;}			
 			}
@@ -164,15 +164,15 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			//Debug.printDbgLine("BOH"+JData.jdata.toString());
 		} catch (MalformedURLException e) {
 			tagmeResp.setCode(-1);
-			tagmeResp.setError("Error MalformedURLException");
+			tagmeResp.setError("MalformedURLException:<br>"+e.getClass().getName());
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			tagmeResp.setCode(-1);
-			tagmeResp.setError("Error UnsupportedEncodingException");
+			tagmeResp.setError("UnsupportedEncodingException:<br>"+e.getClass().getName());
 			e.printStackTrace();
 		} catch (IOException e) {
 			tagmeResp.setCode(-1);
-			tagmeResp.setError("Error IOException");
+			tagmeResp.setError("IOException:<br>"+e.getClass().getName());
 			e.printStackTrace();
 		}
 

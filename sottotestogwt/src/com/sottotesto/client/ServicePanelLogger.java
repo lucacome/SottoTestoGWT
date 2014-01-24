@@ -99,11 +99,10 @@ public class ServicePanelLogger {
 		
 		html.setHTML(html.getHTML()+"<b>Response time:</b> "+String.valueOf(tagmeResp.getTime())+"ms");
 		html.setHTML(html.getHTML()+"<br><br><b>Code:</b> "+String.valueOf(tagmeResp.getCode()));
-		html.setHTML(html.getHTML()+"<br><br><b>Message:</b> "+tagmeResp.getMessage());
-		html.setHTML(html.getHTML()+"<br><br><b>ContentType:</b> "+tagmeResp.getContentType());
-		
 		
 		if (tagmeResp.getCode()==200){
+			html.setHTML(html.getHTML()+"<br><br><b>Message:</b> "+tagmeResp.getMessage());
+			html.setHTML(html.getHTML()+"<br><br><b>ContentType:</b> "+tagmeResp.getContentType());
 			html.setHTML(html.getHTML()+"<br><br><b>Number of Total Resource:</b> "+tagmeResp.getResNum());
 			if (tagmeResp.getResNum()>0)
 			{
