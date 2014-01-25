@@ -152,7 +152,7 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 				else
 					link = link + "," + aa.toJson(templ);
 			}
-			if(link.contains("null")){
+			if(link.isEmpty() || link.contains("null")){
 				response = "["+ response + "]";
 			}else{
 				response = "["+ response + "," + link + "]";				
@@ -163,7 +163,8 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 		// TODO Auto-generated method stub
 		long homeTimeStop = System.currentTimeMillis()-StartTime;
 		Debug.printDbgLine("GraphServiceImpl, TIME="+homeTimeStop);
-		Debug.printDbgLine(response);
+		response = response.replaceAll("dim\":\"9\"", "dim\": 9");
+		//Debug.printDbgLine(response);
 		return response;
 	}
 

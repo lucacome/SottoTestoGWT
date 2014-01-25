@@ -108,13 +108,14 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			jsonFD.id = about;
 			mapDataFD.put("$type", "square");
 			mapDataFD.put("$color", "#BD1B89");
+			mapDataFD.put("$dim", "9");
 			jsonFD.data = mapDataFD;
 
 
 			Resource connection = null;
 
 			Resource link = null;
-			Debug.printDbgLine("ABOUT="+about);
+			//Debug.printDbgLine("ABOUT="+about);
 			link = m.getResource(about);
 			StmtIterator i = new StmtIteratorImpl(null);				
 			linkmap.clear();
@@ -266,6 +267,8 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 						jsonFDsub.id = node;
 						jsonHTsub2.name = linklabel.get(node).toString();
 						jsonFDsub.name = linklabel.get(node).toString();
+						jsonFDsub.data.put("$dim", "9");
+						jsonFDsub.data.put("$type", "circle");		
 						jsonFDsub.adjacencies = null;
 						jsonHTsub2.data.put("$type", "star");
 						jsonHTsub2.data.put("$color", "#C74243");
@@ -315,7 +318,7 @@ public class EkpServiceImpl extends RemoteServiceServlet implements EkpService {
 			else
 				jresp =  aa.toJson(jsonHT)+ "," + jresp ;
 
-			Debug.printDbgLine("EkpServiceImpl.java: "+input+" json response="+jresp);
+			//Debug.printDbgLine("EkpServiceImpl.java: "+input+" json response="+jresp);
 			result.jdataHT=jresp;
 			result.jdataFD=tempf;
 			result.linkList=linkList;
