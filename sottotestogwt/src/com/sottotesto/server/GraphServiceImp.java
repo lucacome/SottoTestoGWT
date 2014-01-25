@@ -152,11 +152,9 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 				else
 					link = link + "," + aa.toJson(templ);
 			}
-			if(link.length() < 5){
-				Debug.printDbgLine("1 "+link.length());
+			if(link.contains("null")){
 				response = "["+ response + "]";
 			}else{
-				Debug.printDbgLine("2 "+link.length());
 				response = "["+ response + "," + link + "]";				
 			}
 		}else
