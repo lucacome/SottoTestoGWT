@@ -145,6 +145,9 @@ public class Sottotestogwt implements EntryPoint {
 
 		long homeTimeStart = System.currentTimeMillis();
 
+		String link="";
+		if(link != null || link.isEmpty()) Debug.printDbgLine("link=null?");
+		
 		//show Loading Icon
 		RootPanel.get("homeLoading").setVisible(true);
 
@@ -953,7 +956,7 @@ public class Sottotestogwt implements EntryPoint {
 				if (curDbpResp.getEntity().equals(entity)){		
 					Debug.printDbgLine("Sottotestogwt.java: showTaggedPopup(): match found!");
 					String dbpQ = curDbpResp.getQueryResultXML();
-					if (dbpQ.length()<5) dbpQ="Nessun dato trovato per questa entita'";
+					if (dbpQ.length()<5) dbpQ="No info found for this entity.";
 					popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b> ["+curDbpResp.getEntityType()+"]<br><br>"+dbpQ);
 					dataFound=true;
 					break;
@@ -961,7 +964,15 @@ public class Sottotestogwt implements EntryPoint {
 			}
 			
 			if (!dataFound){
-				popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>Entita' ignorata dal servizio TAGME.");
+				for (String s : tagmeResp.getTitleSkipped()){
+					if (s.equals(entity))
+						popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>Entity ignored from TAGME service.");
+						dataFound=true;
+				}				
+			}
+			
+			if (!dataFound){
+				popupHtml.setHTML("<b>"+entity.replaceAll("_", " ")+"</b><br><br>Error retrieving info for this entity.");
 			}
 
 			taggedEntityPopup.setWidget(popupHtml);			
