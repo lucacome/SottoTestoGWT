@@ -24,6 +24,7 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 	public String sendToServer(List<String> fdfinal, List<String> selectedEn) throws IllegalArgumentException {
 
 		Debug.printDbgLine("GraphServiceImpl.java: sendToServer()");
+		long StartTime = System.currentTimeMillis();
 		Debug.printDbgLine("Selezionati= "+selectedEn);
 		Iterator<String> iterfd = fdfinal.listIterator();
 		String response = "";
@@ -151,11 +152,20 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 				else
 					link = link + "," + aa.toJson(templ);
 			}
-			response = "["+ response + "," + link + "]";
+			if(link.length() < 5){
+				Debug.printDbgLine("1 "+link.length());
+				response = "["+ response + "]";
+			}else{
+				Debug.printDbgLine("2 "+link.length());
+				response = "["+ response + "," + link + "]";				
+			}
 		}else
 			response = "[ {\"id\":\"vuoto\", \"name\":\"Seleziona qualcosa\"} ]";
 
 		// TODO Auto-generated method stub
+		long homeTimeStop = System.currentTimeMillis()-StartTime;
+		Debug.printDbgLine("GraphServiceImpl, TIME="+homeTimeStop);
+		Debug.printDbgLine(response);
 		return response;
 	}
 

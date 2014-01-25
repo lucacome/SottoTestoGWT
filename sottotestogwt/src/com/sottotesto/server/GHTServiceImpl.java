@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.GHTService;
+import com.sottotesto.shared.Debug;
 
 public class GHTServiceImpl extends RemoteServiceServlet implements GHTService	{
 
@@ -20,6 +21,7 @@ public class GHTServiceImpl extends RemoteServiceServlet implements GHTService	{
 	private static final long serialVersionUID = 687447506834597456L;
 
 	public String sendToServer(String jsonHT, List<String> selectedLink) throws IllegalArgumentException {
+		long StartTime = System.currentTimeMillis();
 		String response="";
 
 
@@ -62,7 +64,8 @@ public class GHTServiceImpl extends RemoteServiceServlet implements GHTService	{
 		}
 		response = "[" + response.substring(0, response.length()-1) + "]";
 		//Debug.printDbgLine(response);
-
+		long homeTimeStop = System.currentTimeMillis()-StartTime;
+		Debug.printDbgLine("GHT="+homeTimeStop);
 		return response;
 	}
 
