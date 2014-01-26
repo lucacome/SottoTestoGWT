@@ -9,7 +9,9 @@ import com.google.gson.JsonParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.ListService;
 import com.sottotesto.shared.DBPQueryResp;
+import com.sottotesto.shared.Debug;
 import com.sottotesto.shared.EkpResponse;
+import com.sottotesto.shared.Utility;
 
 public class ListServiceImpl extends RemoteServiceServlet implements ListService	{
 
@@ -19,10 +21,9 @@ public class ListServiceImpl extends RemoteServiceServlet implements ListService
 	private static final long serialVersionUID = 6701602502729720643L;
 
 	@Override
-	public List<DBPQueryResp> sendToServer(EkpResponse resp)
-			throws IllegalArgumentException {
-
-
+	public List<DBPQueryResp> sendToServer(EkpResponse resp) throws IllegalArgumentException {
+		Debug.printDbgLine("ListServiceImpl.java: sendToServer()");
+		long StartTime = System.currentTimeMillis();
 		String jsonHT = "["+resp.jdataHT+"]";
 		Gson pa = new Gson();
 		JsonParser parser = new JsonParser();
@@ -58,7 +59,7 @@ public class ListServiceImpl extends RemoteServiceServlet implements ListService
 				relation = jdata.id;
 			}
 		}
-		// TODO Auto-generated method stub
+		Debug.printDbgLine("ListServiceImpl.java: Time="+Utility.calcTimeTookMs(StartTime));
 		return response;
 	}
 

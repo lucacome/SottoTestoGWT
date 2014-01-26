@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.GraphService;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.Utility;
 
 public class GraphServiceImp extends RemoteServiceServlet implements GraphService	{
 
@@ -23,9 +24,8 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 
 	public String sendToServer(List<String> fdfinal, List<String> selectedEn) throws IllegalArgumentException {
 
-		Debug.printDbgLine("GraphServiceImpl.java: sendToServer()");
+		Debug.printDbgLine("GraphServiceImp.java: sendToServer()");
 		long StartTime = System.currentTimeMillis();
-		Debug.printDbgLine("Selezionati= "+selectedEn);
 		Iterator<String> iterfd = fdfinal.listIterator();
 		String response = "";
 		String link = "";
@@ -37,13 +37,10 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 		JData finale = new JData();
 		Gson aa = new GsonBuilder().disableHtmlEscaping().create();
 
-		Debug.printDbgLine("Size="+selectedEn.size());
-
 		//ciclo la lista di json
 
 		while (iterfd.hasNext()){
 			String temp = iterfd.next();
-			//Debug.printDbgLine(temp);
 			Gson pa = new Gson();
 			JsonParser parser = new JsonParser();
 			JsonArray array = parser.parse(temp).getAsJsonArray();
@@ -51,7 +48,6 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 
 			for (String item : selectedEn){
 				if(jd.id.equals(item)){
-					Debug.printDbgLine("AGGIUNTO="+item);
 					jdatalist.add(jd);
 					for ( int i=1; i<array.size(); i++){
 						JData jdl = pa.fromJson(array.get(i), JData.class);
@@ -67,8 +63,6 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 			Iterator<JData> jiter2 = jdatalist.listIterator();
 			data1 = jiter.next();
 			data2 = jiter.next();
-
-
 			Iterator<Map<String, String>> iteradj = data1.adjacencies.iterator();
 
 			while (iteradj.hasNext()){
@@ -160,11 +154,8 @@ public class GraphServiceImp extends RemoteServiceServlet implements GraphServic
 		}else
 			response = "[ {\"id\":\"vuoto\", \"name\":\"Seleziona qualcosa\"} ]";
 
-		// TODO Auto-generated method stub
-		long homeTimeStop = System.currentTimeMillis()-StartTime;
-		Debug.printDbgLine("GraphServiceImpl, TIME="+homeTimeStop);
 		response = response.replaceAll("dim\":\"9\"", "dim\": 9");
-		//Debug.printDbgLine(response);
+		Debug.printDbgLine("GraphServiceImp.java: Time="+Utility.calcTimeTookMs(StartTime));
 		return response;
 	}
 

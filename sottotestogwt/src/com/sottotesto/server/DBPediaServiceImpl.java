@@ -39,8 +39,7 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		try {
 			responseQuery.setEntity(URLDecoder.decode(tagmResp, "UTF-8"));
 		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Debug.printErrLine("DBPediServiceImpl.java: Error="+e1.getClass().getName());
 		}
 		responseQuery.setEntityType(type);
 		String resultQueryXML = "";
@@ -48,25 +47,18 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 		String prefix,prefixlink;
 		prefix = "dbo:";
 		prefixlink = "<http://dbpedia.org/ontology/>";
-		//		List<String> titletagme = tagmResp.getTitleTag();
-		//		Iterator<String> itertitle =  titletagme.iterator();
 		try {
-
-
-			//			while (itertitle.hasNext()){
-
 			String titletag = tagmResp;	
 			List <String> allTag = new ArrayList<String>();
 			String tempDecode = "";
 
 			tempDecode = URLDecoder.decode(titletag, "UTF-8");
 			if (tempDecode.equals(titletag))
-				Debug.printDbgLine("DBP Stringa uguale: "+titletag);
+				Debug.printDbgLine("DBPediServiceImpl.java: Stringa uguale="+titletag);
 			else
 				allTag.add(tempDecode);
 
 			allTag.add(titletag);
-
 
 			for (String s : allTag){
 
@@ -75,14 +67,13 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 						"<http://dbpedia.org/resource/"+ s +">  dbo:wikiPageRedirects ?uri .\n"+
 						" }";
 
-				Query query3 = QueryFactory.create(redirect); //s2 = the query above
+				Query query3 = QueryFactory.create(redirect);
 				QueryExecution qExe3 = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query3 );
 				ResultSet results3 = qExe3.execSelect();
 
 				if (results3.hasNext()){
 					QuerySolution sol = results3.nextSolution();
 					titletag = sol.getResource("uri").toString().replace("http://dbpedia.org/resource/", "");
-					Debug.printDbgLine("REDIRECT - DBPediaService= "+titletag);
 					break;
 				}
 			}
@@ -92,13 +83,10 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 						"SELECT  ?"+dbprop.get(j)+"\n" +
 						"WHERE {\n" +
 						"<http://dbpedia.org/resource/" + titletag + "> "+prefix+dbprop.get(j)+" ?"+dbprop.get(j)+" .\n" +
-						//"FILTER (LANG(?"+dbprop.get(j)+") = \"en\") .\n"+
 						" }";
-				//				Debug.printDbgLine("DBPediaServiceImpl.java: s2="+s2);
-				Query query2 = QueryFactory.create(s2); //s2 = the query above
+				Query query2 = QueryFactory.create(s2);
 				QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query2 );
 				results = qExe.execSelect();
-				//TODO fix xmlresult
 				Literal abs =  null;
 				for (; results.hasNext() ;){
 					QuerySolution sol = results.nextSolution();
@@ -111,34 +99,21 @@ public class DBPediaServiceImpl extends RemoteServiceServlet implements DBPediaS
 					}else
 						abs = null;
 				}
-
-
-				//resultQueryXML += ResultSetFormatter.asXMLString(results);
-				//resultQueryText += ResultSetFormatter.asText(results);
-
 			}
-			//TODO output in json
-
-
 			responseQuery.setQueryResultXML(resultQueryXML);
 			responseQuery.setQueryResultText(resultQueryText);
 
-			Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+responseQuery.getTime()+"ms]");
+			
 		} catch (Exception e) {			
-			Debug.printDbgLine("DBPediaServiceImpl.java: Exception: "+e.getMessage());
-			e.printStackTrace();
-			//set error code
-			responseQuery.setCode(500);
-
-			//set error message			
+			Debug.printErrLine("DBPediaServiceImpl.java: Error: "+e.getClass().getName());
+			responseQuery.setCode(500);		
 			responseQuery.setError(e.getCause().getClass().getName()+"<br>"+e.getClass().getName());
-
 			responseQuery.setTime(Utility.calcTimeTookMs(StartTime));
-			return responseQuery;			
 		}
 
 		responseQuery.setCode(200);
 		responseQuery.setTime(Utility.calcTimeTookMs(StartTime));
+		Debug.printDbgLine("DBPediaServiceImpl.java: sendToServer(): END -> ["+responseQuery.getTime()+"ms]");
 		return responseQuery;
 
 	}

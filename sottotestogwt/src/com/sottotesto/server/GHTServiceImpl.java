@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sottotesto.client.GHTService;
 import com.sottotesto.shared.Debug;
+import com.sottotesto.shared.Utility;
 
 public class GHTServiceImpl extends RemoteServiceServlet implements GHTService	{
 
@@ -21,27 +22,21 @@ public class GHTServiceImpl extends RemoteServiceServlet implements GHTService	{
 	private static final long serialVersionUID = 687447506834597456L;
 
 	public String sendToServer(String jsonHT, List<String> selectedLink) throws IllegalArgumentException {
+		Debug.printDbgLine("EkpServiceImpl.java: SendToServer()");
 		long StartTime = System.currentTimeMillis();
 		String response="";
-
-
-
 		Gson pa = new Gson();
 		JsonParser parser = new JsonParser();
 		Gson aa = new GsonBuilder().disableHtmlEscaping().create();
-
 		JsonArray array = parser.parse(jsonHT).getAsJsonArray();
-
 		JData jd = pa.fromJson(array.get(0), JData.class);
-		
+
 		jd.adjacencies.clear();
 		for (String s : selectedLink){
 			Map<String, String> data = new HashMap<String, String>();
 			data.put("nodeTo", s);
 			jd.adjacencies.add(data);
 		}
-
-		
 		response += aa.toJson(jd)+ ",";
 
 		for ( int i=1; i<array.size(); i++){
@@ -63,9 +58,7 @@ public class GHTServiceImpl extends RemoteServiceServlet implements GHTService	{
 				}
 		}
 		response = "[" + response.substring(0, response.length()-1) + "]";
-		//Debug.printDbgLine(response);
-		long homeTimeStop = System.currentTimeMillis()-StartTime;
-		Debug.printDbgLine("GHT="+homeTimeStop);
+		Debug.printDbgLine("GHTServiceImpl.java: Time="+Utility.calcTimeTookMs(StartTime));
 		return response;
 	}
 

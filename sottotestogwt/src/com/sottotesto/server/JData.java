@@ -19,16 +19,11 @@ public class JData {
 
 
 	public JData() {
-		// TODO Auto-generated constructor stub
-		//linkmap =
 		data = new HashMap<String, String>();
 		data.clear();
 		adjacencies = new ArrayList<Map<String, String>>();
 		linkmap = HashMultimap.create();
 		linkmap.clear();
-		//		tag = new HashMap<String,Multimap<String,String>>();
-		//		tag.clear();
-
 	}
 
 	public void setLink(Multimap<String,String> x) {linkmap = x;}

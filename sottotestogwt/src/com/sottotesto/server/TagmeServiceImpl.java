@@ -8,7 +8,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.Normalizer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 
@@ -30,13 +32,15 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 
 	public TagmeResponse sendToServer(String input, double roh, String tagmeKey) throws IllegalArgumentException {
 		Debug.printDbgLine("TagmeServiceImpl.java: sendToServer()");
-
+		
 		long StartTime = System.currentTimeMillis();
-
-		//JData.InitJData();
-
-
-
+		String timeStamp = new SimpleDateFormat("[dd/MM/yyyy-HH:mm:ss]").format(Calendar.getInstance().getTime());
+		String ipAddress = getThreadLocalRequest().getHeader("X-FORWARDED-FOR");
+		if (ipAddress == null) {  
+		ipAddress = getThreadLocalRequest().getRemoteAddr();  
+		}
+		Debug.printErrLine(timeStamp+" - IP: "+ipAddress+" - "+input);
+		
 		TagmeResponse tagmeResp = new TagmeResponse();
 		try {
 			//config TAGME request parameters
@@ -51,7 +55,6 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			String param3value = "true";	
 			String query = String.format("%s=%s&%s=%s&%s=%s", URLEncoder.encode(param1name, charset), URLEncoder.encode(param1value, charset), URLEncoder.encode(param2name, charset), URLEncoder.encode(param2value, charset), URLEncoder.encode(param3name, charset), URLEncoder.encode(param3value, charset));
 
-			//Debug.printDbgLine(query);
 			//open TAGME connection
 			HttpURLConnection connessione = (HttpURLConnection) url.openConnection();
 			connessione.setRequestMethod("POST");
@@ -65,10 +68,13 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			} 
 			finally {
 				if (output != null) try { output.close(); } 
-				catch (IOException err){ tagmeResp.setCode(-1);
-				tagmeResp.setError("Error closing OutputStream:<br>"+err.getClass().getName());
-				tagmeResp.setTime(Utility.calcTimeTookMs(StartTime));
-				return tagmeResp;}			
+				catch (IOException err){ 
+					tagmeResp.setCode(-1);
+					tagmeResp.setError("Error closing OutputStream:<br>"+err.getClass().getName());
+					tagmeResp.setTime(Utility.calcTimeTookMs(StartTime));
+					Debug.printErrLine("TagmeServiceImpl.java: Error="+err.getClass().getName());
+					return tagmeResp;
+				}			
 			}
 
 			//read TAGME response
@@ -100,18 +106,13 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 			List<String> titleSkipped = new ArrayList<String>();
 			List<String> spotSkipped = new ArrayList<String>();
 
-			//converti Json -> gson
 			Gson gson = new Gson();
-			//JsonArray jarray = new JsonArray();
 			tagmeResp.setJsonData(gson.fromJson(tagmeResp.getJson(), TagmeData.class));
 			tagmeResp.setResNum(tagmeResp.getJsonData().annotations.size());
 			for (int i=0; i<=tagmeResp.getResNum()-1; i++){
 				if ( tagmeResp.getJsonData().annotations.get(i).rho > tagmeResp.getRho()){
 
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
-					//JData.jdata.add("title"+i, jarray);
-					//JData.jdata.addProperty("title"+i, responseTagTmp);
-					
 					titletagClean.add(responseTagTmp);
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
 					try {
@@ -126,17 +127,15 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 							responseTagTmp = URLEncoder.encode(responseTagTmp, "UTF-8");
 
 					} catch (UnsupportedEncodingException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						Debug.printErrLine("TagmeServiceImpl.java: Error="+e1.getClass().getName());
 					}
-					
-					titletag.add(responseTagTmp);	
 
+					titletag.add(responseTagTmp);
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).spot;
 					spotTag.add(responseTagTmp);
 					responseTagTmp = "";
 				}else{
-					Debug.printDbgLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + " rho troppo basso("+tagmeResp.getJsonData().annotations.get(i).rho+") e max="+tagmeResp.getRho());
+					Debug.printErrLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + " rho troppo basso("+tagmeResp.getJsonData().annotations.get(i).rho+") e max="+tagmeResp.getRho());
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
 					titleSkipped.add(responseTagTmp);	
@@ -145,35 +144,26 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 					responseTagTmp = "";
 				}
 			}
-			
+
 			tagmeResp.setTitleTag(titletag);
 			tagmeResp.setTitleTagClean(titletagClean);
 			tagmeResp.setSpotTag(spotTag);
 			tagmeResp.setTitleSkipped(titleSkipped);
 			tagmeResp.setSpotSkipped(spotSkipped);
-			
-			
-			
-			//JsonElement jelement = null;
 
-			//jarray.add(jelement);
 
-			//			Gson prova = new Gson();
-			//			String prova2 = prova.toJson();
-			//			Debug.printDbgLine("BOH"+prova2);
-			//Debug.printDbgLine("BOH"+JData.jdata.toString());
 		} catch (MalformedURLException e) {
 			tagmeResp.setCode(-1);
 			tagmeResp.setError("MalformedURLException:<br>"+e.getClass().getName());
-			e.printStackTrace();
+			Debug.printErrLine("TagmeServiceImpl.java: Error="+e.getClass().getName());
 		} catch (UnsupportedEncodingException e) {
 			tagmeResp.setCode(-1);
 			tagmeResp.setError("UnsupportedEncodingException:<br>"+e.getClass().getName());
-			e.printStackTrace();
+			Debug.printErrLine("TagmeServiceImpl.java: Error="+e.getClass().getName());
 		} catch (IOException e) {
 			tagmeResp.setCode(-1);
 			tagmeResp.setError("IOException:<br>"+e.getClass().getName());
-			e.printStackTrace();
+			Debug.printErrLine("TagmeServiceImpl.java: Error="+e.getClass().getName());
 		}
 
 		tagmeResp.setTime(Utility.calcTimeTookMs(StartTime));

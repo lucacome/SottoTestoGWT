@@ -26,9 +26,11 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 
 	@Override
 	public DBPQueryResp sendToServer(DBPQueryResp resp)	throws IllegalArgumentException {
-
 		String entlink = resp.getLink();
-		//long homeTimeStart2 = System.currentTimeMillis();
+		Debug.printDbgLine("DBPediaQueryImpl.java: sendToServer("+entlink+")");
+
+		
+		long homeTimeStart2 = System.currentTimeMillis();
 		String tempDecode = "";
 		boolean sameStr = false;
 
@@ -42,8 +44,7 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 				allTag.add(tempDecode);
 
 		} catch (UnsupportedEncodingException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+			Debug.printErrLine("DBPediaQueryImpl.java: Error="+e2.getClass().getName());
 		}
 		allTag.add(entlink.replace("http://dbpedia.org/resource/", ""));
 
@@ -56,23 +57,21 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 						" }";
 
 				try {
-					Query query3 = QueryFactory.create(redirect); //s2 = the query above
+					Query query3 = QueryFactory.create(redirect);
 					QueryExecution qExe3 = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query3 );
 					ResultSet results3 = qExe3.execSelect();
 
 					if (results3.hasNext()){
 						QuerySolution sol = results3.nextSolution();
 						entlink = sol.getResource("uri").toString();
-						Debug.printDbgLine("REDIRECT - DBPediaQuery= "+entlink);
+						Debug.printDbgLine("DBPediaQueryImpl.java: Redirect="+entlink);
 						break;
 					}
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					Debug.printErrLine("DBPediaQueryImpl.java: Error="+e1.getClass().getName());
 				}
 			}
-		//long homeTimeStop2 = System.currentTimeMillis()-homeTimeStart2;
-		//Debug.printDbgLine("DBPedia Nuove chiamate="+homeTimeStop2);
+
 		ResultSet results = null;
 
 		String gps = "";
@@ -106,7 +105,7 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 
 		}
 		try {
-			Query query = QueryFactory.create(spq); //s2 = the query above
+			Query query = QueryFactory.create(spq);
 			QueryExecution qExe = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", query );
 			results = qExe.execSelect();
 			Literal abs =  null;
@@ -127,12 +126,12 @@ public class DBPediaQueryImpl extends RemoteServiceServlet implements DBPediaQue
 					abs = null;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			Debug.printDbgLine("ERRORE DBPEDIA!   "+e.getCause());
+			Debug.printErrLine("DBPediaQueryImpl.java: Error="+e.getClass().getName());
 			resp.setSuccess(false);
 			resp.setError(e.getCause().getClass().getName()+" "+e.getClass().getName());
 		}
+		long homeTimeStop2 = System.currentTimeMillis()-homeTimeStart2;
+		Debug.printDbgLine("DBPediaQueryImpl.java: END ("+entlink+") Time="+homeTimeStop2);
 		return resp;
 	}
 

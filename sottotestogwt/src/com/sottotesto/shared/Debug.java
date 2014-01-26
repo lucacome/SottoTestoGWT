@@ -1,7 +1,7 @@
 package com.sottotesto.shared;
 
 public class Debug {
-	static boolean debugON = true;
+	static boolean debugON = false;
 	static boolean errorON = true;
 
 	public static void printDbgLine(String text){
