@@ -41,10 +41,6 @@ import com.sottotesto.shared.TreeDataProperties;
 import com.sottotesto.shared.Utility;
 
 
-/* USAGE:
- * ResultController rc = new ResultController();
- * rc.init();
- */
 public class ResultController {
 
 	private int panelMaxHeight;
@@ -56,7 +52,6 @@ public class ResultController {
 	private BoxLayoutData vBoxData;
 	private HTML defaultCenterHTML;
 	private String HTMLsearchSomethingString="<div class=\"result_searchSomethingString\">Search something!</div>";
-	//private String HTMLloadIconString="<div class=\"result_loadingGifContainer\"><img class=\"result_loadingGif\" src='loading.gif'/></div>";
 	private String HTMLerrorString="<div class=\"result_errorString\">Something wrong happened, please try again.</div>";
 
 	//infovis data
@@ -158,7 +153,6 @@ public class ResultController {
 		treeContainer = new FlowLayoutContainer();
 		treeContainer.setScrollMode(ScrollMode.AUTO);
 		treeContainer.setId("treeContainer");
-		//treeContainer.addStyleName("margin-10");
 
 		//TREE EXPAND/COLLAPSE BUTTONS
 		treeButtonBar = new ButtonBar();
@@ -192,7 +186,6 @@ public class ResultController {
 			public void onSelection(SelectionEvent<TreeData> event) {
 				TreeData treeDataSelected = event.getSelectedItem();
 				handleTreeClick(treeDataSelected);
-				//Info.display("Tree Handler", mnu.getName());
 			}
 		});
 
@@ -221,7 +214,6 @@ public class ResultController {
 				if ( model.getName().equals("Explore Entities") ) return STResources.INSTANCE.iconHyperTree();
 				if ( model.getName().equals("Knowledge Map") ) return STResources.INSTANCE.iconMap();
 				else return STResources.INSTANCE.iconTreeEntity();
-				//else return null;
 			}
 				} );
 
@@ -283,8 +275,8 @@ public class ResultController {
 				showMap(treeDataSelected.getName());
 			}
 			else {
-				Info.display("WARNING", "ClickAction sconosciuta (non dovrebbe succedere ... )");
-				showError(); //show red error on center page
+				Info.display("WARNING", "Unknown click action");
+				showError(); 
 			}
 
 			tree.getSelectionModel().deselectAll(); //deselect to allow reclick of same treedata
@@ -297,7 +289,7 @@ public class ResultController {
 		mapC.getMapContainer().setWidth(String.valueOf(centerPanel.getOffsetWidth())+"px");   //adapt map size to centerpanel size
 		mapC.getMapContainer().setHeight(String.valueOf(centerPanel.getOffsetHeight())+"px");
 
-		//BUGFIX - the map doesn't show correctly for the second time, this is the fix (by lollo... fuck stackoverflow!)
+		//BUGFIX - the map doesn't show correctly for the second time, this is the fix
 		mapC.getMap().triggerResize();
 		if(firstMapLoad){
 			mapC.getMap().setCenter(LatLng.create(35,-40));
@@ -307,20 +299,7 @@ public class ResultController {
 		
 		if (mapC != null) mapC.clearMarkerFromMap();  //hide all markers from map
 		Utility.hideLoadingBar();
-		//mapC.loadMarkers(mapName); //load only right markers, depending on selected map
-		mapC.loadMarkersDelayed(mapName, 0);
-	}
-
-
-
-
-	public void setJsonFD(String jdata){
-
-		//Debug.printDbgLine("JSONDF="+jsonFD);	
-	}
-	public void setJsonHT(String jdata){
-
-		//Debug.printDbgLine("JSONHT="+jsonHT);	
+		mapC.loadMarkersDelayed(mapName, 0); //load only right markers, depending on selected map
 	}
 
 

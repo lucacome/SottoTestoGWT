@@ -51,8 +51,8 @@ public class InfovisController {
 	private final GraphServiceAsync GraphService = GWT.create(GraphService.class);
 	private final GHTServiceAsync GHTService = GWT.create(GHTService.class);
 	private List<String> listFD;
-	private List<String> linkList;		//linksToXXX, hasXXX, ...
-	private List<String> linkNameList;	//only XXX from linkList
+	private List<String> linkList;		//linksToXXX, hasXXXX, ...
+	private List<String> linkNameList;	//only XXXX from linkList
 	private List<String> entitiesEscaped;	//entity names with %XX escape chars
 
 	public Widget init(){		
@@ -204,7 +204,6 @@ public class InfovisController {
 		for (EkpResponse curResp : ekpResps){
 			entities.add(curResp.getTag());
 			entitiesEscaped.add(curResp.getEncodedTag());
-			Debug.printDbgLine("InfovisController.java; setCheckBoxes(ekpResps): added entityEscaped= "+curResp.getEncodedTag());
 		}
 
 		//set checkboxes change handler
@@ -310,7 +309,7 @@ public class InfovisController {
 		GraphService.sendToServer(listFD, selectedDbpLinks, new AsyncCallback<String>() {
 			public void onFailure(Throwable caught) {
 				//set the error
-				Debug.printDbgLine("InfovisController.java: callGraphService(): onFailure()");
+				Debug.printErrLine("InfovisController.java: callGraphService(): onFailure()");
 				Utility.hideLoadingBar();
 			}
 
@@ -330,7 +329,7 @@ public class InfovisController {
 		GHTService.sendToServer(jsonHT, selectedLinks, new AsyncCallback<String>() {
 			public void onFailure(Throwable caught) {
 				//set the error
-				Debug.printDbgLine("InfovisController.java: callGHTService(): onFailure()");
+				Debug.printErrLine("InfovisController.java: callGHTService(): onFailure()");
 				Utility.hideLoadingBar();
 			}
 

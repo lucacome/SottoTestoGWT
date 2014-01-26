@@ -96,7 +96,7 @@ public class MapController {
 
 		//find right marker color ---------------------------------
 		int colorIndex=0;
-		if (entities.indexOf(entityName)>=0){ //se era gia in lista questa entit�
+		if (entities.indexOf(entityName)>=0){ //se era gia in lista questa entita'
 			colorIndex = entities.indexOf(entityName); //prendi il colore corrispondente
 		}
 		else{

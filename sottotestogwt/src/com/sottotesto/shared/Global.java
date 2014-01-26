@@ -80,7 +80,7 @@ public class Global {
 		optionsFC.add(optionsVC);
 		
 		optionsDialog = new Dialog();
-		optionsDialog.setHeadingText("OPZIONI GLOBALI");
+		optionsDialog.setHeadingText("GLOBAL OPTIONS");
 		optionsDialog.setId("optionsDB");
 		optionsDialog.setHideOnButtonClick(false);
 		optionsDialog.setPredefinedButtons(PredefinedButton.OK, PredefinedButton.CANCEL);
