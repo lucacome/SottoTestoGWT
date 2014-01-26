@@ -2,10 +2,13 @@ package com.sottotesto.shared;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.TimeZone;
+import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.widget.core.client.box.AutoProgressMessageBox;
@@ -60,12 +63,24 @@ public class Utility {
 		loadingBox.auto();
 		loadingBox.show();
 	}
+	
 	public static void hideLoadingBar(){
 		if (loadingBox != null) loadingBox.hide();
 		loadingText="";
 	}
 
-
+	public static String getCurDate(){
+		String sDate="";
+		
+		Date date = new Date();
+		DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy/MM/dd HH:mm:ss");
+		
+		sDate=dateFormat.format(date, TimeZone.createTimeZone(0));
+		sDate="["+sDate+"]";
+		
+		return sDate;
+	}
+	
 	public static List<String> clearDoubleEntries(List<String> list){
 		List<String> clearedList = new ArrayList<String>();
 		
@@ -125,14 +140,12 @@ public class Utility {
 		return dbMaxHeight;
 	}
 
-
 	public static int getDbMaxWidth(){
 		int dbMaxWidth = RootPanel.get().getOffsetWidth()/3;
 		//Debug.printDbgLine("Utility.java: getDbMaxWidth(): "+dbMaxWidth);
 		return dbMaxWidth;
 	}
 	
-
 	public static int getPanelsMaxWidth(){
 		return RootPanel.get().getOffsetWidth()-(RootPanel.get().getOffsetWidth()*3/100);
 	}
@@ -143,6 +156,7 @@ public class Utility {
 		width = String.valueOf(panelwidth*0.6)+"px";		
 		return width;
 	}
+	
 	public static String getTextAreaMaxHeight(){
 		String height="";
 		int panelheight = RootPanel.get("searchContainer").getOffsetHeight();
