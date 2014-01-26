@@ -1,12 +1,18 @@
 package com.sottotesto.shared;
 
 public class Debug {
-	static boolean ON = true;
+	static boolean debugON = true;
+	static boolean errorON = true;
 
 	public static void printDbgLine(String text){
-		if (ON){
+		if (debugON){
 			System.out.println(text);
 		}
 	}
 
+	public static void printErrLine(String text){
+		if (errorON){
+			System.out.println(text);
+		}
+	}
 }
