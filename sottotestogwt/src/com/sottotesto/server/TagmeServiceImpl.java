@@ -135,7 +135,7 @@ public class TagmeServiceImpl extends RemoteServiceServlet implements TagmeServi
 					spotTag.add(responseTagTmp);
 					responseTagTmp = "";
 				}else{
-					Debug.printErrLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + " rho troppo basso("+tagmeResp.getJsonData().annotations.get(i).rho+") e max="+tagmeResp.getRho());
+					Debug.printDbgLine("TagmeServiceImpl.java: "+ tagmeResp.getJsonData().annotations.get(i).title + " rho troppo basso("+tagmeResp.getJsonData().annotations.get(i).rho+") e max="+tagmeResp.getRho());
 					responseTagTmp = tagmeResp.getJsonData().annotations.get(i).title;
 					responseTagTmp = responseTagTmp.replaceAll(" ", "_");
 					titleSkipped.add(responseTagTmp);	
